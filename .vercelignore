@@ -1,0 +1,17 @@
+node_modules/
+.next/
+.data/
+.git/
+.env*
+!.env.example
+.vercel/
+design/
+docs/
+graphify-out/
+test-results/
+playwright-report/
+coverage/
+tests/
+*.tsbuildinfo
+MASTER_PROMPT_CODEX_Martu_OS_V0.md
+Audios%20de%20Martu.md

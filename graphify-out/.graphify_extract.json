@@ -1,0 +1,3943 @@
+{
+  "nodes": [
+    {
+      "id": "action_service",
+      "label": "action-service.ts",
+      "file_type": "code",
+      "source_file": "action-service.ts",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "action_service_nudgeactionschema",
+      "label": "nudgeActionSchema",
+      "file_type": "code",
+      "source_file": "action-service.ts",
+      "source_location": "L8",
+      "_origin": "ast"
+    },
+    {
+      "id": "action_service_nudgeactioninput",
+      "label": "NudgeActionInput",
+      "file_type": "code",
+      "source_file": "action-service.ts",
+      "source_location": "L18",
+      "_origin": "ast"
+    },
+    {
+      "id": "action_service_nudgeactiongateway",
+      "label": "NudgeActionGateway",
+      "file_type": "code",
+      "source_file": "action-service.ts",
+      "source_location": "L20",
+      "_origin": "ast"
+    },
+    {
+      "id": "action_service_nudgeactiongateway_getnudge",
+      "label": ".getNudge()",
+      "file_type": "code",
+      "source_file": "action-service.ts",
+      "source_location": "L21",
+      "_origin": "ast"
+    },
+    {
+      "id": "action_service_nudgeactiongateway_markacted",
+      "label": ".markActed()",
+      "file_type": "code",
+      "source_file": "action-service.ts",
+      "source_location": "L22",
+      "_origin": "ast"
+    },
+    {
+      "id": "action_service_nudgeactiongateway_dismiss",
+      "label": ".dismiss()",
+      "file_type": "code",
+      "source_file": "action-service.ts",
+      "source_location": "L23",
+      "_origin": "ast"
+    },
+    {
+      "id": "action_service_nudgeactiongateway_snooze",
+      "label": ".snooze()",
+      "file_type": "code",
+      "source_file": "action-service.ts",
+      "source_location": "L24",
+      "_origin": "ast"
+    },
+    {
+      "id": "action_service_nudgeactionservice",
+      "label": "NudgeActionService",
+      "file_type": "code",
+      "source_file": "action-service.ts",
+      "source_location": "L27",
+      "_origin": "ast"
+    },
+    {
+      "id": "action_service_nudgeactionservice_constructor",
+      "label": ".constructor()",
+      "file_type": "code",
+      "source_file": "action-service.ts",
+      "source_location": "L28",
+      "_origin": "ast"
+    },
+    {
+      "id": "action_service_nudgeactionservice_execute",
+      "label": ".execute()",
+      "file_type": "code",
+      "source_file": "action-service.ts",
+      "source_location": "L33",
+      "_origin": "ast"
+    },
+    {
+      "id": "action_service_targettype",
+      "label": "targetType()",
+      "file_type": "code",
+      "source_file": "action-service.ts",
+      "source_location": "L110",
+      "_origin": "ast"
+    },
+    {
+      "id": "composer_test",
+      "label": "composer.test.ts",
+      "file_type": "code",
+      "source_file": "composer.test.ts",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "composer",
+      "label": "composer.ts",
+      "file_type": "code",
+      "source_file": "composer.ts",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "composer_naturalnudgecomposer",
+      "label": "NaturalNudgeComposer",
+      "file_type": "code",
+      "source_file": "composer.ts",
+      "source_location": "L4",
+      "_origin": "ast"
+    },
+    {
+      "id": "composer_naturalnudgecomposer_compose",
+      "label": ".compose()",
+      "file_type": "code",
+      "source_file": "composer.ts",
+      "source_location": "L5",
+      "_origin": "ast"
+    },
+    {
+      "id": "composer_composebody",
+      "label": "composeBody()",
+      "file_type": "code",
+      "source_file": "composer.ts",
+      "source_location": "L27",
+      "_origin": "ast"
+    },
+    {
+      "id": "cron_auth_test",
+      "label": "cron-auth.test.ts",
+      "file_type": "code",
+      "source_file": "cron-auth.test.ts",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "cron_auth",
+      "label": "cron-auth.ts",
+      "file_type": "code",
+      "source_file": "cron-auth.ts",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "cron_auth_cronauthorization",
+      "label": "CronAuthorization",
+      "file_type": "code",
+      "source_file": "cron-auth.ts",
+      "source_location": "L3",
+      "_origin": "ast"
+    },
+    {
+      "id": "cron_auth_authorizecron",
+      "label": "authorizeCron()",
+      "file_type": "code",
+      "source_file": "cron-auth.ts",
+      "source_location": "L7",
+      "_origin": "ast"
+    },
+    {
+      "id": "data_repository",
+      "label": "data-repository.ts",
+      "file_type": "code",
+      "source_file": "data-repository.ts",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "data_repository_row",
+      "label": "Row",
+      "file_type": "code",
+      "source_file": "data-repository.ts",
+      "source_location": "L23",
+      "_origin": "ast"
+    },
+    {
+      "id": "data_repository_martuproactivitydatarepository",
+      "label": "MartuProactivityDataRepository",
+      "file_type": "code",
+      "source_file": "data-repository.ts",
+      "source_location": "L25",
+      "_origin": "ast"
+    },
+    {
+      "id": "data_repository_martuproactivitydatarepository_listforcenter",
+      "label": ".listForCenter()",
+      "file_type": "code",
+      "source_file": "data-repository.ts",
+      "source_location": "L26",
+      "_origin": "ast"
+    },
+    {
+      "id": "data_repository_martuproactivitydatarepository_markseen",
+      "label": ".markSeen()",
+      "file_type": "code",
+      "source_file": "data-repository.ts",
+      "source_location": "L42",
+      "_origin": "ast"
+    },
+    {
+      "id": "data_repository_martuproactivitydatarepository_getsnapshot",
+      "label": ".getSnapshot()",
+      "file_type": "code",
+      "source_file": "data-repository.ts",
+      "source_location": "L47",
+      "_origin": "ast"
+    },
+    {
+      "id": "data_repository_martuproactivitydatarepository_claimcandidate",
+      "label": ".claimCandidate()",
+      "file_type": "code",
+      "source_file": "data-repository.ts",
+      "source_location": "L110",
+      "_origin": "ast"
+    },
+    {
+      "id": "data_repository_martuproactivitydatarepository_findpendingforsametarget",
+      "label": ".findPendingForSameTarget()",
+      "file_type": "code",
+      "source_file": "data-repository.ts",
+      "source_location": "L145",
+      "_origin": "ast"
+    },
+    {
+      "id": "data_repository_martuproactivitydatarepository_listpendingfordelivery",
+      "label": ".listPendingForDelivery()",
+      "file_type": "code",
+      "source_file": "data-repository.ts",
+      "source_location": "L160",
+      "_origin": "ast"
+    },
+    {
+      "id": "data_repository_martuproactivitydatarepository_savecomposedmessage",
+      "label": ".saveComposedMessage()",
+      "file_type": "code",
+      "source_file": "data-repository.ts",
+      "source_location": "L183",
+      "_origin": "ast"
+    },
+    {
+      "id": "data_repository_martuproactivitydatarepository_markdelivered",
+      "label": ".markDelivered()",
+      "file_type": "code",
+      "source_file": "data-repository.ts",
+      "source_location": "L187",
+      "_origin": "ast"
+    },
+    {
+      "id": "data_repository_martuproactivitydatarepository_markfailed",
+      "label": ".markFailed()",
+      "file_type": "code",
+      "source_file": "data-repository.ts",
+      "source_location": "L198",
+      "_origin": "ast"
+    },
+    {
+      "id": "data_repository_martuproactivitydatarepository_appendsystemmessage",
+      "label": ".appendSystemMessage()",
+      "file_type": "code",
+      "source_file": "data-repository.ts",
+      "source_location": "L208",
+      "_origin": "ast"
+    },
+    {
+      "id": "data_repository_martuproactivitydatarepository_getnudge",
+      "label": ".getNudge()",
+      "file_type": "code",
+      "source_file": "data-repository.ts",
+      "source_location": "L219",
+      "_origin": "ast"
+    },
+    {
+      "id": "data_repository_martuproactivitydatarepository_markacted",
+      "label": ".markActed()",
+      "file_type": "code",
+      "source_file": "data-repository.ts",
+      "source_location": "L228",
+      "_origin": "ast"
+    },
+    {
+      "id": "data_repository_martuproactivitydatarepository_dismiss",
+      "label": ".dismiss()",
+      "file_type": "code",
+      "source_file": "data-repository.ts",
+      "source_location": "L233",
+      "_origin": "ast"
+    },
+    {
+      "id": "data_repository_martuproactivitydatarepository_snooze",
+      "label": ".snooze()",
+      "file_type": "code",
+      "source_file": "data-repository.ts",
+      "source_location": "L238",
+      "_origin": "ast"
+    },
+    {
+      "id": "data_repository_martuuserid",
+      "label": "martuUserId()",
+      "file_type": "code",
+      "source_file": "data-repository.ts",
+      "source_location": "L244",
+      "_origin": "ast"
+    },
+    {
+      "id": "data_repository_mapwork",
+      "label": "mapWork()",
+      "file_type": "code",
+      "source_file": "data-repository.ts",
+      "source_location": "L250",
+      "_origin": "ast"
+    },
+    {
+      "id": "data_repository_mapnudge",
+      "label": "mapNudge()",
+      "file_type": "code",
+      "source_file": "data-repository.ts",
+      "source_location": "L259",
+      "_origin": "ast"
+    },
+    {
+      "id": "data_repository_mapprofile",
+      "label": "mapProfile()",
+      "file_type": "code",
+      "source_file": "data-repository.ts",
+      "source_location": "L278",
+      "_origin": "ast"
+    },
+    {
+      "id": "data_repository_status",
+      "label": "status()",
+      "file_type": "code",
+      "source_file": "data-repository.ts",
+      "source_location": "L287",
+      "_origin": "ast"
+    },
+    {
+      "id": "data_repository_iso",
+      "label": "iso()",
+      "file_type": "code",
+      "source_file": "data-repository.ts",
+      "source_location": "L288",
+      "_origin": "ast"
+    },
+    {
+      "id": "data_repository_stringornull",
+      "label": "stringOrNull()",
+      "file_type": "code",
+      "source_file": "data-repository.ts",
+      "source_location": "L289",
+      "_origin": "ast"
+    },
+    {
+      "id": "data_repository_asobject",
+      "label": "asObject()",
+      "file_type": "code",
+      "source_file": "data-repository.ts",
+      "source_location": "L290",
+      "_origin": "ast"
+    },
+    {
+      "id": "data_repository_tostringarray",
+      "label": "toStringArray()",
+      "file_type": "code",
+      "source_file": "data-repository.ts",
+      "source_location": "L291",
+      "_origin": "ast"
+    },
+    {
+      "id": "data_repository_normalizerecord",
+      "label": "normalizeRecord()",
+      "file_type": "code",
+      "source_file": "data-repository.ts",
+      "source_location": "L292",
+      "_origin": "ast"
+    },
+    {
+      "id": "data_repository_normalizenudgekind",
+      "label": "normalizeNudgeKind()",
+      "file_type": "code",
+      "source_file": "data-repository.ts",
+      "source_location": "L293",
+      "_origin": "ast"
+    },
+    {
+      "id": "data_repository_normalizequickactions",
+      "label": "normalizeQuickActions()",
+      "file_type": "code",
+      "source_file": "data-repository.ts",
+      "source_location": "L296",
+      "_origin": "ast"
+    },
+    {
+      "id": "detector_test",
+      "label": "detector.test.ts",
+      "file_type": "code",
+      "source_file": "detector.test.ts",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "detector_test_profile",
+      "label": "profile",
+      "file_type": "code",
+      "source_file": "detector.test.ts",
+      "source_location": "L8",
+      "_origin": "ast"
+    },
+    {
+      "id": "detector_test_snapshot",
+      "label": "snapshot()",
+      "file_type": "code",
+      "source_file": "detector.test.ts",
+      "source_location": "L23",
+      "_origin": "ast"
+    },
+    {
+      "id": "detector",
+      "label": "detector.ts",
+      "file_type": "code",
+      "source_file": "detector.ts",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "detector_final_statuses",
+      "label": "FINAL_STATUSES",
+      "file_type": "code",
+      "source_file": "detector.ts",
+      "source_location": "L15",
+      "_origin": "ast"
+    },
+    {
+      "id": "detector_active_content_statuses",
+      "label": "ACTIVE_CONTENT_STATUSES",
+      "file_type": "code",
+      "source_file": "detector.ts",
+      "source_location": "L16",
+      "_origin": "ast"
+    },
+    {
+      "id": "detector_deterministicnudgedetector",
+      "label": "DeterministicNudgeDetector",
+      "file_type": "code",
+      "source_file": "detector.ts",
+      "source_location": "L18",
+      "_origin": "ast"
+    },
+    {
+      "id": "detector_deterministicnudgedetector_detect",
+      "label": ".detect()",
+      "file_type": "code",
+      "source_file": "detector.ts",
+      "source_location": "L19",
+      "_origin": "ast"
+    },
+    {
+      "id": "detector_workcandidate",
+      "label": "workCandidate()",
+      "file_type": "code",
+      "source_file": "detector.ts",
+      "source_location": "L105",
+      "_origin": "ast"
+    },
+    {
+      "id": "detector_clientgapcandidate",
+      "label": "clientGapCandidate()",
+      "file_type": "code",
+      "source_file": "detector.ts",
+      "source_location": "L146",
+      "_origin": "ast"
+    },
+    {
+      "id": "detector_checkincandidates",
+      "label": "checkInCandidates()",
+      "file_type": "code",
+      "source_file": "detector.ts",
+      "source_location": "L167",
+      "_origin": "ast"
+    },
+    {
+      "id": "detector_iswithincatchupwindow",
+      "label": "isWithinCatchUpWindow()",
+      "file_type": "code",
+      "source_file": "detector.ts",
+      "source_location": "L192",
+      "_origin": "ast"
+    },
+    {
+      "id": "detector_timetominutes",
+      "label": "timeToMinutes()",
+      "file_type": "code",
+      "source_file": "detector.ts",
+      "source_location": "L198",
+      "_origin": "ast"
+    },
+    {
+      "id": "detector_isclosed",
+      "label": "isClosed()",
+      "file_type": "code",
+      "source_file": "detector.ts",
+      "source_location": "L203",
+      "_origin": "ast"
+    },
+    {
+      "id": "detector_normalizestatus",
+      "label": "normalizeStatus()",
+      "file_type": "code",
+      "source_file": "detector.ts",
+      "source_location": "L207",
+      "_origin": "ast"
+    },
+    {
+      "id": "detector_asdate",
+      "label": "asDate()",
+      "file_type": "code",
+      "source_file": "detector.ts",
+      "source_location": "L211",
+      "_origin": "ast"
+    },
+    {
+      "id": "detector_dedupecandidates",
+      "label": "dedupeCandidates()",
+      "file_type": "code",
+      "source_file": "detector.ts",
+      "source_location": "L217",
+      "_origin": "ast"
+    },
+    {
+      "id": "detector_applyinsistenceprofile",
+      "label": "applyInsistenceProfile()",
+      "file_type": "code",
+      "source_file": "detector.ts",
+      "source_location": "L226",
+      "_origin": "ast"
+    },
+    {
+      "id": "engine_test",
+      "label": "engine.test.ts",
+      "file_type": "code",
+      "source_file": "engine.test.ts",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "engine_test_profile",
+      "label": "profile",
+      "file_type": "code",
+      "source_file": "engine.test.ts",
+      "source_location": "L8",
+      "_origin": "ast"
+    },
+    {
+      "id": "engine_test_snapshot",
+      "label": "snapshot",
+      "file_type": "code",
+      "source_file": "engine.test.ts",
+      "source_location": "L23",
+      "_origin": "ast"
+    },
+    {
+      "id": "engine_test_candidate",
+      "label": "candidate",
+      "file_type": "code",
+      "source_file": "engine.test.ts",
+      "source_location": "L36",
+      "_origin": "ast"
+    },
+    {
+      "id": "engine_test_persisted",
+      "label": "persisted",
+      "file_type": "code",
+      "source_file": "engine.test.ts",
+      "source_location": "L50",
+      "_origin": "ast"
+    },
+    {
+      "id": "engine",
+      "label": "engine.ts",
+      "file_type": "code",
+      "source_file": "engine.ts",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "engine_proactivityengine",
+      "label": "ProactivityEngine",
+      "file_type": "code",
+      "source_file": "engine.ts",
+      "source_location": "L5",
+      "_origin": "ast"
+    },
+    {
+      "id": "engine_proactivityengine_constructor",
+      "label": ".constructor()",
+      "file_type": "code",
+      "source_file": "engine.ts",
+      "source_location": "L6",
+      "_origin": "ast"
+    },
+    {
+      "id": "engine_proactivityengine_tick",
+      "label": ".tick()",
+      "file_type": "code",
+      "source_file": "engine.ts",
+      "source_location": "L13",
+      "_origin": "ast"
+    },
+    {
+      "id": "engine_messageof",
+      "label": "messageOf()",
+      "file_type": "code",
+      "source_file": "engine.ts",
+      "source_location": "L88",
+      "_origin": "ast"
+    },
+    {
+      "id": "ports",
+      "label": "ports.ts",
+      "file_type": "code",
+      "source_file": "ports.ts",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "ports_proactivityrepository",
+      "label": "ProactivityRepository",
+      "file_type": "code",
+      "source_file": "ports.ts",
+      "source_location": "L10",
+      "_origin": "ast"
+    },
+    {
+      "id": "ports_proactivityrepository_getsnapshot",
+      "label": ".getSnapshot()",
+      "file_type": "code",
+      "source_file": "ports.ts",
+      "source_location": "L11",
+      "_origin": "ast"
+    },
+    {
+      "id": "ports_proactivityrepository_claimcandidate",
+      "label": ".claimCandidate()",
+      "file_type": "code",
+      "source_file": "ports.ts",
+      "source_location": "L12",
+      "_origin": "ast"
+    },
+    {
+      "id": "ports_proactivityrepository_listpendingfordelivery",
+      "label": ".listPendingForDelivery()",
+      "file_type": "code",
+      "source_file": "ports.ts",
+      "source_location": "L13",
+      "_origin": "ast"
+    },
+    {
+      "id": "ports_proactivityrepository_savecomposedmessage",
+      "label": ".saveComposedMessage()",
+      "file_type": "code",
+      "source_file": "ports.ts",
+      "source_location": "L14",
+      "_origin": "ast"
+    },
+    {
+      "id": "ports_proactivityrepository_markdelivered",
+      "label": ".markDelivered()",
+      "file_type": "code",
+      "source_file": "ports.ts",
+      "source_location": "L15",
+      "_origin": "ast"
+    },
+    {
+      "id": "ports_proactivityrepository_markfailed",
+      "label": ".markFailed()",
+      "file_type": "code",
+      "source_file": "ports.ts",
+      "source_location": "L16",
+      "_origin": "ast"
+    },
+    {
+      "id": "ports_proactivityrepository_appendsystemmessage",
+      "label": ".appendSystemMessage()",
+      "file_type": "code",
+      "source_file": "ports.ts",
+      "source_location": "L17",
+      "_origin": "ast"
+    },
+    {
+      "id": "ports_nudgedetector",
+      "label": "NudgeDetector",
+      "file_type": "code",
+      "source_file": "ports.ts",
+      "source_location": "L20",
+      "_origin": "ast"
+    },
+    {
+      "id": "ports_nudgedetector_detect",
+      "label": ".detect()",
+      "file_type": "code",
+      "source_file": "ports.ts",
+      "source_location": "L21",
+      "_origin": "ast"
+    },
+    {
+      "id": "ports_nudgecomposer",
+      "label": "NudgeComposer",
+      "file_type": "code",
+      "source_file": "ports.ts",
+      "source_location": "L24",
+      "_origin": "ast"
+    },
+    {
+      "id": "ports_nudgecomposer_compose",
+      "label": ".compose()",
+      "file_type": "code",
+      "source_file": "ports.ts",
+      "source_location": "L25",
+      "_origin": "ast"
+    },
+    {
+      "id": "ports_proactivitynotificationprovider",
+      "label": "ProactivityNotificationProvider",
+      "file_type": "code",
+      "source_file": "ports.ts",
+      "source_location": "L28",
+      "_origin": "ast"
+    },
+    {
+      "id": "quiet_hours_test",
+      "label": "quiet-hours.test.ts",
+      "file_type": "code",
+      "source_file": "quiet-hours.test.ts",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "quiet_hours",
+      "label": "quiet-hours.ts",
+      "file_type": "code",
+      "source_file": "quiet-hours.ts",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "quiet_hours_isquiettime",
+      "label": "isQuietTime()",
+      "file_type": "code",
+      "source_file": "quiet-hours.ts",
+      "source_location": "L5",
+      "_origin": "ast"
+    },
+    {
+      "id": "quiet_hours_tominutes",
+      "label": "toMinutes()",
+      "file_type": "code",
+      "source_file": "quiet-hours.ts",
+      "source_location": "L14",
+      "_origin": "ast"
+    },
+    {
+      "id": "types",
+      "label": "types.ts",
+      "file_type": "code",
+      "source_file": "types.ts",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "types_nudgekind",
+      "label": "NudgeKind",
+      "file_type": "code",
+      "source_file": "types.ts",
+      "source_location": "L3",
+      "_origin": "ast"
+    },
+    {
+      "id": "types_nudgepriority",
+      "label": "NudgePriority",
+      "file_type": "code",
+      "source_file": "types.ts",
+      "source_location": "L18",
+      "_origin": "ast"
+    },
+    {
+      "id": "types_proactivityclient",
+      "label": "ProactivityClient",
+      "file_type": "code",
+      "source_file": "types.ts",
+      "source_location": "L20",
+      "_origin": "ast"
+    },
+    {
+      "id": "types_proactivityworkitem",
+      "label": "ProactivityWorkItem",
+      "file_type": "code",
+      "source_file": "types.ts",
+      "source_location": "L29",
+      "_origin": "ast"
+    },
+    {
+      "id": "types_metricopportunity",
+      "label": "MetricOpportunity",
+      "file_type": "code",
+      "source_file": "types.ts",
+      "source_location": "L46",
+      "_origin": "ast"
+    },
+    {
+      "id": "types_existingnudgeref",
+      "label": "ExistingNudgeRef",
+      "file_type": "code",
+      "source_file": "types.ts",
+      "source_location": "L56",
+      "_origin": "ast"
+    },
+    {
+      "id": "types_proactivitysnapshot",
+      "label": "ProactivitySnapshot",
+      "file_type": "code",
+      "source_file": "types.ts",
+      "source_location": "L64",
+      "_origin": "ast"
+    },
+    {
+      "id": "types_nudgecandidate",
+      "label": "NudgeCandidate",
+      "file_type": "code",
+      "source_file": "types.ts",
+      "source_location": "L77",
+      "_origin": "ast"
+    },
+    {
+      "id": "types_persistednudge",
+      "label": "PersistedNudge",
+      "file_type": "code",
+      "source_file": "types.ts",
+      "source_location": "L93",
+      "_origin": "ast"
+    },
+    {
+      "id": "types_composednudge",
+      "label": "ComposedNudge",
+      "file_type": "code",
+      "source_file": "types.ts",
+      "source_location": "L102",
+      "_origin": "ast"
+    },
+    {
+      "id": "types_proactivitytickresult",
+      "label": "ProactivityTickResult",
+      "file_type": "code",
+      "source_file": "types.ts",
+      "source_location": "L110",
+      "_origin": "ast"
+    }
+  ],
+  "edges": [
+    {
+      "source": "action_service",
+      "target": "ref_zod",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "action-service.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "action_service",
+      "target": "e_escritorio_python_proyectos_martu_martix_src_server_agent_ports_ts",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "action-service.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "action_service",
+      "target": "e_escritorio_python_proyectos_martu_martix_src_server_agent_ports_agenttoolexecutor",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "action-service.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "action_service",
+      "target": "e_escritorio_python_proyectos_martu_martix_src_server_agent_types_ts",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "action-service.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "action_service",
+      "target": "e_escritorio_python_proyectos_martu_martix_src_server_agent_types_agentactionreceipt",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "action-service.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "action_service",
+      "target": "types",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "action-service.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "action_service",
+      "target": "types_persistednudge",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "action-service.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "action_service",
+      "target": "action_service_nudgeactionschema",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "action-service.ts",
+      "source_location": "L8",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "action_service",
+      "target": "action_service_nudgeactioninput",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "action-service.ts",
+      "source_location": "L18",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "action_service",
+      "target": "action_service_nudgeactiongateway",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "action-service.ts",
+      "source_location": "L20",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "action_service_nudgeactiongateway",
+      "target": "action_service_nudgeactiongateway_getnudge",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "action-service.ts",
+      "source_location": "L21",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "action_service_nudgeactiongateway",
+      "target": "action_service_nudgeactiongateway_markacted",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "action-service.ts",
+      "source_location": "L22",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "action_service_nudgeactiongateway",
+      "target": "action_service_nudgeactiongateway_dismiss",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "action-service.ts",
+      "source_location": "L23",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "action_service_nudgeactiongateway",
+      "target": "action_service_nudgeactiongateway_snooze",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "action-service.ts",
+      "source_location": "L24",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "action_service",
+      "target": "action_service_nudgeactionservice",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "action-service.ts",
+      "source_location": "L27",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "action_service_nudgeactionservice",
+      "target": "action_service_nudgeactionservice_constructor",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "action-service.ts",
+      "source_location": "L28",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "action_service_nudgeactionservice",
+      "target": "action_service_nudgeactionservice_execute",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "action-service.ts",
+      "source_location": "L33",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "action_service",
+      "target": "action_service_targettype",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "action-service.ts",
+      "source_location": "L110",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "action_service_nudgeactionservice_execute",
+      "target": "action_service_targettype",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "action-service.ts",
+      "source_location": "L82",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "composer_test",
+      "target": "ref_vitest",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "composer.test.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "composer_test",
+      "target": "composer",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "composer.test.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "composer_test",
+      "target": "composer_naturalnudgecomposer",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "composer.test.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "composer_test",
+      "target": "types",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "composer.test.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "composer_test",
+      "target": "types_persistednudge",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "composer.test.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "composer_test",
+      "target": "types_proactivitysnapshot",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "composer.test.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "composer",
+      "target": "ports",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "composer.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "composer",
+      "target": "ports_nudgecomposer",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "composer.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "composer",
+      "target": "types",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "composer.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "composer",
+      "target": "types_composednudge",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "composer.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "composer",
+      "target": "types_persistednudge",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "composer.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "composer",
+      "target": "types_proactivitysnapshot",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "composer.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "composer",
+      "target": "composer_naturalnudgecomposer",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "composer.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "composer_naturalnudgecomposer",
+      "target": "composer_naturalnudgecomposer_compose",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "composer.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "composer",
+      "target": "composer_composebody",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "composer.ts",
+      "source_location": "L27",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "composer_naturalnudgecomposer_compose",
+      "target": "composer_composebody",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "composer.ts",
+      "source_location": "L8",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "cron_auth_test",
+      "target": "ref_vitest",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "cron-auth.test.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "cron_auth_test",
+      "target": "cron_auth",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "cron-auth.test.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "cron_auth_test",
+      "target": "cron_auth_authorizecron",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "cron-auth.test.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "cron_auth",
+      "target": "ref_node_crypto",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "cron-auth.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "cron_auth",
+      "target": "cron_auth_cronauthorization",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "cron-auth.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "cron_auth",
+      "target": "cron_auth_authorizecron",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "cron-auth.ts",
+      "source_location": "L7",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository",
+      "target": "ref_server_only",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository",
+      "target": "e_escritorio_python_proyectos_martu_martix_src_server_data_index_ts",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository",
+      "target": "e_escritorio_python_proyectos_martu_martix_src_server_data_index_appendchatmessage",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository",
+      "target": "e_escritorio_python_proyectos_martu_martix_src_server_data_index_getcommunicationprofile",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository",
+      "target": "e_escritorio_python_proyectos_martu_martix_src_server_data_index_getorcreatechatthread",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository",
+      "target": "e_escritorio_python_proyectos_martu_martix_src_server_data_index_query",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository",
+      "target": "e_escritorio_python_proyectos_martu_martix_src_server_data_index_communicationprofile",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository",
+      "target": "e_escritorio_python_proyectos_martu_martix_src_server_agent_types_ts",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L11",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository",
+      "target": "e_escritorio_python_proyectos_martu_martix_src_server_agent_types_communicationprofile",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L11",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository",
+      "target": "action_service",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L13",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository",
+      "target": "action_service_nudgeactiongateway",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L13",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository",
+      "target": "ports",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L14",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository",
+      "target": "ports_proactivityrepository",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L14",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository",
+      "target": "types",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L15",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository",
+      "target": "types_composednudge",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L15",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository",
+      "target": "types_nudgecandidate",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L15",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository",
+      "target": "types_persistednudge",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L15",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository",
+      "target": "types_proactivitysnapshot",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L15",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository",
+      "target": "types_proactivityworkitem",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L15",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository",
+      "target": "data_repository_row",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L23",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository",
+      "target": "data_repository_martuproactivitydatarepository",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L25",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository_martuproactivitydatarepository",
+      "target": "data_repository_martuproactivitydatarepository_listforcenter",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L26",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository_martuproactivitydatarepository",
+      "target": "data_repository_martuproactivitydatarepository_markseen",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L42",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository_martuproactivitydatarepository",
+      "target": "data_repository_martuproactivitydatarepository_getsnapshot",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L47",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository_martuproactivitydatarepository",
+      "target": "data_repository_martuproactivitydatarepository_claimcandidate",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L110",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository_martuproactivitydatarepository",
+      "target": "data_repository_martuproactivitydatarepository_findpendingforsametarget",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L145",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository_martuproactivitydatarepository",
+      "target": "data_repository_martuproactivitydatarepository_listpendingfordelivery",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L160",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository_martuproactivitydatarepository",
+      "target": "data_repository_martuproactivitydatarepository_savecomposedmessage",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L183",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository_martuproactivitydatarepository",
+      "target": "data_repository_martuproactivitydatarepository_markdelivered",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L187",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository_martuproactivitydatarepository",
+      "target": "data_repository_martuproactivitydatarepository_markfailed",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L198",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository_martuproactivitydatarepository",
+      "target": "data_repository_martuproactivitydatarepository_appendsystemmessage",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L208",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository_martuproactivitydatarepository",
+      "target": "data_repository_martuproactivitydatarepository_getnudge",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L219",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository_martuproactivitydatarepository",
+      "target": "data_repository_martuproactivitydatarepository_markacted",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L228",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository_martuproactivitydatarepository",
+      "target": "data_repository_martuproactivitydatarepository_dismiss",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L233",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository_martuproactivitydatarepository",
+      "target": "data_repository_martuproactivitydatarepository_snooze",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L238",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository",
+      "target": "data_repository_martuuserid",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L244",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository",
+      "target": "data_repository_mapwork",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L250",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository",
+      "target": "data_repository_mapnudge",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L259",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository",
+      "target": "data_repository_mapprofile",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L278",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository",
+      "target": "data_repository_status",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L287",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository",
+      "target": "data_repository_iso",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L288",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository",
+      "target": "data_repository_stringornull",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L289",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository",
+      "target": "data_repository_asobject",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L290",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository",
+      "target": "data_repository_tostringarray",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L291",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository",
+      "target": "data_repository_normalizerecord",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L292",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository",
+      "target": "data_repository_normalizenudgekind",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L293",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository",
+      "target": "data_repository_normalizequickactions",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L296",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository_martuproactivitydatarepository_listforcenter",
+      "target": "data_repository_martuuserid",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L27",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository_martuproactivitydatarepository_listforcenter",
+      "target": "data_repository_mapnudge",
+      "relation": "indirect_call",
+      "context": "argument",
+      "confidence": "INFERRED",
+      "source_file": "data-repository.ts",
+      "source_location": "L39",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository_martuproactivitydatarepository_markseen",
+      "target": "data_repository_martuuserid",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L44",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository_martuproactivitydatarepository_getsnapshot",
+      "target": "data_repository_martuuserid",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L48",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository_martuproactivitydatarepository_getsnapshot",
+      "target": "data_repository_tostringarray",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L87",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository_martuproactivitydatarepository_getsnapshot",
+      "target": "data_repository_mapwork",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L90",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository_martuproactivitydatarepository_getsnapshot",
+      "target": "data_repository_status",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L105",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository_martuproactivitydatarepository_getsnapshot",
+      "target": "data_repository_iso",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L105",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository_martuproactivitydatarepository_getsnapshot",
+      "target": "data_repository_mapprofile",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L106",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository_martuproactivitydatarepository_claimcandidate",
+      "target": "data_repository_martuuserid",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L111",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository_martuproactivitydatarepository_claimcandidate",
+      "target": "data_repository_iso",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L116",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository_martuproactivitydatarepository_claimcandidate",
+      "target": "data_repository_martuproactivitydatarepository_findpendingforsametarget",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L125",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository_martuproactivitydatarepository_claimcandidate",
+      "target": "data_repository_mapnudge",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L142",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository_martuproactivitydatarepository_listpendingfordelivery",
+      "target": "data_repository_martuuserid",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L179",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository_martuproactivitydatarepository_listpendingfordelivery",
+      "target": "data_repository_mapnudge",
+      "relation": "indirect_call",
+      "context": "argument",
+      "confidence": "INFERRED",
+      "source_file": "data-repository.ts",
+      "source_location": "L180",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository_martuproactivitydatarepository_markfailed",
+      "target": "data_repository_asobject",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L200",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository_martuproactivitydatarepository_getnudge",
+      "target": "data_repository_martuuserid",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L224",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository_martuproactivitydatarepository_getnudge",
+      "target": "data_repository_mapnudge",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L225",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository_martuproactivitydatarepository_markacted",
+      "target": "data_repository_martuuserid",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L230",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository_martuproactivitydatarepository_dismiss",
+      "target": "data_repository_martuuserid",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L235",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository_martuproactivitydatarepository_snooze",
+      "target": "data_repository_martuuserid",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L240",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository_mapwork",
+      "target": "data_repository_stringornull",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L252",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository_mapwork",
+      "target": "data_repository_iso",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L253",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository_mapwork",
+      "target": "data_repository_normalizerecord",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L255",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository_mapnudge",
+      "target": "data_repository_asobject",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L260",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository_mapnudge",
+      "target": "data_repository_normalizenudgekind",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L268",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository_mapnudge",
+      "target": "data_repository_stringornull",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L269",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository_mapnudge",
+      "target": "data_repository_normalizequickactions",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L273",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository_mapnudge",
+      "target": "data_repository_status",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L273",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository_mapnudge",
+      "target": "data_repository_iso",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L274",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository_normalizequickactions",
+      "target": "data_repository_asobject",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L300",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "detector_test",
+      "target": "ref_vitest",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "detector.test.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "detector_test",
+      "target": "e_escritorio_python_proyectos_martu_martix_src_server_agent_types_ts",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "detector.test.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "detector_test",
+      "target": "e_escritorio_python_proyectos_martu_martix_src_server_agent_types_communicationprofile",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "detector.test.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "detector_test",
+      "target": "detector",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "detector.test.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "detector_test",
+      "target": "detector_deterministicnudgedetector",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "detector.test.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "detector_test",
+      "target": "types",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "detector.test.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "detector_test",
+      "target": "types_proactivitysnapshot",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "detector.test.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "detector_test",
+      "target": "detector_test_profile",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "detector.test.ts",
+      "source_location": "L8",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "detector_test",
+      "target": "detector_test_snapshot",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "detector.test.ts",
+      "source_location": "L23",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "detector",
+      "target": "ref_date_fns_tz",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "detector.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "detector",
+      "target": "e_escritorio_python_proyectos_martu_martix_src_server_agent_types_ts",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "detector.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "detector",
+      "target": "e_escritorio_python_proyectos_martu_martix_src_server_agent_types_martu_time_zone",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "detector.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "detector",
+      "target": "types",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "detector.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "detector",
+      "target": "types_nudgecandidate",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "detector.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "detector",
+      "target": "types_nudgekind",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "detector.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "detector",
+      "target": "types_nudgepriority",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "detector.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "detector",
+      "target": "types_proactivitysnapshot",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "detector.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "detector",
+      "target": "types_proactivityworkitem",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "detector.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "detector",
+      "target": "detector_final_statuses",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "detector.ts",
+      "source_location": "L15",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "detector",
+      "target": "detector_active_content_statuses",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "detector.ts",
+      "source_location": "L16",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "detector",
+      "target": "detector_deterministicnudgedetector",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "detector.ts",
+      "source_location": "L18",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "detector_deterministicnudgedetector",
+      "target": "detector_deterministicnudgedetector_detect",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "detector.ts",
+      "source_location": "L19",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "detector",
+      "target": "detector_workcandidate",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "detector.ts",
+      "source_location": "L105",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "detector",
+      "target": "detector_clientgapcandidate",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "detector.ts",
+      "source_location": "L146",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "detector",
+      "target": "detector_checkincandidates",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "detector.ts",
+      "source_location": "L167",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "detector",
+      "target": "detector_iswithincatchupwindow",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "detector.ts",
+      "source_location": "L192",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "detector",
+      "target": "detector_timetominutes",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "detector.ts",
+      "source_location": "L198",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "detector",
+      "target": "detector_isclosed",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "detector.ts",
+      "source_location": "L203",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "detector",
+      "target": "detector_normalizestatus",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "detector.ts",
+      "source_location": "L207",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "detector",
+      "target": "detector_asdate",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "detector.ts",
+      "source_location": "L211",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "detector",
+      "target": "detector_dedupecandidates",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "detector.ts",
+      "source_location": "L217",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "detector",
+      "target": "detector_applyinsistenceprofile",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "detector.ts",
+      "source_location": "L226",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "detector_deterministicnudgedetector_detect",
+      "target": "detector_asdate",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "detector.ts",
+      "source_location": "L25",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "detector_deterministicnudgedetector_detect",
+      "target": "detector_isclosed",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "detector.ts",
+      "source_location": "L26",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "detector_deterministicnudgedetector_detect",
+      "target": "detector_workcandidate",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "detector.ts",
+      "source_location": "L29",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "detector_deterministicnudgedetector_detect",
+      "target": "detector_normalizestatus",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "detector.ts",
+      "source_location": "L56",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "detector_deterministicnudgedetector_detect",
+      "target": "detector_clientgapcandidate",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "detector.ts",
+      "source_location": "L77",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "detector_deterministicnudgedetector_detect",
+      "target": "detector_checkincandidates",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "detector.ts",
+      "source_location": "L100",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "detector_deterministicnudgedetector_detect",
+      "target": "detector_applyinsistenceprofile",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "detector.ts",
+      "source_location": "L101",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "detector_deterministicnudgedetector_detect",
+      "target": "detector_dedupecandidates",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "detector.ts",
+      "source_location": "L101",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "detector_checkincandidates",
+      "target": "detector_iswithincatchupwindow",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "detector.ts",
+      "source_location": "L175",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "detector_checkincandidates",
+      "target": "detector_isclosed",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "detector.ts",
+      "source_location": "L182",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "detector_checkincandidates",
+      "target": "detector_asdate",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "detector.ts",
+      "source_location": "L183",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "detector_iswithincatchupwindow",
+      "target": "detector_timetominutes",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "detector.ts",
+      "source_location": "L193",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "detector_isclosed",
+      "target": "detector_normalizestatus",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "detector.ts",
+      "source_location": "L204",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "engine_test",
+      "target": "ref_vitest",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "engine.test.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "engine_test",
+      "target": "e_escritorio_python_proyectos_martu_martix_src_server_agent_types_ts",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "engine.test.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "engine_test",
+      "target": "e_escritorio_python_proyectos_martu_martix_src_server_agent_types_communicationprofile",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "engine.test.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "engine_test",
+      "target": "engine",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "engine.test.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "engine_test",
+      "target": "engine_proactivityengine",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "engine.test.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "engine_test",
+      "target": "types",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "engine.test.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "engine_test",
+      "target": "types_nudgecandidate",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "engine.test.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "engine_test",
+      "target": "types_persistednudge",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "engine.test.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "engine_test",
+      "target": "types_proactivitysnapshot",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "engine.test.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "engine_test",
+      "target": "engine_test_profile",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "engine.test.ts",
+      "source_location": "L8",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "engine_test",
+      "target": "engine_test_snapshot",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "engine.test.ts",
+      "source_location": "L23",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "engine_test",
+      "target": "engine_test_candidate",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "engine.test.ts",
+      "source_location": "L36",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "engine_test",
+      "target": "engine_test_persisted",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "engine.test.ts",
+      "source_location": "L50",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "engine",
+      "target": "ports",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "engine.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "engine",
+      "target": "ports_nudgecomposer",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "engine.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "engine",
+      "target": "ports_nudgedetector",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "engine.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "engine",
+      "target": "ports_proactivitynotificationprovider",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "engine.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "engine",
+      "target": "ports_proactivityrepository",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "engine.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "engine",
+      "target": "quiet_hours",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "engine.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "engine",
+      "target": "quiet_hours_isquiettime",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "engine.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "engine",
+      "target": "types",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "engine.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "engine",
+      "target": "types_proactivitytickresult",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "engine.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "engine",
+      "target": "engine_proactivityengine",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "engine.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "engine_proactivityengine",
+      "target": "engine_proactivityengine_constructor",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "engine.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "engine_proactivityengine",
+      "target": "engine_proactivityengine_tick",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "engine.ts",
+      "source_location": "L13",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "engine",
+      "target": "engine_messageof",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "engine.ts",
+      "source_location": "L88",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "engine_proactivityengine_tick",
+      "target": "engine_messageof",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "engine.ts",
+      "source_location": "L34",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "ports",
+      "target": "e_escritorio_python_proyectos_martu_martix_src_server_push_types_ts",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "ports.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "ports",
+      "target": "e_escritorio_python_proyectos_martu_martix_src_server_push_types_notificationprovider",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "ports.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "ports",
+      "target": "types",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "ports.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "ports",
+      "target": "types_composednudge",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "ports.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "ports",
+      "target": "types_nudgecandidate",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "ports.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "ports",
+      "target": "types_persistednudge",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "ports.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "ports",
+      "target": "types_proactivitysnapshot",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "ports.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "ports",
+      "target": "ports_proactivityrepository",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ports.ts",
+      "source_location": "L10",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "ports_proactivityrepository",
+      "target": "ports_proactivityrepository_getsnapshot",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "ports.ts",
+      "source_location": "L11",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "ports_proactivityrepository",
+      "target": "ports_proactivityrepository_claimcandidate",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "ports.ts",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "ports_proactivityrepository",
+      "target": "ports_proactivityrepository_listpendingfordelivery",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "ports.ts",
+      "source_location": "L13",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "ports_proactivityrepository",
+      "target": "ports_proactivityrepository_savecomposedmessage",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "ports.ts",
+      "source_location": "L14",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "ports_proactivityrepository",
+      "target": "ports_proactivityrepository_markdelivered",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "ports.ts",
+      "source_location": "L15",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "ports_proactivityrepository",
+      "target": "ports_proactivityrepository_markfailed",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "ports.ts",
+      "source_location": "L16",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "ports_proactivityrepository",
+      "target": "ports_proactivityrepository_appendsystemmessage",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "ports.ts",
+      "source_location": "L17",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "ports",
+      "target": "ports_nudgedetector",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ports.ts",
+      "source_location": "L20",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "ports_nudgedetector",
+      "target": "ports_nudgedetector_detect",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "ports.ts",
+      "source_location": "L21",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "ports",
+      "target": "ports_nudgecomposer",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ports.ts",
+      "source_location": "L24",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "ports_nudgecomposer",
+      "target": "ports_nudgecomposer_compose",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "ports.ts",
+      "source_location": "L25",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "ports",
+      "target": "ports_proactivitynotificationprovider",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ports.ts",
+      "source_location": "L28",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "quiet_hours_test",
+      "target": "ref_vitest",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "quiet-hours.test.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "quiet_hours_test",
+      "target": "quiet_hours",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "quiet-hours.test.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "quiet_hours_test",
+      "target": "quiet_hours_isquiettime",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "quiet-hours.test.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "quiet_hours",
+      "target": "ref_date_fns_tz",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "quiet-hours.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "quiet_hours",
+      "target": "e_escritorio_python_proyectos_martu_martix_src_server_agent_types_ts",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "quiet-hours.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "quiet_hours",
+      "target": "e_escritorio_python_proyectos_martu_martix_src_server_agent_types_martu_time_zone",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "quiet-hours.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "quiet_hours",
+      "target": "quiet_hours_isquiettime",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "quiet-hours.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "quiet_hours",
+      "target": "quiet_hours_tominutes",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "quiet-hours.ts",
+      "source_location": "L14",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "quiet_hours_isquiettime",
+      "target": "quiet_hours_tominutes",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "quiet-hours.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "types",
+      "target": "e_escritorio_python_proyectos_martu_martix_src_server_agent_types_ts",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "types.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "types",
+      "target": "e_escritorio_python_proyectos_martu_martix_src_server_agent_types_communicationprofile",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "types.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "types",
+      "target": "types_nudgekind",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "types.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "types",
+      "target": "types_nudgepriority",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "types.ts",
+      "source_location": "L18",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "types",
+      "target": "types_proactivityclient",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "types.ts",
+      "source_location": "L20",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "types",
+      "target": "types_proactivityworkitem",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "types.ts",
+      "source_location": "L29",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "types",
+      "target": "types_metricopportunity",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "types.ts",
+      "source_location": "L46",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "types",
+      "target": "types_existingnudgeref",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "types.ts",
+      "source_location": "L56",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "types",
+      "target": "types_proactivitysnapshot",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "types.ts",
+      "source_location": "L64",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "types",
+      "target": "types_nudgecandidate",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "types.ts",
+      "source_location": "L77",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "types",
+      "target": "types_persistednudge",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "types.ts",
+      "source_location": "L93",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "types",
+      "target": "types_composednudge",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "types.ts",
+      "source_location": "L102",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "types",
+      "target": "types_proactivitytickresult",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "types.ts",
+      "source_location": "L110",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "action_service_nudgeactiongateway_getnudge",
+      "target": "types_persistednudge",
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "action-service.ts",
+      "source_location": "L21",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "composer_naturalnudgecomposer",
+      "target": "ports_nudgecomposer",
+      "relation": "implements",
+      "context": "type",
+      "confidence": "EXTRACTED",
+      "source_file": "composer.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "composer_naturalnudgecomposer_compose",
+      "target": "types_persistednudge",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "composer.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "composer_naturalnudgecomposer_compose",
+      "target": "types_proactivitysnapshot",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "composer.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "composer_naturalnudgecomposer_compose",
+      "target": "types_composednudge",
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "composer.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository_martuproactivitydatarepository",
+      "target": "ports_proactivityrepository",
+      "relation": "implements",
+      "context": "type",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L25",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository_martuproactivitydatarepository",
+      "target": "action_service_nudgeactiongateway",
+      "relation": "implements",
+      "context": "type",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L25",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository_martuproactivitydatarepository_listforcenter",
+      "target": "types_persistednudge",
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L26",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository_martuproactivitydatarepository_getsnapshot",
+      "target": "types_proactivitysnapshot",
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L47",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository_martuproactivitydatarepository_claimcandidate",
+      "target": "types_nudgecandidate",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L110",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository_martuproactivitydatarepository_claimcandidate",
+      "target": "types_persistednudge",
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L110",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository_martuproactivitydatarepository_findpendingforsametarget",
+      "target": "types_nudgecandidate",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L145",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository_martuproactivitydatarepository_listpendingfordelivery",
+      "target": "types_persistednudge",
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L160",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository_martuproactivitydatarepository_appendsystemmessage",
+      "target": "types_persistednudge",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L208",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository_martuproactivitydatarepository_appendsystemmessage",
+      "target": "types_composednudge",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L208",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "data_repository_martuproactivitydatarepository_getnudge",
+      "target": "types_persistednudge",
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "data-repository.ts",
+      "source_location": "L219",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "detector_deterministicnudgedetector_detect",
+      "target": "types_proactivitysnapshot",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "detector.ts",
+      "source_location": "L19",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "detector_deterministicnudgedetector_detect",
+      "target": "types_nudgecandidate",
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "detector.ts",
+      "source_location": "L19",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "engine_proactivityengine_constructor",
+      "target": "ports_proactivityrepository",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "engine.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "engine_proactivityengine_constructor",
+      "target": "ports_nudgedetector",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "engine.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "engine_proactivityengine_constructor",
+      "target": "ports_nudgecomposer",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "engine.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "engine_proactivityengine_constructor",
+      "target": "ports_proactivitynotificationprovider",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "engine.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "engine_proactivityengine_tick",
+      "target": "types_proactivitytickresult",
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "engine.ts",
+      "source_location": "L13",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "ports_proactivityrepository_getsnapshot",
+      "target": "types_proactivitysnapshot",
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "ports.ts",
+      "source_location": "L11",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "ports_proactivityrepository_claimcandidate",
+      "target": "types_nudgecandidate",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "ports.ts",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "ports_proactivityrepository_claimcandidate",
+      "target": "types_persistednudge",
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "ports.ts",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "ports_proactivityrepository_listpendingfordelivery",
+      "target": "types_persistednudge",
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "ports.ts",
+      "source_location": "L13",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "ports_proactivityrepository_appendsystemmessage",
+      "target": "types_persistednudge",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "ports.ts",
+      "source_location": "L17",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "ports_proactivityrepository_appendsystemmessage",
+      "target": "types_composednudge",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "ports.ts",
+      "source_location": "L17",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "ports_nudgedetector_detect",
+      "target": "types_proactivitysnapshot",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "ports.ts",
+      "source_location": "L21",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "ports_nudgedetector_detect",
+      "target": "types_nudgecandidate",
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "ports.ts",
+      "source_location": "L21",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "ports_nudgecomposer_compose",
+      "target": "types_persistednudge",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "ports.ts",
+      "source_location": "L25",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "ports_nudgecomposer_compose",
+      "target": "types_proactivitysnapshot",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "ports.ts",
+      "source_location": "L25",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "ports_nudgecomposer_compose",
+      "target": "types_composednudge",
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "ports.ts",
+      "source_location": "L25",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "types_persistednudge",
+      "target": "types_nudgecandidate",
+      "relation": "inherits",
+      "context": "type",
+      "confidence": "EXTRACTED",
+      "source_file": "types.ts",
+      "source_location": "L93",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "engine_proactivityengine_tick",
+      "target": "quiet_hours_isquiettime",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "engine.ts",
+      "source_location": "L41",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "action_service_nudgeactionservice_execute",
+      "target": "action_service_nudgeactiongateway_getnudge",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "action-service.ts",
+      "source_location": "L47",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "action_service_nudgeactionservice_execute",
+      "target": "action_service_nudgeactiongateway_markacted",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "action-service.ts",
+      "source_location": "L57",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "action_service_nudgeactionservice_execute",
+      "target": "action_service_nudgeactiongateway_dismiss",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "action-service.ts",
+      "source_location": "L61",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "action_service_nudgeactionservice_execute",
+      "target": "action_service_nudgeactiongateway_snooze",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "action-service.ts",
+      "source_location": "L65",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "detector_deterministicnudgedetector_detect",
+      "target": "detector_active_content_statuses",
+      "relation": "references",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "detector.ts",
+      "source_location": "L56",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "detector_workcandidate",
+      "target": "types_nudgekind",
+      "relation": "references",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "detector.ts",
+      "source_location": "L115",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "detector_isclosed",
+      "target": "detector_final_statuses",
+      "relation": "references",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "detector.ts",
+      "source_location": "L204",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "engine_proactivityengine_tick",
+      "target": "ports_proactivityrepository_getsnapshot",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "engine.ts",
+      "source_location": "L23",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "engine_proactivityengine_tick",
+      "target": "ports_nudgedetector_detect",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "engine.ts",
+      "source_location": "L24",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "engine_proactivityengine_tick",
+      "target": "ports_proactivityrepository_claimcandidate",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "engine.ts",
+      "source_location": "L29",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "engine_proactivityengine_tick",
+      "target": "ports_proactivityrepository_listpendingfordelivery",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "engine.ts",
+      "source_location": "L40",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "engine_proactivityengine_tick",
+      "target": "ports_nudgecomposer_compose",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "engine.ts",
+      "source_location": "L48",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "engine_proactivityengine_tick",
+      "target": "ports_proactivityrepository_savecomposedmessage",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "engine.ts",
+      "source_location": "L49",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "engine_proactivityengine_tick",
+      "target": "ports_proactivityrepository_appendsystemmessage",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "engine.ts",
+      "source_location": "L52",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "engine_proactivityengine_tick",
+      "target": "ports_proactivitynotificationprovider",
+      "relation": "references",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "engine.ts",
+      "source_location": "L53",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "engine_proactivityengine_tick",
+      "target": "ports_proactivityrepository_markfailed",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "engine.ts",
+      "source_location": "L61",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "engine_proactivityengine_tick",
+      "target": "ports_proactivityrepository_markdelivered",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "engine.ts",
+      "source_location": "L67",
+      "weight": 1.0,
+      "_origin": "ast"
+    }
+  ],
+  "hyperedges": [],
+  "input_tokens": 0,
+  "output_tokens": 0
+}

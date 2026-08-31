@@ -1,0 +1,269 @@
+{
+  "communities": {
+    "0": [
+      "engine",
+      "engine_messageof",
+      "engine_proactivityengine",
+      "engine_proactivityengine_constructor",
+      "engine_proactivityengine_tick",
+      "ports_nudgedetector",
+      "ports_nudgedetector_detect",
+      "ports_proactivitynotificationprovider",
+      "ports_proactivityrepository",
+      "ports_proactivityrepository_appendsystemmessage",
+      "ports_proactivityrepository_claimcandidate",
+      "ports_proactivityrepository_getsnapshot",
+      "ports_proactivityrepository_listpendingfordelivery",
+      "ports_proactivityrepository_markdelivered",
+      "ports_proactivityrepository_markfailed",
+      "ports_proactivityrepository_savecomposedmessage",
+      "quiet_hours",
+      "quiet_hours_isquiettime",
+      "quiet_hours_test",
+      "quiet_hours_tominutes",
+      "types_proactivitytickresult"
+    ],
+    "1": [
+      "detector",
+      "detector_active_content_statuses",
+      "detector_applyinsistenceprofile",
+      "detector_asdate",
+      "detector_checkincandidates",
+      "detector_clientgapcandidate",
+      "detector_dedupecandidates",
+      "detector_deterministicnudgedetector",
+      "detector_deterministicnudgedetector_detect",
+      "detector_final_statuses",
+      "detector_isclosed",
+      "detector_iswithincatchupwindow",
+      "detector_normalizestatus",
+      "detector_test",
+      "detector_test_profile",
+      "detector_test_snapshot",
+      "detector_timetominutes",
+      "detector_workcandidate",
+      "types_nudgekind"
+    ],
+    "2": [
+      "composer",
+      "composer_composebody",
+      "composer_naturalnudgecomposer",
+      "composer_naturalnudgecomposer_compose",
+      "composer_test",
+      "data_repository_martuproactivitydatarepository_appendsystemmessage",
+      "ports",
+      "ports_nudgecomposer",
+      "ports_nudgecomposer_compose",
+      "types",
+      "types_composednudge",
+      "types_existingnudgeref",
+      "types_metricopportunity",
+      "types_nudgepriority",
+      "types_persistednudge",
+      "types_proactivityclient",
+      "types_proactivitysnapshot",
+      "types_proactivityworkitem"
+    ],
+    "3": [
+      "action_service",
+      "action_service_nudgeactiongateway",
+      "action_service_nudgeactiongateway_dismiss",
+      "action_service_nudgeactiongateway_getnudge",
+      "action_service_nudgeactiongateway_markacted",
+      "action_service_nudgeactiongateway_snooze",
+      "action_service_nudgeactioninput",
+      "action_service_nudgeactionschema",
+      "action_service_nudgeactionservice",
+      "action_service_nudgeactionservice_constructor",
+      "action_service_nudgeactionservice_execute",
+      "action_service_targettype"
+    ],
+    "4": [
+      "data_repository",
+      "data_repository_iso",
+      "data_repository_mapprofile",
+      "data_repository_mapwork",
+      "data_repository_martuproactivitydatarepository_getsnapshot",
+      "data_repository_normalizerecord",
+      "data_repository_row",
+      "data_repository_status",
+      "data_repository_stringornull",
+      "data_repository_tostringarray"
+    ],
+    "5": [
+      "data_repository_martuproactivitydatarepository",
+      "data_repository_martuproactivitydatarepository_dismiss",
+      "data_repository_martuproactivitydatarepository_listpendingfordelivery",
+      "data_repository_martuproactivitydatarepository_markacted",
+      "data_repository_martuproactivitydatarepository_markdelivered",
+      "data_repository_martuproactivitydatarepository_markseen",
+      "data_repository_martuproactivitydatarepository_savecomposedmessage",
+      "data_repository_martuproactivitydatarepository_snooze",
+      "data_repository_martuuserid"
+    ],
+    "6": [
+      "data_repository_asobject",
+      "data_repository_mapnudge",
+      "data_repository_martuproactivitydatarepository_getnudge",
+      "data_repository_martuproactivitydatarepository_listforcenter",
+      "data_repository_martuproactivitydatarepository_markfailed",
+      "data_repository_normalizenudgekind",
+      "data_repository_normalizequickactions"
+    ],
+    "7": [
+      "engine_test",
+      "engine_test_candidate",
+      "engine_test_persisted",
+      "engine_test_profile",
+      "engine_test_snapshot"
+    ],
+    "8": [
+      "cron_auth",
+      "cron_auth_authorizecron",
+      "cron_auth_cronauthorization",
+      "cron_auth_test"
+    ],
+    "9": [
+      "data_repository_martuproactivitydatarepository_claimcandidate",
+      "data_repository_martuproactivitydatarepository_findpendingforsametarget",
+      "types_nudgecandidate"
+    ]
+  },
+  "cohesion": {
+    "0": 0.18095238095238095,
+    "1": 0.2046783625730994,
+    "2": 0.24836601307189543,
+    "3": 0.24242424242424243,
+    "4": 0.35555555555555557,
+    "5": 0.3333333333333333,
+    "6": 0.3333333333333333,
+    "7": 0.4,
+    "8": 0.6666666666666666,
+    "9": 1.0
+  },
+  "gods": [
+    {
+      "id": "types_persistednudge",
+      "label": "PersistedNudge",
+      "degree": 19
+    },
+    {
+      "id": "data_repository_martuproactivitydatarepository",
+      "label": "MartuProactivityDataRepository",
+      "degree": 17
+    },
+    {
+      "id": "types_proactivitysnapshot",
+      "label": "ProactivitySnapshot",
+      "degree": 14
+    },
+    {
+      "id": "ports_proactivityrepository",
+      "label": "ProactivityRepository",
+      "degree": 12
+    },
+    {
+      "id": "data_repository_mapnudge",
+      "label": "mapNudge()",
+      "degree": 11
+    },
+    {
+      "id": "types_nudgecandidate",
+      "label": "NudgeCandidate",
+      "degree": 11
+    },
+    {
+      "id": "data_repository_martuuserid",
+      "label": "martuUserId()",
+      "degree": 10
+    },
+    {
+      "id": "types_composednudge",
+      "label": "ComposedNudge",
+      "degree": 8
+    },
+    {
+      "id": "action_service_nudgeactiongateway",
+      "label": "NudgeActionGateway",
+      "degree": 7
+    },
+    {
+      "id": "ports_nudgecomposer",
+      "label": "NudgeComposer",
+      "degree": 6
+    }
+  ],
+  "surprises": [
+    {
+      "source": "MartuProactivityDataRepository",
+      "target": "NudgeActionGateway",
+      "source_files": [
+        "data-repository.ts",
+        "action-service.ts"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "implements",
+      "why": "connects across different repos/directories; bridges separate communities"
+    },
+    {
+      "source": "MartuProactivityDataRepository",
+      "target": "ProactivityRepository",
+      "source_files": [
+        "data-repository.ts",
+        "ports.ts"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "implements",
+      "why": "connects across different repos/directories; bridges separate communities"
+    },
+    {
+      "source": "NaturalNudgeComposer",
+      "target": "NudgeComposer",
+      "source_files": [
+        "composer.ts",
+        "ports.ts"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "implements",
+      "why": "connects across different repos/directories"
+    },
+    {
+      "source": "workCandidate()",
+      "target": "NudgeKind",
+      "source_files": [
+        "detector.ts",
+        "types.ts"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "references",
+      "why": "connects across different repos/directories"
+    }
+  ],
+  "questions": [
+    {
+      "type": "bridge_node",
+      "question": "Why does `PersistedNudge` connect `Community 2` to `Community 0`, `Community 3`, `Community 4`, `Community 5`, `Community 6`, `Community 7`, `Community 9`?",
+      "why": "High betweenness centrality (0.130) - this node is a cross-community bridge."
+    },
+    {
+      "type": "bridge_node",
+      "question": "Why does `MartuProactivityDataRepository` connect `Community 5` to `Community 0`, `Community 2`, `Community 3`, `Community 4`, `Community 6`, `Community 9`?",
+      "why": "High betweenness centrality (0.119) - this node is a cross-community bridge."
+    },
+    {
+      "type": "bridge_node",
+      "question": "Why does `ProactivitySnapshot` connect `Community 2` to `Community 0`, `Community 1`, `Community 4`, `Community 7`?",
+      "why": "High betweenness centrality (0.113) - this node is a cross-community bridge."
+    },
+    {
+      "type": "verify_inferred",
+      "question": "Are the 2 inferred relationships involving `mapNudge()` (e.g. with `.listForCenter()` and `.listPendingForDelivery()`) actually correct?",
+      "why": "`mapNudge()` has 2 INFERRED edges - model-reasoned connections that need verification."
+    },
+    {
+      "type": "isolated_nodes",
+      "question": "What connects `nudgeActionSchema`, `NudgeActionInput`, `CronAuthorization` to the rest of the system?",
+      "why": "12 weakly-connected nodes found - possible documentation gaps or missing edges."
+    }
+  ]
+}
