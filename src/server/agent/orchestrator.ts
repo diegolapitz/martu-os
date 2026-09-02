@@ -1,13 +1,13 @@
 import { routeAgentTurn } from "./intent-router";
-import type { AgentConversationStore, AgentModelProvider, AgentModelResult, AgentToolExecutor } from "./ports";
+import type { AgentConversationStore, AgentModelProvider, AgentModelResult, AgentToolExecutor, RequestPlanner } from "./ports";
 import { authorizeToolCall, evaluateServiceScope, safeToolError } from "./policy";
 import {
-  contextualNextStepFastPath,
   directResult,
   presentAgentResult,
-  readFastPath,
   timeoutResult,
 } from "./presenter";
+import { DeterministicRequestPlanner } from "./request-planner";
+import { planRetrieval } from "./retrieval-planner";
 import {
   AGENT_CONTEXT_TIMEOUT_MS,
   AGENT_TURN_TIMEOUT_MS,
@@ -17,6 +17,7 @@ import {
 import type {
   AgentActionReceipt,
   AgentContext,
+  AgentPlanningContext,
   AgentReply,
   AgentRequest,
   AgentTurnPlan,
@@ -29,6 +30,7 @@ export class AgentOrchestrator {
     private readonly tools: AgentToolExecutor,
     private readonly primaryProvider: AgentModelProvider,
     private readonly fallbackProvider?: AgentModelProvider,
+    private readonly requestPlanner: RequestPlanner = new DeterministicRequestPlanner(),
   ) {}
 
   async run(request: AgentRequest): Promise<AgentReply> {
@@ -72,12 +74,9 @@ export class AgentOrchestrator {
     timing.persistenceMs += performance.now() - phase;
 
     phase = performance.now();
-    let context: AgentContext;
+    let planningContext: AgentPlanningContext;
     try {
-      context = await this.buildContextWithDeadline(
-        { ...request, message, threadId, turnId, now },
-        startedAt,
-      );
+      planningContext = await this.buildPlanningContextWithDeadline({ ...request, message, threadId, turnId, now }, startedAt);
     } catch (error) {
       timing.contextMs += performance.now() - phase;
       if (isAgentTimeout(error)) {
@@ -96,45 +95,45 @@ export class AgentOrchestrator {
     timing.contextMs += performance.now() - phase;
 
     phase = performance.now();
-    let plan = routeAgentTurn({ ...request, message, threadId, turnId, now }, context);
+    let requestPlan;
+    try {
+      requestPlan = await this.planRequestWithDeadline({ ...request, message, threadId, turnId, now }, planningContext, startedAt);
+    } catch {
+      // A planner outage may reduce semantic quality, never safety or turn availability.
+      requestPlan = await new DeterministicRequestPlanner().plan({ request: { ...request, message, threadId, turnId, now }, context: planningContext });
+    }
     timing.routingMs += performance.now() - phase;
 
-    // A client named in a global conversation scopes only this turn. The thread
-    // remains global, while retrieval is rebuilt with the correct services and
-    // client memory before any response or mutation is allowed.
-    if (plan.clientSlug && context.currentClient?.slug !== plan.clientSlug) {
-      phase = performance.now();
-      try {
-        context = await this.buildContextWithDeadline({
-          ...request,
-          message,
-          threadId,
-          turnId,
-          clientSlug: plan.clientSlug,
-          clientOverride: plan.clientSlug,
-          now,
-        }, startedAt);
-      } catch (error) {
-        timing.contextMs += performance.now() - phase;
-        if (isAgentTimeout(error)) {
-          timing.timedOut = true;
-          return this.timeoutBeforePlan({
-            request: { ...request, clientSlug: plan.clientSlug },
-            threadId,
-            turnId,
-            source,
-            startedAt,
-            timing,
-            intent: plan.intent,
-          });
-        }
-        throw error;
-      }
+    phase = performance.now();
+    let context: AgentContext;
+    let plan: AgentTurnPlan;
+    try {
+      // Understanding precedes retrieval. The read plan is built from the
+      // semantic request and the adapter only loads the sources it names.
+      const provisional = routeAgentTurn({ ...request, message, threadId, turnId, clientSlug: requestPlan.clientSlug ?? request.clientSlug, now }, planningContextToContext(planningContext), requestPlan);
+      const retrievalPlan = planRetrieval(requestPlan, provisional);
+      context = await this.buildContextWithDeadline({
+        ...request,
+        message,
+        threadId,
+        turnId,
+        clientSlug: retrievalPlan.clientSlug ?? request.clientSlug,
+        clientOverride: retrievalPlan.clientSlug,
+        retrievalPlan,
+        now,
+      }, startedAt);
+      const routed = routeAgentTurn({ ...request, message, threadId, turnId, clientSlug: retrievalPlan.clientSlug ?? request.clientSlug, now }, context, requestPlan);
+      const finalRetrievalPlan = planRetrieval(requestPlan, routed);
+      plan = { ...routed, retrievalPlan: finalRetrievalPlan, requestPlan };
+    } catch (error) {
       timing.contextMs += performance.now() - phase;
-      phase = performance.now();
-      plan = routeAgentTurn({ ...request, message, threadId, turnId, clientSlug: plan.clientSlug, now }, context);
-      timing.routingMs += performance.now() - phase;
+      if (isAgentTimeout(error)) {
+        timing.timedOut = true;
+        return this.timeoutBeforePlan({ request: { ...request, clientSlug: requestPlan.clientSlug }, threadId, turnId, source, startedAt, timing });
+      }
+      throw error;
     }
+    timing.contextMs += performance.now() - phase;
 
     const serviceScope = evaluateServiceScope(plan, context);
     const mutationContext = {
@@ -173,12 +172,7 @@ export class AgentOrchestrator {
       timing.fastPath = true;
       generated = await this.undoLastAction(plan, context, mutationContext, timing, executedActions);
     } else {
-      const readResult = readFastPath(plan, context);
-      const contextualResult = contextualNextStepFastPath(plan, context, message);
-      if (readResult || contextualResult) {
-        timing.fastPath = true;
-        generated = readResult ?? contextualResult!;
-      } else if (plan.directToolCall) {
+      if (plan.directToolCall) {
         timing.fastPath = true;
         generated = await this.executePlannedTool(plan, plan.directToolCall, mutationContext, executeTool);
       } else {
@@ -338,6 +332,29 @@ export class AgentOrchestrator {
     );
   }
 
+  private async buildPlanningContextWithDeadline(
+    input: Omit<Parameters<AgentConversationStore["buildContext"]>[0], "signal" | "retrievalPlan" | "clientOverride">,
+    startedAt: number,
+  ): Promise<AgentPlanningContext> {
+    const remaining = Math.max(1, Math.min(AGENT_CONTEXT_TIMEOUT_MS, AGENT_TURN_TIMEOUT_MS - (performance.now() - startedAt)));
+    return withAgentTimeout(async (signal) => {
+      if (this.conversations.buildPlanningContext) return this.conversations.buildPlanningContext({ ...input, signal });
+      // Compatibility bridge for in-memory stores while they migrate. Production
+      // uses buildPlanningContext and therefore performs no broad retrieval here.
+      const full = await this.conversations.buildContext({ ...input, signal });
+      return planningContextFromContext(full);
+    }, remaining, () => false);
+  }
+
+  private planRequestWithDeadline(
+    request: AgentRequest,
+    context: AgentPlanningContext,
+    startedAt: number,
+  ) {
+    const remaining = Math.max(1, AGENT_TURN_TIMEOUT_MS - (performance.now() - startedAt));
+    return withAgentTimeout((signal) => this.requestPlanner.plan({ request, context, signal }), remaining, () => false);
+  }
+
   private async timeoutBeforePlan(input: {
     request: AgentRequest;
     threadId: string;
@@ -403,4 +420,31 @@ export class AgentOrchestrator {
 
 function rounded(value: number): number {
   return Math.max(0, Math.round(value * 10) / 10);
+}
+
+function planningContextFromContext(context: AgentContext): AgentPlanningContext {
+  return {
+    now: context.now,
+    clients: context.clients,
+    conversationScope: context.conversationScope,
+    conversationClient: context.conversationClient,
+    conversationEntity: context.conversationEntity,
+    currentView: context.currentView,
+    currentViewItem: context.currentViewItem,
+    recentMessages: context.recentMessages,
+    lastReferencedEntity: context.lastReferencedEntity,
+  };
+}
+
+function planningContextToContext(context: AgentPlanningContext): AgentContext {
+  return {
+    ...context,
+    currentClient: context.conversationClient,
+    tasks: [], scripts: [], content: [], notes: [], meetings: [], metrics: [], campaigns: [], memories: [],
+    profile: {
+      language: "es-AR", formality: 0.4, preferredLength: "medium", humor: 0.3, insistenceLevel: 0.5,
+      quietHoursStart: "22:00", quietHoursEnd: "08:00", morningBriefingAt: "09:00", morningBriefingEnabled: true,
+      middayCheckAt: "13:00", middayCheckEnabled: false, endOfDayEnabled: false, expressions: [], preferences: {},
+    },
+  };
 }

@@ -88,7 +88,7 @@ describe("AgentOrchestrator", () => {
     expect(reply.undoToken).toBeUndefined();
   });
 
-  it("answers a simple contextual next step without paying for a model call", async () => {
+  it("lets the model compose a contextual next step instead of a presenter shortcut", async () => {
     const contextual = {
       ...context,
       currentView: {
@@ -113,7 +113,11 @@ describe("AgentOrchestrator", () => {
     conversations.buildContext.mockResolvedValue(contextual);
     const provider = {
       mode: "real" as const,
-      generate: vi.fn(),
+      generate: vi.fn().mockResolvedValue({
+        message: "Con “Reel · Tres señales de que necesitás cortar”, ajustaría el arranque y el CTA antes de abrir otro frente.",
+        capability: "creative",
+        actions: [],
+      }),
     } satisfies AgentModelProvider;
 
     const reply = await new AgentOrchestrator(
@@ -126,11 +130,11 @@ describe("AgentOrchestrator", () => {
       currentView: contextual.currentView,
     });
 
-    expect(provider.generate).not.toHaveBeenCalled();
+    expect(provider.generate).toHaveBeenCalledOnce();
     expect(reply.message).toContain("Reel · Tres señales de que necesitás cortar");
     expect(reply.message).toMatch(/arranque|CTA/);
     expect(reply.message).not.toMatch(/scheduled|UTC|dueAt/);
-    expect(reply.timings).toMatchObject({ fastPath: true });
+    expect(reply.timings).toMatchObject({ fastPath: false });
   });
 
   it("returns a no-write timeout response when context retrieval stalls", async () => {

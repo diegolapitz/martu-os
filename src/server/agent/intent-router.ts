@@ -7,6 +7,7 @@ import type {
   AgentTurnPlan,
   ClientRef,
   PlannedToolCall,
+  RequestPlan,
 } from "./types";
 
 const ORDINAL_PATTERN = /\b(?:primer|primero|segundo|tercer|tercero|cuarto|quinto|1(?:er|ro)?|2(?:do)?|3(?:er|ro)?|4(?:to)?|5(?:to)?|#?[1-9])\b/;
@@ -20,7 +21,47 @@ const TARGET_STOPWORDS = new Set([
   "compromiso", "promesa", "para", "por", "con", "del", "una", "uno", "este", "esta", "eso", "ese", "esa",
 ]);
 
-export function routeAgentTurn(request: AgentRequest, context: AgentContext): AgentTurnPlan {
+/**
+ * Converts semantic understanding into broad execution/safety categories.
+ * The legacy parser remains only as a conservative verifier for explicit
+ * writes and undo; it is not allowed to collapse read language into a
+ * presenter-specific answer.
+ */
+export function routeAgentTurn(request: AgentRequest, context: AgentContext, requestPlan?: RequestPlan): AgentTurnPlan {
+  const legacy = routeLegacyTurn(request, context);
+  if (!requestPlan) return legacy;
+
+  // Writes and undo still require deterministic parsing, entity resolution and
+  // policy gating. A model-produced plan can never activate a mutating tool.
+  if (legacy.allowedTools.length || legacy.operation === "undo" || legacy.requiresClarification) {
+    return { ...legacy, requestPlan };
+  }
+  if (requestPlan.requiresClarification) {
+    return plan({
+      intent: "AMBIGUOUS",
+      operation: "clarify",
+      clientSlug: requestPlan.clientSlug ?? legacy.clientSlug,
+      maxWords: 35,
+      requiresClarification: true,
+      clarification: requestPlan.ambiguities[0] ?? "¿Me aclarás a qué te referís?",
+      requestPlan,
+    });
+  }
+  const analysis = requestPlan.job === "analyze";
+  const creative = ["create", "review", "reflect", "converse", "prioritize"].includes(requestPlan.job);
+  return plan({
+    intent: analysis ? "ANALYSIS" : creative ? "CREATIVE_CHAT" : "READ",
+    operation: analysis ? "analysis" : creative ? "creative_feedback" : "read_general",
+    clientSlug: requestPlan.clientSlug ?? legacy.clientSlug,
+    entity: semanticEntity(requestPlan, context) ?? legacy.entity,
+    requiredServices: legacy.requiredServices,
+    serviceLabel: legacy.serviceLabel,
+    maxWords: responseWordLimit(requestPlan),
+    requestPlan,
+  });
+}
+
+function routeLegacyTurn(request: AgentRequest, context: AgentContext): AgentTurnPlan {
   const message = request.message.trim();
   const normalized = normalizeSpanish(message).replace(/^[¿¡!?.,;:\s]+/, "");
   const currentView = context.currentView ?? request.currentView;
@@ -329,7 +370,23 @@ function plan(input: PlanInput): AgentTurnPlan {
     directToolCall: input.directToolCall,
     requiredServices: input.requiredServices,
     serviceLabel: input.serviceLabel,
+    requestPlan: input.requestPlan,
+    retrievalPlan: input.retrievalPlan,
   };
+}
+
+function semanticEntity(requestPlan: RequestPlan, context: AgentContext): AgentEntityRef | undefined {
+  const requested = requestPlan.relevantEntities[0];
+  if (!requested) return undefined;
+  if (requested.id && context.currentViewItem?.id === requested.id) return context.currentViewItem;
+  if (requested.id && context.lastReferencedEntity?.id === requested.id) return context.lastReferencedEntity;
+  return undefined;
+}
+
+function responseWordLimit(requestPlan: RequestPlan): number {
+  if (requestPlan.response.depth === "short") return 70;
+  if (requestPlan.response.depth === "deep") return 220;
+  return requestPlan.response.type === "briefing" ? 160 : 120;
 }
 
 function ambiguousPlan(clarification: string, clientSlug?: string): AgentTurnPlan {

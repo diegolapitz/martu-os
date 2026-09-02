@@ -14,6 +14,7 @@ import { MartuAgentDataAdapter } from "./data-adapter";
 import { DemoAgentProvider } from "./demo-provider";
 import { OpenAIResponsesProvider } from "./openai-provider";
 import { AgentOrchestrator } from "./orchestrator";
+import { DeterministicRequestPlanner, OpenAIRequestPlanner } from "./request-planner";
 
 export interface MartuRuntime {
   agent: AgentOrchestrator;
@@ -41,7 +42,8 @@ function createRuntime(): MartuRuntime {
   const actions = new AgentActionService(agentData);
   const demo = new DemoAgentProvider();
   const real = process.env.OPENAI_API_KEY ? new OpenAIResponsesProvider() : undefined;
-  const agent = new AgentOrchestrator(agentData, actions, real ?? demo, real ? demo : undefined);
+  const planner = process.env.OPENAI_API_KEY ? new OpenAIRequestPlanner() : new DeterministicRequestPlanner();
+  const agent = new AgentOrchestrator(agentData, actions, real ?? demo, real ? demo : undefined, planner);
   const pushRepository = new MartuPushSubscriptionRepository();
   const pushSubscriptions = new PushSubscriptionService(pushRepository);
   const webPush = new WebPushNotificationProvider(pushRepository);

@@ -27,6 +27,7 @@ import type {
   AgentContextItem,
   AgentEntityRef,
   AgentMemory,
+  AgentPlanningContext,
   AgentRequest,
   ClientRef,
   CommunicationProfile,
@@ -63,11 +64,55 @@ export class MartuAgentDataAdapter implements AgentConversationStore, AgentMutat
     });
   }
 
+  async buildPlanningContext(input: AgentRequest & {
+    threadId: string;
+    now: Date;
+    signal?: AbortSignal;
+  }): Promise<AgentPlanningContext> {
+    const clients = await loadClients(input.signal);
+    const threadScope = await loadThreadScope(input.threadId, input.signal);
+    const pathnameSlug = input.pathname?.match(/\/(?:clients|clientes)\/([^/?#]+)/)?.[1];
+    const conversationScope = threadScope?.scope
+      ?? input.contextScope
+      ?? (input.clientSlug || input.contextEntity?.clientSlug ? "client" : "global");
+    const conversationClient = clients.find((client) => client.slug === threadScope?.clientSlug)
+      ?? (conversationScope === "client"
+        ? clients.find((client) => client.slug === (input.clientSlug ?? input.contextEntity?.clientSlug ?? pathnameSlug))
+        : undefined);
+    const userId = await martuUserId(input.signal);
+    const currentViewItem = await loadCurrentViewItem({
+      view: input.currentView,
+      clients,
+      conversationScope,
+      conversationClient,
+      userId,
+      signal: input.signal,
+    });
+    const messages = await contextRead(input.signal, () => listChatMessages(input.threadId, { limit: 12 }));
+    const recentMessages = messages.map(mapChatMessage);
+    const requestedConversationEntity = conversationEntityFromMessages(recentMessages) ?? input.contextEntity;
+    const conversationEntity = entityWithinConversationScope(requestedConversationEntity, conversationScope, conversationClient)
+      ? requestedConversationEntity
+      : undefined;
+    return {
+      now: input.now.toISOString(),
+      clients,
+      conversationScope,
+      conversationClient,
+      conversationEntity,
+      currentView: canonicalCurrentView(input.currentView, currentViewItem, clients),
+      currentViewItem,
+      recentMessages,
+      lastReferencedEntity: conversationEntity ?? entityFromNotification(input.metadata) ?? lastEntityFromMessages(recentMessages),
+    };
+  }
+
   async buildContext(input: AgentRequest & {
     threadId: string;
     now: Date;
     signal?: AbortSignal;
     clientOverride?: string;
+    retrievalPlan?: import("./types").AgentRetrievalPlan;
   }): Promise<AgentContext> {
     const clients = await loadClients(input.signal);
     const threadScope = await loadThreadScope(input.threadId, input.signal);
@@ -79,7 +124,7 @@ export class MartuAgentDataAdapter implements AgentConversationStore, AgentMutat
       ?? (conversationScope === "client"
         ? clients.find((client) => client.slug === (input.clientSlug ?? input.contextEntity?.clientSlug ?? pathnameSlug))
         : undefined);
-    const scopedSlug = input.clientOverride ?? conversationClient?.slug;
+    const scopedSlug = input.clientOverride ?? input.retrievalPlan?.clientSlug ?? conversationClient?.slug;
     const currentClient = clients.find((client) => client.slug === scopedSlug);
     const clientId = currentClient?.id;
     const scopedClause = clientId ? "and client_id = $2" : "";
@@ -98,33 +143,35 @@ export class MartuAgentDataAdapter implements AgentConversationStore, AgentMutat
     // The cloud runtime deliberately owns one postgres.js connection. Keep
     // context reads in order so a dead first socket cannot strand nine queued
     // leases and prevent the generation from being retired.
-    const tasks = await contextRead(input.signal, () => query<Row>(`select id, client_id, title, status, due_at, updated_at, description, entity_type, entity_id
+    const shouldRead = (source: NonNullable<typeof input.retrievalPlan>["sources"][number]) =>
+      !input.retrievalPlan || input.retrievalPlan.sources.includes(source);
+    const tasks = shouldRead("work") ? await contextRead(input.signal, () => query<Row>(`select id, client_id, title, status, due_at, updated_at, description, entity_type, entity_id
         from public.tasks where user_id = $1 ${scopedClause} and archived_at is null
-        and status not in ('cancelled') order by due_at nulls last, updated_at desc limit 20`, params));
-    const scripts = currentClient
+        and status not in ('cancelled') order by due_at nulls last, updated_at desc limit 20`, params)) : [];
+    const scripts = currentClient && shouldRead("scripts")
       ? await contextRead(input.signal, () => query<Row>(`select id, client_id, title, status, due_at, updated_at, body, script_number
         from public.scripts where client_id = $1 and status <> 'archived' order by due_at nulls last, script_number nulls last, updated_at desc limit 16`, [clientId]))
       : [];
-    const content = currentClient
+    const content = currentClient && shouldRead("content")
       ? await contextRead(input.signal, () => query<Row>(`select id, client_id, title, status, due_at, updated_at, status_changed_at, script_id
         from public.content_items where client_id = $1 and archived_at is null order by due_at nulls last, updated_at desc limit 16`, [clientId]))
       : [];
-    const notes = currentClient
+    const notes = currentClient && shouldRead("notes")
       ? await contextRead(input.signal, () => query<Row>(`select id, client_id, text, tags, created_at, updated_at
         from public.notes where client_id = $1 order by created_at desc limit 10`, [clientId]))
       : [];
-    const meetings = currentClient
+    const meetings = currentClient && shouldRead("meetings")
       ? await contextRead(input.signal, () => query<Row>(`select id, client_id, title, summary, decisions, next_steps, starts_at, updated_at
         from public.meetings where client_id = $1 order by starts_at desc limit 6`, [clientId]))
       : [];
-    const metricRows = currentClient
+    const metricRows = currentClient && shouldRead("metrics")
       ? await contextRead(input.signal, () => query<Row>(`select cm.id, c.slug as client_slug, ci.title, cm.reach, cm.views, cm.avg_watch_seconds,
           cm.retention_rate, cm.saves, cm.shares, cm.comments, cm.clicks, cm.inquiries, cm.conversions, cm.captured_at
         from public.content_metrics cm join public.content_items ci on ci.id = cm.content_item_id
         join public.clients c on c.id = ci.client_id where ci.client_id = $1
         order by cm.captured_at desc limit 12`, [clientId]))
       : [];
-    const instagramMetricRows = currentClient
+    const instagramMetricRows = currentClient && shouldRead("metrics")
       ? await contextRead(input.signal, () => query<Row>(`select im.id, c.slug as client_slug,
           coalesce(ci.title, nullif(left(im.caption, 100), ''), 'Publicación de Instagram') as title,
           im.instagram_media_id as external_id, im.media_type, im.media_product_type,
@@ -140,15 +187,15 @@ export class MartuAgentDataAdapter implements AgentConversationStore, AgentMutat
         where ic.client_id = $1
         group by im.id, c.slug, ci.title order by im.published_at desc nulls last limit 20`, [clientId]))
       : [];
-    const campaigns = currentClient
+    const campaigns = currentClient && shouldRead("campaigns")
       ? await contextRead(input.signal, () => query<Row>(`select ac.*, c.slug as client_slug from public.ad_campaigns ac
         join public.clients c on c.id = ac.client_id where ac.client_id = $1 order by ac.updated_at desc limit 8`, [clientId]))
       : [];
-    const memoriesRaw = await contextRead(input.signal, () => listMemories({
+    const memoriesRaw = shouldRead("memories") ? await contextRead(input.signal, () => listMemories({
       clientSlug: currentClient?.slug,
       includeGlobal: true,
       limit: 20,
-    }));
+    })) : [];
     const profileRaw = await contextRead(input.signal, () => getCommunicationProfile());
     const messagesRaw = await contextRead(input.signal, () => listChatMessages(input.threadId, { limit: 12 }));
 

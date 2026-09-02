@@ -2,8 +2,11 @@ import type {
   AgentActionReceipt,
   AgentContext,
   AgentEntityRef,
+  AgentPlanningContext,
   AgentReply,
+  AgentRetrievalPlan,
   AgentRequest,
+  RequestPlan,
   AgentSource,
   AgentTurnPlan,
   ClientRef,
@@ -75,7 +78,24 @@ export interface AgentConversationStore {
     signal?: AbortSignal;
     /** Internal, policy-routed one-turn override. Never accepted from HTTP. */
     clientOverride?: string;
+    retrievalPlan?: AgentRetrievalPlan;
   }): Promise<AgentContext>;
+  /** Optional during migration so lightweight test stores stay compatible. */
+  buildPlanningContext?(input: AgentRequest & {
+    threadId: string;
+    now: Date;
+    signal?: AbortSignal;
+  }): Promise<AgentPlanningContext>;
+}
+
+export interface RequestPlannerInput {
+  request: AgentRequest;
+  context: AgentPlanningContext;
+  signal?: AbortSignal;
+}
+
+export interface RequestPlanner {
+  plan(input: RequestPlannerInput): Promise<RequestPlan>;
 }
 
 export interface AgentToolExecutor {

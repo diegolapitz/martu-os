@@ -1,7 +1,7 @@
 import type { AgentIntent, AgentRequest, AgentToolName } from "../types";
 
 export interface AgentGoldenScenario {
-  id: "read" | "ambiguous" | "contextual_action" | "memory" | "scope" | "current_view" | "reference" | "human" | "creative" | "open_loop" | "preference" | "undo";
+  id: "read" | "meeting_prep" | "ambiguous" | "contextual_action" | "memory" | "scope" | "current_view" | "reference" | "human" | "creative" | "open_loop" | "preference" | "undo";
   request: AgentRequest;
   expectedIntent: AgentIntent;
   expectedTool?: AgentToolName;
@@ -16,6 +16,13 @@ export const AGENT_GOLDEN_SCENARIOS: AgentGoldenScenario[] = [
     expectedIntent: "READ",
     maximumWrites: 0,
     maximumWords: 80,
+  },
+  {
+    id: "meeting_prep",
+    request: { message: "¿Qué tengo que saber de Gavilán? Tengo una reunión en una hora." },
+    expectedIntent: "READ",
+    maximumWrites: 0,
+    maximumWords: 160,
   },
   {
     id: "ambiguous",

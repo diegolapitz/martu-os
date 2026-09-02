@@ -112,6 +112,67 @@ export interface AgentContext {
   summary?: string;
 }
 
+/**
+ * Contexto mínimo y seguro para comprender un pedido antes de consultar el
+ * trabajo del cliente. No contiene una carga masiva de retrieval.
+ */
+export interface AgentPlanningContext {
+  now: string;
+  clients: ClientRef[];
+  conversationScope?: "global" | "client";
+  conversationClient?: ClientRef;
+  conversationEntity?: AgentEntityRef;
+  currentView?: AgentCurrentView;
+  currentViewItem?: AgentContextItem;
+  recentMessages: RecentChatMessage[];
+  lastReferencedEntity?: AgentEntityRef;
+}
+
+export const REQUEST_JOBS = [
+  "orient",
+  "prepare_interaction",
+  "recall",
+  "prioritize",
+  "create",
+  "review",
+  "analyze",
+  "plan",
+  "modify",
+  "capture",
+  "follow_up",
+  "reflect",
+  "converse",
+] as const;
+
+export type RequestJob = (typeof REQUEST_JOBS)[number];
+export type RequestScope = "global" | "client" | "entity" | "unknown";
+export type RequestTimeHorizon = "now" | "today" | "upcoming" | "past" | "range" | "unspecified";
+export type AgentKnowledgeSource = "work" | "scripts" | "content" | "notes" | "meetings" | "memories" | "metrics" | "campaigns" | "profile" | "thread";
+
+/** Semantic understanding of a turn. It deliberately does not authorize a tool. */
+export interface RequestPlan {
+  job: RequestJob;
+  scope: RequestScope;
+  clientSlug?: string;
+  relevantEntities: Array<{ type?: AgentEntityRef["type"]; title: string; id?: string }>;
+  timeHorizon: { kind: RequestTimeHorizon; detail?: string };
+  informationNeeds: AgentKnowledgeSource[];
+  ambiguities: string[];
+  requiresClarification: boolean;
+  sideEffectsExplicitlyRequested: boolean;
+  response: {
+    type: "answer" | "briefing" | "decision_support" | "draft" | "review" | "analysis" | "confirmation";
+    depth: "short" | "medium" | "deep";
+  };
+}
+
+/** The retrieval layer converts semantic needs into this bounded read plan. */
+export interface AgentRetrievalPlan {
+  sources: AgentKnowledgeSource[];
+  scope: RequestScope;
+  clientSlug?: string;
+}
+
 export interface AgentRequest {
   message: string;
   clientSlug?: string;
@@ -165,6 +226,8 @@ export interface AgentTurnPlan {
   directToolCall?: PlannedToolCall;
   requiredServices?: string[];
   serviceLabel?: string;
+  requestPlan?: RequestPlan;
+  retrievalPlan?: AgentRetrievalPlan;
 }
 
 export interface AgentTurnTimings {

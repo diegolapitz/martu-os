@@ -40,9 +40,13 @@ describe("Agent V1 mandatory golden evals", () => {
       }));
       if (scenario.expectedTool) expect(harness.toolCalls.map((call) => call.name)).toEqual([scenario.expectedTool]);
       else expect(harness.toolCalls).toHaveLength(0);
-      expect(harness.provider.generate).not.toHaveBeenCalled();
-      expect(reply.timings?.fastPath).toBe(true);
-      expect(reply.timings?.totalMs ?? Infinity).toBeLessThan(1_000);
+      if (scenario.expectedTool || scenario.expectedIntent === "AMBIGUOUS" || scenario.id === "scope") {
+        expect(harness.provider.generate).not.toHaveBeenCalled();
+        expect(reply.timings?.fastPath).toBe(true);
+      } else {
+        expect(harness.provider.generate).toHaveBeenCalledOnce();
+        expect(reply.timings?.fastPath).toBe(false);
+      }
     });
   }
 
@@ -55,7 +59,7 @@ describe("Agent V1 mandatory golden evals", () => {
     expect(numberedItems.length).toBeGreaterThanOrEqual(1);
     expect(numberedItems.length).toBeLessThanOrEqual(4);
     expect(harness.toolCalls).toHaveLength(0);
-    expect(harness.provider.generate).not.toHaveBeenCalled();
+    expect(harness.provider.generate).toHaveBeenCalledOnce();
   });
 
   it("READ does not repeat an entity when a linked task already represents it", async () => {
@@ -126,14 +130,14 @@ describe("Agent V1 mandatory golden evals", () => {
     });
 
     expect(reply.intent).toBe("CREATIVE_CHAT");
-    expect(harness.exposedTools).toEqual([]);
+    expect(harness.exposedTools.at(-1)).toEqual([]);
     expect(harness.toolCalls).toHaveLength(0);
-    expect(reply.message).toMatch(/arrancar[ií]a por la escapada/i);
-    expect(reply.timings?.fastPath).toBe(true);
+    expect(reply.message).toMatch(/escapad/i);
+    expect(reply.timings?.fastPath).toBe(false);
     expect(wordCount(reply.message)).toBeLessThanOrEqual(100);
   });
 
-  it("CURRENT_VIEW keeps an open idea grounded without calling the model", async () => {
+  it("CURRENT_VIEW keeps an open idea grounded during model composition", async () => {
     const harness = createHarness();
     const reply = await harness.agent.run({
       message: "No sé cómo seguir con esto.",
@@ -152,8 +156,8 @@ describe("Agent V1 mandatory golden evals", () => {
 
     expect(reply.message).toContain("Serie de microhistorias behind the scenes");
     expect(harness.toolCalls).toHaveLength(0);
-    expect(harness.provider.generate).not.toHaveBeenCalled();
-    expect(reply.timings?.fastPath).toBe(true);
+    expect(harness.provider.generate).toHaveBeenCalledOnce();
+    expect(reply.timings?.fastPath).toBe(false);
   });
 
   it("HUMAN pressure asks Martu to prioritize without coaching or mutations", async () => {
@@ -163,8 +167,8 @@ describe("Agent V1 mandatory golden evals", () => {
     expect(reply.intent).toBe("CREATIVE_CHAT");
     expect(reply.message).toMatch(/priori|mover/i);
     expect(harness.toolCalls).toHaveLength(0);
-    expect(harness.provider.generate).not.toHaveBeenCalled();
-    expect(reply.timings?.fastPath).toBe(true);
+    expect(harness.provider.generate).toHaveBeenCalledOnce();
+    expect(reply.timings?.fastPath).toBe(false);
   });
 
   it("PREFERENCE lowers insistence explicitly instead of treating it as small talk", async () => {
@@ -335,6 +339,23 @@ function createHarness() {
   const generate = vi.fn(async (input: AgentModelInput): Promise<AgentModelResult> => {
       exposedTools.push([...input.plan.allowedTools]);
       const avoidsInstitutional = input.context.memories.some((memory) => /no le gustan los videos institucionales/i.test(memory.content));
+      const currentItem = input.context.currentViewItem;
+      if (/reuni[oó]n|en una hora/i.test(input.request.message)) return {
+        message: "Para la reunión con Gavilán, llevaría frescas las decisiones recientes, el guion abierto y cualquier bloqueo. No veo nada que requiera un cambio ahora.",
+        capability: "supervisor", actions: [],
+      };
+      if (currentItem) return {
+        message: `Con “${currentItem.title}”, elegiría una escena concreta y un cierre antes de abrir otro frente.`,
+        capability: "creative", actions: [],
+      };
+      if (input.plan.intent === "READ") return {
+        message: "Hoy cerraría esto:\n1. Cerrar tercer guion de Gavilán\n2. Revisar copy de Gavilán",
+        capability: "supervisor", actions: [],
+      };
+      if (input.request.message.toLocaleLowerCase("es-AR").includes("no llego")) return {
+        message: "Priorizaría cerrar el tercer guion y movería lo demás después, sin tocar nada todavía.",
+        capability: "supervisor", actions: [],
+      };
       return {
         message: avoidsInstitutional
           ? "Sí. Evitaría lo institucional: iría directo a una escena concreta del detrás de escena."

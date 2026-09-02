@@ -17,6 +17,7 @@
     "test:e2e": "playwright test",
     "eval:quality": "tsx scripts/eval-agent-quality.ts",
     "eval:supervisor": "tsx scripts/run-supervisor-quality-baseline.ts",
+    "eval:capabilities": "tsx scripts/benchmark-supervisor-capabilities.ts",
     "db:migrate": "tsx scripts/db-migrate.ts",
     "db:seed": "tsx scripts/db-seed.ts",
     "db:reset:demo": "tsx scripts/db-reset.ts",
