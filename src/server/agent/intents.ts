@@ -143,7 +143,7 @@ export function parseDemoIntent(message: string, context: IntentParsingContext):
     return { type: "create_task", clientSlug, title: title || "Tarea creada desde el chat", dueAt: relativeDate?.toISOString() };
   }
 
-  if (/\b(?:no me jodas con esto|avisame menos|avísame menos|baja la insistencia|bajá la insistencia)\b/.test(normalized)) {
+  if (/\b(?:no me jodas(?: mas)? con esto|avisame menos|baja la insistencia)\b/.test(normalized)) {
     return { type: "reduce_insistence" };
   }
 

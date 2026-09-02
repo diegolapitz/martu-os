@@ -1,53 +1,52 @@
-# Martu OS V2.1 — Design QA
+# Design QA — Martu OS 3a
 
-Fecha: 2026-08-31
+Resultado local: **PASS** (2 de septiembre de 2026).
 
-## Evidencia comparada
+## Fuente y método
 
-- Mi Día: `11-concept-day.png` ↔ `21-after-day.png`
-- Trabajo y propuesta de prioridad: `10-concept-work.png` ↔ `22-after-work.png`
-- Calendario: `12-concept-calendar.png` ↔ `23-after-calendar.png`
-- Cliente / objeto editable: `13-concept-client.png` ↔ `24-after-client-idea.png`
-- Onboarding móvil: `14-concept-onboarding.png` ↔ `20-after-onboarding-mobile.png`
-- Supervisora contextual: `15-concept-supervisor.png` ↔ `25-after-supervisor.png`
-- Detalle de cliente móvil: `26-after-client-mobile.png`
+- Fuente normativa: `Rediseño de sitio Vercel.zip`, sección `#t3` del HTML y
+  `IMPLEMENTACION-3a.md`.
+- Captura de referencia: `C:/Users/Dieg/AppData/Local/Temp/martu-reference-3a.png`.
+- Capturas renderizadas: `martu-3a-{day,work,client,calendar,supervisor}-desktop.png`,
+  sus variantes mobile y `martu-3a-onboarding-logo-desktop.png` en la misma
+  carpeta temporal.
+- La referencia y los renders se inspeccionaron juntos a 1440×1000. También se
+  verificaron 390×844 y los breakpoints de 760/900/1180 px.
+- El Browser integrado no expuso su runtime de control en esta sesión. Se usó
+  Playwright Chromium como fallback para navegación, consola, requests,
+  screenshots, overflow y flujos E2E.
 
-Evidencia del deploy canónico:
+## Ledger de fidelidad
 
-- Mi Día: `30-prod-day.png`
-- Trabajo con prioridad: `31-prod-work.png`
-- Calendario: `32-prod-calendar.png`
-- Supervisora: `33-prod-supervisor.png`
-- Detalle de cliente móvil: `34-prod-client-mobile.png`
-- Configuración móvil: `35-prod-settings-mobile.png`
-- Feedback humano de la Supervisora: `36-prod-agent-feedback.png`
+| Superficie | Estado | Evidencia |
+| --- | --- | --- |
+| Tipografía | PASS | Schibsted Grotesk en UI; IBM Plex Mono sólo en fecha, conteos y overlines. |
+| Paleta | PASS | Canvas `#EEF0ED`, superficies blancas, tinta negra y lima limitada a Supervisora. |
+| Shell | PASS | Sidebar clara con registro de clientes, topbar persistente y regla superior semántica. |
+| Mi día | PASS | Tres conteos, foco con rail del cliente, prioridades y rail contextual. |
+| Trabajo | PASS | Registro Trabajo · Cliente · Estado · Vence; filtros y CRUD directo. |
+| Cliente | PASS | Cabecera, tabs y workspaces reales; deep links canónicos conservados. |
+| Calendario | PASS | Mes, filtros, colores por cliente y lectura segmentada de carga. |
+| Supervisora | PASS | Sistema neutral con marca lima acotada; memoria y conversaciones preservadas. |
+| Onboarding | PASS | Flujo responsive; selección, recorte, subida y lectura real de logo WebP. |
+| Responsive | PASS | Cero overflow horizontal en todas las rutas capturadas a 1440 y 390 px. |
+| Consola | PASS | Sin `console.error`, warnings de aplicación ni `pageerror` durante el recorrido. |
+| Accesibilidad | PASS | Nombres accesibles, foco visible, controles táctiles y reduced motion. |
 
-Las referencias y las capturas implementadas se inspeccionaron juntas, en estados equivalentes y con viewports desktop (1440 × 1000) y móvil (390 × 844).
+## Diferencias deliberadas
 
-## Resultado visual y funcional
+- La referencia estática muestra una porción ilustrativa de Mi día; la app real
+  conserva más datos, estados vacíos, acciones y rails existentes.
+- Los colores persistidos de clientes siguen siendo fuente de verdad; los cinco
+  valores canónicos actúan como fallback visual.
+- No se incrustó ningún PNG/HTML del concepto. Toda la interfaz es React/CSS
+  nativo conectado al producto.
 
-- Se conserva la gramática visual existente de Martu OS: tipografía, azul de acción, superficies sobrias, navegación lateral y densidad operativa.
-- Mi Día mantiene una jerarquía clara entre foco inmediato, prioridades, captura rápida, agenda y bloqueos.
-- Trabajo muestra filtros persistentes, identidad de cliente, tipo, estado, vencimiento y una propuesta de prioridad aplicable sin abrir conversación.
-- Calendario mantiene legibilidad mensual, leyenda interactiva, filtros visibles y deep links por objeto.
-- Los objetos de cliente tienen edición directa, contexto visible y trazabilidad entre Idea, Guion, Contenido, Publicación y Métricas.
-- Supervisora separa el panel operativo de la conversación, mantiene contexto fijado y muestra respuestas breves sin jerga interna.
-- Onboarding móvil usa una única dirección de scroll, tamaños táctiles y tipográficos legibles, confirmación explícita y avance no bloqueante.
-- En móvil, índice y detalle ya no compiten en la misma pantalla: un deep link abre sólo el detalle y ofrece regreso explícito a la colección.
+## Verificación funcional
 
-## Correcciones surgidas de la comparación
-
-- Eliminado el scroll anidado del catálogo de servicios en onboarding móvil.
-- Aumentados tamaños de texto y objetivos táctiles críticos del onboarding móvil.
-- Separados índice y detalle de Ideas, Guiones y Contenido en móvil, con regreso contextual y URL de colección.
-- Verificado que el drawer de Supervisora no comprime el título ni mezcla la vista actual con el contexto fijado.
-- Recapturada toda la evidencia con viewport real; se descartaron capturas corruptas de `fullPage`.
-
-## Criterios de aprobación
-
-- Sin recortes, superposiciones críticas ni columnas ilegibles en los flujos principales.
-- Navegación, CTA, filtros, formularios, deep links, cambio de cliente y estados visibles funcionan.
-- Los desvíos respecto de los conceptos son adaptaciones deliberadas al sistema existente, no regresiones visuales.
-- Producción validada en `https://martu-os.vercel.app` después del deploy final.
-
-final result: passed
+- Logo onboarding: recorte WebP, `POST /logo` 200, `GET /logo` 200,
+  `content-type: image/webp`.
+- Vitest: 39 archivos, 209 tests aprobados.
+- Playwright: 7/7 E2E aprobados (login/onboarding, Trabajo CRUD, cliente y
+  estrategia, Idea→Guion→Contenido, calendario CRUD, notificaciones y Web Push).
+- ESLint, TypeScript y build de producción: aprobados.

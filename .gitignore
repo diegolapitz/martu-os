@@ -36,10 +36,14 @@ yarn-error.log*
 
 # local PostgreSQL fallback and generated secrets
 /.data/
+/.tmp/
+**/__pycache__/
+*.py[cod]
 
 # browser QA
 /playwright-report/
 /test-results/
+Rediseño de sitio Vercel.zip
 
 # vercel
 .vercel
@@ -47,6 +51,3 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-
-.vercel
-.env*

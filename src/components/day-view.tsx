@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import type { CSSProperties } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -56,6 +57,10 @@ export function DayView({ data }: { data: DayData }) {
     return !shownWorkTitles.some((title) => title.length > 8 && detail.includes(title));
   });
   const actionCount = priorities.length + (spotlight ? 1 : 0);
+  const overdueCount = data.stats?.overdue
+    ?? priorities.filter((item) => /vencid|atras/i.test(item.dueLabel || "")).length;
+  const todayCount = data.stats?.today
+    ?? priorities.filter((item) => /hoy/i.test(item.dueLabel || "")).length;
 
   async function submitCapture(event: FormEvent) {
     event.preventDefault();
@@ -171,18 +176,29 @@ export function DayView({ data }: { data: DayData }) {
     <div className="day-layout">
       <section className="day-main">
         <header className="page-heading page-heading--day">
-          <p>{formatDay(data.date)}</p>
-          <h1 data-testid="day-heading">
-            {data.greeting || "Buen día, Martu."}
-          </h1>
-          <span>
-            {actionCount
-              ? `Hay ${actionCount} ${actionCount === 1 ? "frente" : "frentes"} que conviene sacar hoy.`
-              : "El día está despejado para elegir el próximo frente."}
-          </span>
+          <div className="day-heading__copy">
+            <p>{formatDay(data.date)}</p>
+            <h1 data-testid="day-heading">
+              {data.greeting || "Buen día, Martu."}
+            </h1>
+            <span>
+              {actionCount
+                ? `Hay ${actionCount} ${actionCount === 1 ? "frente" : "frentes"} que conviene sacar hoy.`
+                : "El día está despejado para elegir el próximo frente."}
+            </span>
+          </div>
+          <div className="day-heading__counts" aria-label="Resumen del día">
+            <span><strong>{overdueCount}</strong><small>Vencido</small></span>
+            <span><strong>{todayCount}</strong><small>Hoy</small></span>
+            <span><strong>{actionCount}</strong><small>Abiertos</small></span>
+          </div>
         </header>
 
-        <section className="supervisor-callout" aria-labelledby="day-now-title">
+        <section
+          className="supervisor-callout"
+          aria-labelledby="day-now-title"
+          style={{ "--client-accent": clientAccent(spotlight?.clientSlug, spotlight?.clientName) } as CSSProperties}
+        >
           <div className="supervisor-callout__mark">
             <ClientMark name={spotlight?.clientName || "Martu"} accent={clientAccent(spotlight?.clientSlug, spotlight?.clientName)} large />
           </div>
@@ -219,6 +235,7 @@ export function DayView({ data }: { data: DayData }) {
                   className={
                     index === 0 ? "priority-row is-primary" : "priority-row"
                   }
+                  style={{ "--client-accent": clientAccent(priority.clientSlug, priority.clientName) } as CSSProperties}
                   key={priority.id}
                 >
                   <span className="priority-row__number">{index + 1}</span>

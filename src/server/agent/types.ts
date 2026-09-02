@@ -136,6 +136,7 @@ export type AgentOperation =
   | "create_task"
   | "capture_note"
   | "save_memory"
+  | "update_communication_profile"
   | "create_commitment"
   | "create_open_loop"
   | "create_idea"

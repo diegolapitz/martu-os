@@ -8,7 +8,7 @@ export function StatusDot({ tone = "success" }: { tone?: "success" | "warning" |
 export function SectionTitle({ icon, children, action }: { icon?: ReactNode; children: ReactNode; action?: ReactNode }) {
   return (
     <div className="section-heading">
-      <div>{icon}{children}</div>
+      <h2>{icon}{children}</h2>
       {action ? <div>{action}</div> : null}
     </div>
   );

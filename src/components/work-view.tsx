@@ -19,7 +19,7 @@ import {
   Trash2,
   X,
 } from "lucide-react";
-import { ClientMark } from "@/components/brand";
+import { ClientIdentity, ClientMark } from "@/components/brand";
 import type { DayData, DayPriority } from "@/components/types";
 import { announceFeedback, Feedback } from "@/components/ui";
 import {
@@ -675,8 +675,10 @@ export function WorkView({ data }: { data: DayData }) {
           </div>
 
           <div className="work-list-heading" id="work-list-title">
-            <span>{visibleItems.length} {visibleItems.length === 1 ? "resultado" : "resultados"}</span>
-            <span>Vencimiento</span>
+            <span>Trabajo · {visibleItems.length}</span>
+            <span>Cliente</span>
+            <span>Estado</span>
+            <span>Vence</span>
           </div>
 
           <div className="work-list">
@@ -695,9 +697,24 @@ export function WorkView({ data }: { data: DayData }) {
                   <button className={"check-button" + (complete ? " is-checked" : "")} type="button" onClick={() => void setStatus(item, complete ? "pending" : "completed")} disabled={busy} aria-label={complete ? "Reabrir " + item.title : "Completar " + item.title}>
                     {busy ? <LoaderCircle className="spin" size={17} /> : complete ? <Check size={17} /> : <Circle size={23} strokeWidth={1.45} />}
                   </button>
-                  <button className="work-row__identity" type="button" onClick={() => openEdit(item)} aria-label={"Editar " + item.title}>
-                    <strong><ObjectTypeIcon type={item.kind || item.entityType} size={16} />{item.title}</strong>
-                    <span><ClientMark name={friendlyClient(item)} accent={accent} />{friendlyClient(item)}<small>{humanStatus(item.status)}</small><small>{objectTypeLabel(item.kind || item.entityType)}</small></span>
+                  <button
+                    className="work-row__identity"
+                    type="button"
+                    onClick={() => openEdit(item)}
+                    aria-label={`Editar ${item.title}. ${friendlyClient(item)}. ${humanStatus(item.status)}. ${objectTypeLabel(item.kind || item.entityType)}.`}
+                  >
+                    <span className="work-row__task">
+                      <strong><ObjectTypeIcon type={item.kind || item.entityType} size={16} />{item.title}</strong>
+                      <small>{objectTypeLabel(item.kind || item.entityType)}</small>
+                    </span>
+                    <ClientIdentity
+                      className="work-row__client"
+                      name={friendlyClient(item)}
+                      accent={accent}
+                      meta={item.clientSlug ? "Cliente" : "Interno"}
+                      compact
+                    />
+                    <span className="work-row__meta"><small>{humanStatus(item.status)}</small></span>
                   </button>
                   <span className={"work-due work-due--" + bucket}><CalendarDays size={14} />{displayDue(item)}</span>
                   <Link href={href} prefetch={false} onClick={(event) => {

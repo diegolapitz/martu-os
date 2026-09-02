@@ -124,6 +124,22 @@ export class MartuAgentDataAdapter implements AgentConversationStore, AgentMutat
         join public.clients c on c.id = ci.client_id where ci.client_id = $1
         order by cm.captured_at desc limit 12`, [clientId]))
       : [];
+    const instagramMetricRows = currentClient
+      ? await contextRead(input.signal, () => query<Row>(`select im.id, c.slug as client_slug,
+          coalesce(ci.title, nullif(left(im.caption, 100), ''), 'Publicación de Instagram') as title,
+          im.instagram_media_id as external_id, im.media_type, im.media_product_type,
+          im.published_at, im.permalink,
+          coalesce(jsonb_object_agg(imi.metric_name, imi.metric_value)
+            filter (where imi.metric_name is not null), '{}'::jsonb) as observed_metrics,
+          'instagram_api'::text as source, 'observed'::text as evidence_kind
+        from public.instagram_media im
+        join public.instagram_connections ic on ic.id = im.connection_id
+        join public.clients c on c.id = ic.client_id
+        left join public.content_items ci on ci.id = im.content_item_id
+        left join public.instagram_media_insights imi on imi.media_id = im.id
+        where ic.client_id = $1
+        group by im.id, c.slug, ci.title order by im.published_at desc nulls last limit 20`, [clientId]))
+      : [];
     const campaigns = currentClient
       ? await contextRead(input.signal, () => query<Row>(`select ac.*, c.slug as client_slug from public.ad_campaigns ac
         join public.clients c on c.id = ac.client_id where ac.client_id = $1 order by ac.updated_at desc limit 8`, [clientId]))
@@ -158,7 +174,7 @@ export class MartuAgentDataAdapter implements AgentConversationStore, AgentMutat
       content: content.map((row) => mapItem(row, "content", clients)),
       notes: notes.map((row) => mapItem({ ...row, title: truncate(String(row.text ?? "Nota"), 80), body: row.text, status: "saved" }, "note", clients)),
       meetings: meetings.map((row) => mapItem({ ...row, body: row.summary, status: "held", due_at: row.starts_at }, "meeting", clients)),
-      metrics: metricRows.map(normalizeRecord),
+      metrics: [...instagramMetricRows, ...metricRows].map(normalizeRecord),
       campaigns: campaigns.map(normalizeRecord),
       memories: memoriesRaw.map(mapMemory),
       profile: mapProfile(profileRaw),

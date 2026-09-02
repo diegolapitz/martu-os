@@ -6,6 +6,15 @@ const BASE_URL = "http://127.0.0.1:3000";
 test.describe.configure({ mode: "serial" });
 test.setTimeout(60_000);
 
+async function leaveOptionalOnboarding(page: Page) {
+  await expect(page).toHaveURL(/\/(day|onboarding)$/);
+  if (page.url().endsWith("/onboarding")) {
+    const later = page.getByRole("button", { name: /Lo hago después|Continuar más tarde/ });
+    await expect(later).toBeVisible();
+    await later.click();
+  }
+}
+
 async function enterMartuOs(page: Page) {
   await page.goto("/");
   const login = page.getByRole("heading", { name: "Entrá a Martu OS." });
@@ -15,6 +24,7 @@ async function enterMartuOs(page: Page) {
     await page.getByRole("button", { name: "Entrar a laburar" }).click();
   }
 
+  await leaveOptionalOnboarding(page);
   await expect(page).toHaveURL(/\/day$/);
   await expect(
     page.getByRole("heading", { name: /Buen día, Martu\./ }),
@@ -62,6 +72,7 @@ test("login de desarrollo y shell principal funcionan también en móvil", async
   );
   await page.getByRole("button", { name: "Entrar a laburar" }).click();
 
+  await leaveOptionalOnboarding(page);
   await expect(page).toHaveURL(/\/day$/);
   await expect(
     page.getByRole("heading", { name: /Buen día, Martu\./ }),

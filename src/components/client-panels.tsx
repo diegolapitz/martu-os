@@ -1,8 +1,10 @@
 "use client";
+/* eslint-disable @next/next/no-img-element -- Meta CDN URLs are dynamic, signed and may expire. */
 
 import {
   FormEvent,
   useDeferredValue,
+  useEffect,
   useMemo,
   useState,
 } from "react";
@@ -20,15 +22,20 @@ import {
   FlaskConical,
   Folder,
   GitBranch,
+  Instagram as InstagramIcon,
+  ExternalLink,
+  Link2,
   Lightbulb,
   NotebookPen,
   Pencil,
   Play,
   Plus,
+  RefreshCw,
   Search,
   Sparkles,
   Tag,
   Users,
+  Unplug,
 } from "lucide-react";
 import { ClientMark, SunMark } from "@/components/brand";
 import {
@@ -270,7 +277,12 @@ export function SummaryPanel({ data }: { data: ClientWorkspaceData }) {
     <div className="summary-layout">
       <div className="summary-canvas">
         <section className="client-supervisor">
-          <ClientMark name={data.client.name} large />
+          <ClientMark
+            name={data.client.name}
+            large
+            logoUrl={data.client.logoUrl}
+            accent={data.client.accent}
+          />
           <blockquote>
             {data.summary?.insight ||
               `Hay una sola cosa que hoy movería primero: cerrar lo urgente de ${data.client.name} antes del próximo deadline.`}
@@ -1764,6 +1776,168 @@ function metricValue(value?: number, suffix = "") {
     : "Sin dato";
 }
 
+function instagramMetric(value: unknown): number | undefined {
+  if (typeof value === "number" && Number.isFinite(value)) return value;
+  if (typeof value === "string" && value.trim() && Number.isFinite(Number(value))) return Number(value);
+  if (value && typeof value === "object" && "value" in value) return instagramMetric((value as { value?: unknown }).value);
+  return undefined;
+}
+
+function InstagramConnectionPanel({ data }: { data: ClientWorkspaceData }) {
+  const router = useRouter();
+  const instagram = data.instagram ?? { configured: false, connected: false, media: [] };
+  const [busy, setBusy] = useState<"connect" | "sync" | "disconnect" | `link-${string}` | null>(null);
+  const [feedback, setFeedback] = useState<string | null>(instagram.lastError ?? null);
+  const [confirmingDisconnect, setConfirmingDisconnect] = useState(false);
+  const [links, setLinks] = useState<Record<string, string>>(() => Object.fromEntries(
+    instagram.media.map((item) => [item.id, item.contentItemId ?? ""]),
+  ));
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const status = params.get("instagram");
+    const message = params.get("message");
+    const nextFeedback = status === "connected"
+      ? "Instagram quedó conectado y sincronizado."
+      : status === "cancelled"
+        ? "La conexión fue cancelada. No se guardó ninguna cuenta."
+        : status === "error"
+          ? message || "No pude conectar Instagram."
+          : null;
+    if (nextFeedback) queueMicrotask(() => setFeedback(nextFeedback));
+    if (status) {
+      const url = new URL(window.location.href);
+      url.searchParams.delete("instagram");
+      url.searchParams.delete("message");
+      window.history.replaceState(window.history.state, "", url.pathname + url.search);
+    }
+  }, []);
+
+  async function readResponse(response: Response) {
+    const payload = await response.json().catch(() => ({})) as { message?: string };
+    if (!response.ok) throw new Error(payload.message || "No pude completar la acción de Instagram.");
+    return payload;
+  }
+
+  async function connect() {
+    setBusy("connect");
+    setFeedback(null);
+    try {
+      const response = await fetch("/api/instagram/oauth/start", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ clientSlug: data.client.slug }),
+      });
+      const payload = await response.json().catch(() => ({})) as { authorizationUrl?: string; message?: string };
+      if (!response.ok || !payload.authorizationUrl) throw new Error(payload.message || "No pude iniciar la conexión con Instagram.");
+      window.location.assign(payload.authorizationUrl);
+    } catch (error) {
+      setFeedback(error instanceof Error ? error.message : "No pude iniciar la conexión con Instagram.");
+      setBusy(null);
+    }
+  }
+
+  async function sync() {
+    setBusy("sync");
+    setFeedback(null);
+    try {
+      await readResponse(await fetch("/api/instagram/sync", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ clientSlug: data.client.slug }),
+      }));
+      setFeedback("Instagram se actualizó sin duplicar publicaciones.");
+      router.refresh();
+    } catch (error) {
+      setFeedback(error instanceof Error ? error.message : "No pude actualizar Instagram.");
+    } finally { setBusy(null); }
+  }
+
+  async function disconnect() {
+    setBusy("disconnect");
+    setFeedback(null);
+    try {
+      await readResponse(await fetch(`/api/instagram?client=${encodeURIComponent(data.client.slug)}`, { method: "DELETE" }));
+      setFeedback("Instagram quedó desconectado. El historial sincronizado se conservó.");
+      setConfirmingDisconnect(false);
+      router.refresh();
+    } catch (error) {
+      setFeedback(error instanceof Error ? error.message : "No pude desconectar Instagram.");
+    } finally { setBusy(null); }
+  }
+
+  async function saveLink(mediaId: string) {
+    setBusy(`link-${mediaId}`);
+    setFeedback(null);
+    try {
+      await readResponse(await fetch(`/api/instagram/media/${mediaId}/link`, {
+        method: "PATCH",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ clientSlug: data.client.slug, contentItemId: links[mediaId] || null }),
+      }));
+      setFeedback(links[mediaId] ? "Publicación vinculada al contenido interno." : "Vinculación eliminada.");
+      router.refresh();
+    } catch (error) {
+      setFeedback(error instanceof Error ? error.message : "No pude guardar la vinculación.");
+    } finally { setBusy(null); }
+  }
+
+  const totals = instagram.media.reduce((result, item) => {
+    for (const key of ["views", "reach", "total_interactions"] as const) {
+      const value = instagramMetric(item.insights[key]);
+      if (value != null) result[key] += value;
+    }
+    return result;
+  }, { views: 0, reach: 0, total_interactions: 0 });
+
+  return <section className="instagram-connection" aria-busy={busy != null}>
+    <header className="instagram-connection__header">
+      <div className="instagram-connection__identity">
+        {instagram.profilePictureUrl ? <img src={instagram.profilePictureUrl} alt="" loading="lazy" /> : <span><InstagramIcon size={21} aria-hidden="true" /></span>}
+        <div><small>Instagram</small><strong>{instagram.username ? `@${instagram.username}` : "No conectado"}</strong></div>
+      </div>
+      {instagram.connected ? <div className="instagram-connection__status"><i /><span>Conectado</span>{instagram.lastSyncAt ? <small>Actualizado <TimeAgo value={instagram.lastSyncAt} /></small> : <small>Todavía sin sincronizar</small>}</div> : null}
+      <div className="instagram-connection__actions">
+        {instagram.connected ? <>
+          <button className="button button--secondary button--small" type="button" onClick={() => void sync()} disabled={busy != null}><RefreshCw size={15} aria-hidden="true" />{busy === "sync" ? "Sincronizando…" : "Sincronizar ahora"}</button>
+          <button className="button button--ghost-danger button--small" type="button" onClick={() => setConfirmingDisconnect(true)} disabled={busy != null}><Unplug size={14} aria-hidden="true" />Desconectar</button>
+        </> : <button className="button button--primary button--small" type="button" onClick={() => void connect()} disabled={busy != null || !instagram.configured}><InstagramIcon size={15} aria-hidden="true" />{busy === "connect" ? "Abriendo Instagram…" : "Conectar"}</button>}
+      </div>
+    </header>
+    {!instagram.connected ? <p className="instagram-connection__hint">{instagram.configured ? "Conectá una cuenta Creator o Business para traer publicaciones y métricas reales." : "La integración todavía no tiene credenciales configuradas en el servidor."}</p> : null}
+    {instagram.status === "needs_reauth" ? <Feedback tone="error" message="La conexión necesita renovarse. Volvé a conectar la cuenta." /> : <Feedback tone={instagram.lastError ? "error" : undefined} message={feedback} />}
+    {confirmingDisconnect ? <div className="instagram-disconnect" role="alert"><p><strong>¿Desconectar Instagram?</strong><span>Se elimina el token, pero las publicaciones y métricas ya sincronizadas quedan guardadas.</span></p><div><button className="button button--secondary button--small" type="button" onClick={() => setConfirmingDisconnect(false)} disabled={busy != null}>Cancelar</button><button className="button button--danger button--small" type="button" onClick={() => void disconnect()} disabled={busy != null}>{busy === "disconnect" ? "Desconectando…" : "Desconectar"}</button></div></div> : null}
+    {instagram.connected ? <>
+      <div className="instagram-summary" aria-label="Resumen de Instagram">
+        <div><span>Piezas sincronizadas</span><strong>{instagram.media.length}</strong></div>
+        <div><span>Views disponibles</span><strong>{metricValue(totals.views)}</strong></div>
+        <div><span>Alcance acumulado</span><strong>{metricValue(totals.reach)}</strong></div>
+        <div><span>Interacciones</span><strong>{metricValue(totals.total_interactions)}</strong></div>
+      </div>
+      <div className="instagram-media-list">
+        <SectionTitle>Publicaciones y reels reales</SectionTitle>
+        {instagram.media.length ? instagram.media.map((item) => {
+          const image = item.thumbnailUrl || item.mediaUrl;
+          const entries = Object.entries(item.insights).filter(([, value]) => instagramMetric(value) != null);
+          return <details className="instagram-media" key={item.id}>
+            <summary>
+              <span className="instagram-media__thumb">{image ? <img src={image} alt="" loading="lazy" /> : <InstagramIcon size={20} aria-hidden="true" />}</span>
+              <span className="instagram-media__copy"><small>{item.mediaProductType || item.mediaType} · {prettyDate(item.publishedAt)}</small><strong>{item.caption?.trim() || "Publicación sin caption"}</strong>{item.contentTitle ? <em><Link2 size={12} aria-hidden="true" />{item.contentTitle}</em> : null}</span>
+              <span className="instagram-media__quick"><b>{metricValue(instagramMetric(item.insights.views))}</b><small>views</small></span>
+              <ChevronDown size={17} aria-hidden="true" />
+            </summary>
+            <div className="instagram-media__detail">
+              <dl>{entries.length ? entries.map(([name, value]) => <div key={name}><dt>{name.replaceAll("_", " ")}</dt><dd>{metricValue(instagramMetric(value))}</dd></div>) : <div><dt>Métricas</dt><dd>No disponibles para esta pieza</dd></div>}</dl>
+              <div className="instagram-media__link"><label><span>Contenido interno</span><select value={links[item.id] ?? ""} onChange={(event) => setLinks((current) => ({ ...current, [item.id]: event.target.value }))}><option value="">Sin vincular</option>{data.content.map((content) => <option key={content.id} value={content.id}>{content.title}</option>)}</select></label><button className="button button--secondary button--small" type="button" onClick={() => void saveLink(item.id)} disabled={busy != null}>{busy === `link-${item.id}` ? "Guardando…" : "Guardar vínculo"}</button></div>
+              {item.permalink ? <a className="text-link" href={item.permalink} target="_blank" rel="noreferrer">Abrir en Instagram <ExternalLink size={13} aria-hidden="true" /></a> : null}
+            </div>
+          </details>;
+        }) : <EmptyState title="Sin publicaciones disponibles" body="La cuenta está conectada, pero Instagram no devolvió media para sincronizar." />}
+      </div>
+    </> : null}
+  </section>;
+}
+
 export function MetricsPanel({ data }: { data: ClientWorkspaceData }) {
   const latest = data.metrics[0];
   const maxViews = Math.max(
@@ -1772,11 +1946,12 @@ export function MetricsPanel({ data }: { data: ClientWorkspaceData }) {
   );
   return (
     <div className="metrics-panel">
+      <InstagramConnectionPanel data={data} />
       <header>
         <div>
           <p>Últimos 30 días</p>
           <h2>Rendimiento orgánico</h2>
-          <span>Datos demo · no conectado a Instagram</span>
+          <span>{data.instagram?.connected ? `Datos internos separados de @${data.instagram.username}` : "Datos demo · no conectado a Instagram"}</span>
         </div>
         <button
           className="button button--secondary button--small"
@@ -1787,7 +1962,7 @@ export function MetricsPanel({ data }: { data: ClientWorkspaceData }) {
           Pedir una hipótesis
         </button>
       </header>
-      {latest ? (
+      {!data.instagram?.connected && latest ? (
         <>
           <section className="metric-strip">
             {[
@@ -1862,12 +2037,12 @@ export function MetricsPanel({ data }: { data: ClientWorkspaceData }) {
             ))}
           </section>
         </>
-      ) : (
+      ) : !data.instagram?.connected ? (
         <EmptyState
           title="Todavía no hay métricas"
           body="Este servicio está activo, pero falta cargar el primer corte de datos."
         />
-      )}
+      ) : null}
       <InsightsBoard
         data={data}
         surface="metrics"

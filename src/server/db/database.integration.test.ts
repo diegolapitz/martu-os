@@ -37,11 +37,13 @@ describe("Martu OS database contract", () => {
     expect(gavilan.scripts.length).toBeGreaterThanOrEqual(6);
     expect(gavilan.content.length).toBeGreaterThanOrEqual(8);
     expect(gavilan.tabs.map((tab) => tab.id)).toEqual(expect.arrayContaining(["metricas", "pauta", "guiones"]));
-    expect(gavilan.scripts.find((script) => script.number === 3)?.title).toBe("Escapada sin organizar de más");
-    const laguna = gavilan.content.find((item) => item.title.includes("Laguna de los Patos"));
-    expect(laguna?.scriptId).toBe(gavilan.scripts.find((script) => script.title === "Un día en la Laguna de los Patos")?.id);
-    expect(gavilan.metrics.find((metric) => metric.contentTitle.includes("Laguna de los Patos"))?.retention).toBe(71);
-    expect(gavilan.metrics.filter((metric) => metric.contentTitle.includes("institucional")).every((metric) => (metric.retention ?? 100) < 35)).toBe(true);
+    expect(gavilan.scripts.find((script) => script.number === 3)?.title).toBe("Open call para artistas");
+    const liveSession = gavilan.content.find((item) => item.title.includes("Live Session"));
+    expect(liveSession?.scriptId).toBe(gavilan.scripts.find((script) => script.title === "Qué pasa en una Live Session")?.id);
+    expect(gavilan.metrics.find((metric) => metric.contentTitle.includes("Live Session"))?.retention).toBe(71);
+    const longFormMetrics = gavilan.metrics.filter((metric) => /Así suena|Una sala/.test(metric.contentTitle));
+    expect(longFormMetrics).toHaveLength(2);
+    expect(longFormMetrics.every((metric) => (metric.retention ?? 100) < 35)).toBe(true);
 
     const luma = await getClientWorkspace("luma-estudio");
     expect(luma.tabs.map((tab) => tab.id)).not.toContain("metricas");

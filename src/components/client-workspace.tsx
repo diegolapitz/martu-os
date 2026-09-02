@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import type { CSSProperties } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -10,6 +11,7 @@ import {
   ChevronDown,
   Circle,
   Clock3,
+  ImagePlus,
   MessageSquareText,
   Pencil,
   Sparkles,
@@ -33,6 +35,7 @@ import {
 } from "@/components/client-v1-panels";
 import { announceFeedback, Feedback, TimeAgo } from "@/components/ui";
 import type { ClientWorkspaceData, WorkspaceTab } from "@/components/types";
+import { getClientLogoSuggestedAccent, prepareClientLogo, removeClientLogo, saveClientLogo, type PreparedClientLogo } from "@/lib/client-logo-browser";
 
 const aliases: Record<string, string> = {
   summary: "resumen",
@@ -373,13 +376,49 @@ function ClientDialog({
   const [name, setName] = useState(data.client.name);
   const [description, setDescription] = useState(data.client.description);
   const [status, setStatus] = useState(data.client.status || "Activo");
-  const [logoUrl, setLogoUrl] = useState(data.client.logoUrl || "");
+  const [logo, setLogo] = useState<PreparedClientLogo | null>(null);
+  const [removeLogo, setRemoveLogo] = useState(false);
+  const [showAccentSuggestion, setShowAccentSuggestion] = useState(false);
+  const [suggestedAccent, setSuggestedAccent] = useState<string | null>(null);
+  const logoInputRef = useRef<HTMLInputElement | null>(null);
   const [accent, setAccent] = useState(data.client.accent || "#155eef");
   const [serviceSlugs, setServiceSlugs] = useState<string[]>(
     data.client.serviceSlugs || [],
   );
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => () => { if (logo) URL.revokeObjectURL(logo.previewUrl); }, [logo]);
+
+  useEffect(() => {
+    let active = true;
+    if (!data.client.logoUrl) return;
+    void getClientLogoSuggestedAccent(data.client.logoUrl)
+      .then((value) => { if (active) setSuggestedAccent(value); })
+      .catch(() => undefined);
+    return () => { active = false; };
+  }, [data.client.logoUrl]);
+
+  async function chooseLogo(file: File | undefined) {
+    if (!file) return;
+    setError("");
+    try {
+      const prepared = await prepareClientLogo(file);
+      setLogo((current) => { if (current) URL.revokeObjectURL(current.previewUrl); return prepared; });
+      setSuggestedAccent(prepared.suggestedAccent);
+      setRemoveLogo(false);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "No pude preparar la imagen.");
+    } finally {
+      if (logoInputRef.current) { logoInputRef.current.value = ""; logoInputRef.current.blur(); }
+    }
+  }
+
+  function clearLogo() {
+    setLogo((current) => { if (current) URL.revokeObjectURL(current.previewUrl); return null; });
+    setRemoveLogo(Boolean(data.client.logoUrl));
+    setSuggestedAccent(null);
+  }
 
   async function submit(event: FormEvent) {
     event.preventDefault();
@@ -393,7 +432,6 @@ function ClientDialog({
           name,
           description,
           status,
-          logoUrl: logoUrl || null,
           accent,
           serviceSlugs,
         }),
@@ -407,17 +445,24 @@ function ClientDialog({
       const serviceLabels = serviceOptions
         .filter(([slug]) => serviceSlugs.includes(slug))
         .map(([, label]) => label);
+      let nextLogoUrl = data.client.logoUrl || null;
+      if (logo) nextLogoUrl = await saveClientLogo(data.client.slug, logo.file);
+      else if (removeLogo) {
+        await removeClientLogo(data.client.slug);
+        nextLogoUrl = null;
+      }
       onSaved({
         ...data.client,
         ...(payload.client || {}),
         name,
         description,
         status,
-        logoUrl: logoUrl || null,
+        logoUrl: nextLogoUrl,
         accent,
         serviceSlugs,
         services: serviceLabels,
       });
+      window.dispatchEvent(new CustomEvent("martu:client-identity", { detail: { slug: data.client.slug, name, accent, logoUrl: nextLogoUrl } }));
       announceFeedback("Cliente actualizado.");
       onClose();
       router.refresh();
@@ -485,23 +530,27 @@ function ClientDialog({
           />
         </label>
         <div className="client-edit-dialog__identity">
-          <label>
-            <span>Logo o foto (URL)</span>
-            <input
-              type="url"
-              value={logoUrl}
-              onChange={(event) => setLogoUrl(event.target.value)}
-              placeholder="https://…"
-            />
-          </label>
-          <label>
+          <div className="client-logo-upload">
+            <span>Logo o foto</span>
+            <div className="client-logo-upload__row">
+              <ClientMark name={name || data.client.name} accent={accent} logoUrl={logo?.previewUrl ?? (removeLogo ? null : data.client.logoUrl)} large />
+              <div className="client-logo-upload__details"><strong>{logo || (!removeLogo && data.client.logoUrl) ? "Imagen del cliente" : "Sin imagen"}</strong><small>JPG, PNG o WebP</small><label className="client-logo-upload__choose"><ImagePlus size={14} aria-hidden="true" />{logo || (!removeLogo && data.client.logoUrl) ? "Cambiar imagen" : "Elegir imagen"}
+                <input ref={logoInputRef} type="file" accept="image/jpeg,image/png,image/webp" onChange={(event) => void chooseLogo(event.target.files?.[0])} />
+              </label></div>
+              {logo || (!removeLogo && data.client.logoUrl) ? <button className="client-logo-upload__remove" type="button" onClick={clearLogo}>Quitar</button> : null}
+            </div>
+          </div>
+          <div className="client-color-field">
             <span>Color del cliente</span>
             <input
               type="color"
               value={accent}
+              onFocus={() => setShowAccentSuggestion(true)}
+              onClick={() => setShowAccentSuggestion(true)}
               onChange={(event) => setAccent(event.target.value)}
             />
-          </label>
+            {showAccentSuggestion && suggestedAccent && suggestedAccent !== accent ? <button className="client-color-field__suggestion" type="button" onClick={() => setAccent(suggestedAccent)}><i style={{ backgroundColor: suggestedAccent }} />Sugerido: {suggestedAccent.toUpperCase()}</button> : null}
+          </div>
           <label>
             <span>Estado</span>
             <select
@@ -671,7 +720,10 @@ export function ClientWorkspace({
   }
 
   return (
-    <div className={`client-workspace client-workspace--${active}`}>
+    <div
+      className={`client-workspace client-workspace--${active}`}
+      style={{ "--client-accent": client.accent || "#64748b" } as CSSProperties}
+    >
       <header className="client-header">
         <div className="client-header__identity">
           <ClientMark

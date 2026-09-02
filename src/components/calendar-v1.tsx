@@ -280,6 +280,9 @@ function CalendarMonth({ cursor, events, onPickDay, onEdit }: { cursor: Date; ev
             <button className="calendar-month__number" type="button" onClick={() => onPickDay(day)} aria-label={`Ver ${format(day, "d 'de' MMMM", { locale: es })}`}>{format(day, "d")}</button>
             <div>{dayEvents.slice(0, 3).map((event) => <EventCard event={event} compact onEdit={onEdit} key={event.id} />)}</div>
             {dayEvents.length > 3 ? <button className="calendar-month__more" type="button" onClick={() => onPickDay(day)}>+{dayEvents.length - 3} más</button> : null}
+            {dayEvents.length ? <div className="calendar-day-load" aria-label={`${dayEvents.length} elementos de carga`}>
+              {dayEvents.map((event) => <i key={event.id} style={{ backgroundColor: clientAccent(event.clientSlug, event.clientName, event.clientAccent) }} />)}
+            </div> : null}
           </section>
         );
       })}
@@ -377,6 +380,15 @@ export function CalendarV1() {
     const matchesStatus = status === "all" || statusCategory(event.status) === status;
     return matchesKind && matchesClient && matchesStatus;
   });
+  const clientLoad = clients
+    .map(([slug, name, accent]) => ({
+      slug,
+      name,
+      accent: clientAccent(slug, name, accent),
+      count: filtered.filter((event) => event.clientSlug === slug).length,
+    }))
+    .filter((client) => client.count > 0);
+  const totalClientLoad = clientLoad.reduce((total, client) => total + client.count, 0);
 
   function move(direction: -1 | 1) {
     setLoading(true);
@@ -495,22 +507,34 @@ export function CalendarV1() {
         </div>
       ) : null}
 
-      <div className="calendar-client-legend" aria-label="Filtrar por cliente">
-        <button className={clientSlug === "all" ? "is-active" : ""} type="button" onClick={() => setClientSlug("all")} aria-pressed={clientSlug === "all"}>Todos</button>
-        {clients.map(([slug, name, accent]) => (
-          <button className={clientSlug === slug ? "is-active" : ""} type="button" onClick={() => setClientSlug((current) => current === slug ? "all" : slug)} aria-pressed={clientSlug === slug} key={slug}>
-            <i style={{ backgroundColor: clientAccent(slug, name, accent) }} />{name}
-          </button>
-        ))}
-      </div>
-
       <Feedback message={feedback?.message} tone={feedback?.error ? "error" : "success"} />
-      <div className="calendar-v1-surface" aria-busy={loading}>
-        {loading ? <div className="calendar-v1-loading" role="status"><p className="sr-only">Cargando calendario</p><span aria-hidden="true" /><span aria-hidden="true" /><span aria-hidden="true" /></div> : null}
-        {!loading && mode === "month" ? <CalendarMonth cursor={cursor} events={filtered} onPickDay={(day) => { setLoading(true); setCursor(day); setMode("day"); }} onEdit={editEvent} /> : null}
-        {!loading && mode === "week" ? <CalendarColumns days={weekDays} events={filtered} onEdit={editEvent} /> : null}
-        {!loading && mode === "day" ? <CalendarColumns days={[cursor]} events={filtered} onEdit={editEvent} /> : null}
-        {!loading && mode === "agenda" ? <CalendarAgenda events={filtered} onEdit={editEvent} /> : null}
+      <div className="calendar-v1-body">
+        <aside className="calendar-load-rail">
+          <div className="calendar-client-legend" aria-label="Filtrar por cliente">
+            <strong>Filtrar por cliente</strong>
+            <button className={clientSlug === "all" ? "is-active" : ""} type="button" onClick={() => setClientSlug("all")} aria-pressed={clientSlug === "all"}>Todos <span>{events.length}</span></button>
+            {clients.map(([slug, name, accent]) => {
+              const count = events.filter((event) => event.clientSlug === slug).length;
+              return <button className={clientSlug === slug ? "is-active" : ""} type="button" onClick={() => setClientSlug((current) => current === slug ? "all" : slug)} aria-pressed={clientSlug === slug} key={slug}>
+                <i style={{ backgroundColor: clientAccent(slug, name, accent) }} />{name}<span>{count}</span>
+              </button>;
+            })}
+          </div>
+          <section className="calendar-week-load">
+            <strong>Carga del período</strong>
+            <div aria-label={`${totalClientLoad} elementos distribuidos por cliente`}>
+              {clientLoad.map((client) => <i key={client.slug} style={{ backgroundColor: client.accent, flex: client.count }} />)}
+            </div>
+            <p>{clientLoad[0] ? `${clientLoad[0].name} concentra ${Math.round((clientLoad[0].count / Math.max(1, totalClientLoad)) * 100)}% de la carga visible.` : "Todavía no hay carga asignada a clientes."}</p>
+          </section>
+        </aside>
+        <div className="calendar-v1-surface" aria-busy={loading}>
+          {loading ? <div className="calendar-v1-loading" role="status"><p className="sr-only">Cargando calendario</p><span aria-hidden="true" /><span aria-hidden="true" /><span aria-hidden="true" /></div> : null}
+          {!loading && mode === "month" ? <CalendarMonth cursor={cursor} events={filtered} onPickDay={(day) => { setLoading(true); setCursor(day); setMode("day"); }} onEdit={editEvent} /> : null}
+          {!loading && mode === "week" ? <CalendarColumns days={weekDays} events={filtered} onEdit={editEvent} /> : null}
+          {!loading && mode === "day" ? <CalendarColumns days={[cursor]} events={filtered} onEdit={editEvent} /> : null}
+          {!loading && mode === "agenda" ? <CalendarAgenda events={filtered} onEdit={editEvent} /> : null}
+        </div>
       </div>
 
       {dialogOpen ? (

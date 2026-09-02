@@ -84,10 +84,10 @@ const serviceDefinitions = [
 const clientDefinitions = [
   {
     slug: "gavilan",
-    name: "Gavilán",
-    description: "Turismo de cercanía · servicio integral",
-    summary: "Escapadas simples para cortar con la rutina sin irse lejos.",
-    accent: "#4f7157",
+    name: "Metauro",
+    description: "Espacio cultural · salas, shows y comunidad",
+    summary: "Un espacio en La Paternal para que artistas y proyectos compartan escena.",
+    accent: "#0d5870",
     services: [
       "strategy",
       "community-management",
@@ -161,18 +161,18 @@ const clientDefinitions = [
 
 const ideasByClient: Record<string, string[]> = {
   gavilan: [
-    "Escapada sin organizar de más",
-    "Un día en la Laguna de los Patos",
-    "Tres señales de que necesitás cortar",
-    "Un fin de semana, cero planeamiento",
-    "Naturaleza cerca, mente lejos",
-    "Escapadas que te recargan",
-    "Viajar cerca también es viajar",
-    "Caminatas, aves y un atardecer",
-    "Qué entra en una mochila de finde",
-    "Quiénes hacen posible Gavilán",
-    "La escapada contada por una pareja",
-    "¿Campo, laguna o sobremesa larga?",
+    "Buscamos profes: abrimos agenda de salas",
+    "Qué pasa en una Live Session",
+    "Cuando cerramos la sala de los shows",
+    "Tu proyecto necesita escenario",
+    "Open call para artistas",
+    "Así suena una noche en Metauro",
+    "Una sala, mil proyectos",
+    "Detrás de cada función",
+    "Comunidad que comparte escenario",
+    "Agenda cultural de la semana",
+    "Del ensayo al aplauso",
+    "¿Qué disciplina trae tu proyecto?",
   ],
   "luma-estudio": [
     "La luz cambia antes que el plano",
@@ -213,16 +213,16 @@ const ideasByClient: Record<string, string[]> = {
 
 const scriptsByClient: Record<string, string[]> = {
   gavilan: [
-    "Escapadas que te recargan",
-    "Naturaleza cerca, mente lejos",
-    "Escapada sin organizar de más",
-    "Un fin de semana, cero planeamiento",
-    "Pequeñas escapadas, grandes recuerdos",
-    "Por qué viajar cerca también es viajar",
-    "Un día en la Laguna de los Patos",
-    "Tres señales de que necesitás cortar",
-    "Qué entra en una mochila de finde",
-    "La escapada contada por quienes fueron",
+    "Tu proyecto necesita escenario",
+    "Qué pasa en una Live Session",
+    "Open call para artistas",
+    "Una sala, mil proyectos",
+    "Cuando cerramos la sala de los shows",
+    "Así suena una noche en Metauro",
+    "Detrás de cada función",
+    "Buscamos profes: abrimos agenda de salas",
+    "Comunidad que comparte escenario",
+    "Del ensayo al aplauso",
   ],
   "luma-estudio": [
     "La luz cambia antes que el plano",
@@ -248,20 +248,20 @@ const scriptsByClient: Record<string, string[]> = {
 
 const contentByClient: Record<string, string[]> = {
   gavilan: [
-    "Reel · Un día en la Laguna de los Patos",
-    "Reel · Escapada sin organizar de más",
-    "Carrusel · Qué llevar a una escapada corta",
-    "Historias · Elegí tu paisaje",
-    "Reel · Tres señales de que necesitás cortar",
-    "Video institucional · La experiencia Gavilán",
-    "Video institucional · Quiénes somos",
-    "Reel · Un fin de semana, cero planeamiento",
-    "Carrusel · Viajar cerca también es viajar",
-    "Historias · Preguntas sobre Laguna de los Patos",
-    "Reel · Naturaleza cerca, mente lejos",
-    "Testimonio · Sofi y Nico se escaparon",
-    "Historias · Agenda de septiembre",
-    "Reel · Pequeñas escapadas, grandes recuerdos",
+    "Reel · Qué pasa en una Live Session",
+    "Reel · Cuando cerramos la sala de los shows",
+    "Carrusel · Tu proyecto necesita escenario",
+    "Historias · Agenda cultural de la semana",
+    "Reel · Open call para artistas",
+    "Reel · Así suena una noche en Metauro",
+    "Carrusel · Una sala, mil proyectos",
+    "Reel · Detrás de cada función",
+    "Carrusel · Comunidad que comparte escenario",
+    "Historias · Preguntas sobre las salas",
+    "Reel · Del ensayo al aplauso",
+    "Testimonio · Artistas que pasaron por Metauro",
+    "Historias · Horarios disponibles",
+    "Reel · Buscamos profes: abrimos agenda de salas",
   ],
   "luma-estudio": [
     "Reel · La luz cambia antes que el plano",
@@ -308,8 +308,8 @@ const contentLinkIndexes: Record<
   { ideas: Array<number | null>; scripts: Array<number | null> }
 > = {
   gavilan: {
-    ideas: [1, 0, 8, 11, 2, 9, 9, 3, 6, 1, 4, 10, 11, 5],
-    scripts: [6, 2, null, null, 7, null, null, 3, 5, null, 1, 9, null, 4],
+    ideas: [1, 2, 3, 9, 4, 5, 6, 7, 8, 11, 10, 8, 0, 0],
+    scripts: [1, 4, 0, null, 2, 5, 3, 6, 8, null, 9, null, null, 7],
   },
   "luma-estudio": {
     ideas: [0, 8, 5, 2, 3, 7, 9, 1, 8, 8],
@@ -503,14 +503,14 @@ export async function seedDatabase(
       [
         gavilanId,
         "complete",
-        ["Aumentar consultas por escapadas", "Instalar el turismo de cercanía"],
-        "Personas de 28 a 45 que necesitan cortar la rutina sin planear un viaje largo.",
-        "Cercano, sereno y concreto; mostrar experiencias antes que instalaciones.",
-        "La pausa que necesitás puede estar mucho más cerca de lo que pensás.",
-        ["Laguna de los Patos", "Anfitriones presentes", "Planes simples"],
+        ["Aumentar consultas por salas", "Instalar a Metauro como espacio cultural"],
+        "Artistas, docentes y públicos de La Paternal que buscan una sala para crear, ensayar o encontrarse.",
+        "Cercano, vivo y concreto; mostrar escena, comunidad y procesos reales.",
+        "Tu proyecto ya tiene algo para decir: ahora necesita escenario.",
+        ["Salas equipadas", "Escena en vivo", "Comunidad artística"],
         [
           "Evitar promesas grandilocuentes",
-          "No convertir todo en institucional",
+          "No convertir todo en una placa institucional",
         ],
       ],
       [
@@ -571,27 +571,27 @@ export async function seedDatabase(
     const strategies = [
       [
         gavilanId,
-        "Estrategia de cercanía — primavera",
+        "Estrategia de comunidad — temporada",
         [
-          "Convertir deseo de pausa en consulta",
-          "Subir guardados de escapadas",
+          "Convertir búsquedas de salas en consultas",
+          "Subir guardados de agenda cultural",
         ],
-        "Adultos con poco tiempo de planificación",
-        "Natural, observacional, rioplatense",
-        "La escapada posible, cerca y sin logística pesada",
+        "Artistas y público cultural de CABA que buscan proyectos con identidad",
+        "Directo, cultural y rioplatense",
+        "Una sala cercana para proyectos que quieren suceder",
         [
-          "Microescapadas",
-          "Naturaleza observable",
-          "Personas reales",
-          "Datos útiles",
+          "Escena en vivo",
+          "Salas habitadas",
+          "Artistas reales",
+          "Convocatorias útiles",
         ],
         [
-          "Los reels de 18–25 segundos con una experiencia concreta retendrán mejor que los institucionales largos",
+          "Los reels de 18–25 segundos con artistas y shows concretos retendrán mejor que las presentaciones institucionales largas",
         ],
         [
           "Probar videos cortos y verticales primero",
-          "Usar Laguna de los Patos como puerta de entrada",
-          "Reservar institucionales para remarketing",
+          "Usar una Live Session como puerta de entrada",
+          "Reservar la presentación institucional para información de salas",
         ],
       ],
       [
@@ -657,7 +657,7 @@ export async function seedDatabase(
           index % 4 === 0 ? "meeting" : index % 3 === 0 ? "ai" : "Martu";
         const description =
           slug === "gavilan"
-            ? `Una pieza que vuelve tangible “${title}” desde una escena real, sin vender una escapada como folleto turístico.`
+            ? `Una pieza que vuelve tangible “${title}” desde una escena real, mostrando el espacio y su comunidad sin tono institucional.`
             : slug === "luma-estudio"
               ? `Mostrar “${title}” a través de una decisión espacial concreta y la razón detrás, no sólo con un recorrido lindo.`
               : slug === "casa-norte"
@@ -706,13 +706,12 @@ export async function seedDatabase(
           status = "review";
           dueAt = at(1, 18);
           version = 3;
-          hook =
-            "No necesitás quince días ni un Excel eterno para cortar con la rutina.";
+          hook = "Tu proyecto no necesita esperar para tener escenario.";
           body =
-            "A veces, lo único que necesitamos es un cambio de aire.\n\nMuy cerca hay lugares que te devuelven el ritmo: naturaleza, tranquilidad y planes simples que se disfrutan sin apuro.\n\nUn finde en la Laguna de los Patos te desconecta sin desconectarte de todo: caminatas, aves, buena comida y atardeceres que se quedan con vos.\n\nNo tenés que organizar cada detalle. Solo elegir ir.";
-          cta = "Guardalo para cuando necesites irte sin irte tan lejos.";
+            "Un proyecto no necesita esperar a estar perfecto para empezar a suceder.\n\nEn Metauro hay una sala para ensayar, mostrar, probar una idea o encontrarse con comunidad.\n\nDe una Live Session a una clase, cada fecha se arma con artistas y público cerca de la escena.\n\nTraé tu propuesta: el escenario puede ser el próximo paso.";
+          cta = "Guardalo si tu proyecto está buscando una sala.";
           notes =
-            "Tono cercano y relajado. Hablarle a quien necesita una pausa pero no quiere complicarse. Probar un CTA más breve.";
+            "Tono directo y cultural. Hablarle a proyectos que buscan sala sin sonar institucional. Probar un CTA más breve.";
         }
 
         const row = await one<IdRow>(
@@ -857,12 +856,12 @@ export async function seedDatabase(
 
     const noteTexts: Record<string, string[]> = {
       gavilan: [
-        "Volvió a pedir videos institucionales, pero prefiere empezar por piezas más cortas para redes. Quiero mostrar el detrás de escena de las experiencias.",
-        "La Laguna de los Patos funciona mejor cuando se ve movimiento: aves, caminata y llegada. Evitar abrir con dron largo.",
+        "Priorizar reels breves de shows, ensayos y artistas. La presentación institucional queda como apoyo, no como eje del feed.",
+        "Las Live Sessions funcionan mejor cuando se ve el vínculo entre escenario y público. Evitar abrir con tomas vacías de sala.",
         "En la próxima reunión validar el guion 3 y pedir una opción de CTA más breve.",
-        "El cliente se quedó con la frase ‘irte sin irte tan lejos’. Puede ordenar la campaña de primavera.",
-        "Los dos institucionales largos retuvieron peor que los reels de experiencia. Es señal para experimentar, no prueba causal.",
-        "Falta confirmar disponibilidad para grabar testimonios de una pareja real en septiembre.",
+        "La frase “Tu proyecto necesita escenario” puede ordenar la comunicación de salas y convocatorias.",
+        "Las presentaciones largas retuvieron peor que los reels de artistas en escena. Es señal para experimentar, no prueba causal.",
+        "Falta confirmar disponibilidad de dos artistas para grabar testimonios sobre el espacio.",
       ],
       "luma-estudio": [
         "Luma quiere que los videos expliquen decisiones, no que parezcan recorridos inmobiliarios.",
@@ -914,18 +913,18 @@ export async function seedDatabase(
     const meetingDefinitions = [
       [
         "gavilan",
-        "Reunión con Gavilán",
+        "Reunión con Metauro",
         -1,
-        "Decidimos probar videos más cortos y verticales primero. Los institucionales se mantienen como material de apoyo, no como eje del feed.",
+        "Decidimos probar videos más cortos y verticales de artistas, shows y comunidad. La presentación de Metauro queda como material de apoyo.",
         [
           "Validar guion 3 mañana",
-          "Usar Laguna de los Patos como primer experimento",
+          "Usar una Live Session como primer experimento",
         ],
-        ["Martu cierra CTA del guion 3", "Gavilán confirma testimonios"],
+        ["Martu cierra CTA del guion 3", "Metauro confirma testimonios"],
       ],
       [
         "gavilan",
-        "Revisión de videos institucionales",
+        "Revisión de piezas de presentación",
         4,
         "Revisión de cortes largos y selección de escenas reutilizables para piezas breves.",
         ["Comparar retención sin afirmar causalidad"],
@@ -935,7 +934,7 @@ export async function seedDatabase(
         "gavilan",
         "Plan de pauta septiembre",
         11,
-        "Definir audiencias y materiales de la campaña de escapadas de primavera.",
+        "Definir audiencias y materiales para comunicar salas, shows y convocatorias.",
         ["Separar prospecting y remarketing"],
         ["Confirmar presupuesto semanal"],
       ],
@@ -1037,9 +1036,9 @@ export async function seedDatabase(
 
     const filesByClient: Record<string, Array<[string, string]>> = {
       gavilan: [
-        ["Brief Gavilán v2.pdf", "brief"],
+        ["Brief Metauro v2.pdf", "brief"],
         ["Borrador guion 3.pdf", "script"],
-        ["Plan de rodaje Laguna.xlsx", "production"],
+        ["Plan de rodaje Live Session.xlsx", "production"],
         ["Referencias primavera", "folder"],
       ],
       "luma-estudio": [
@@ -1085,7 +1084,7 @@ export async function seedDatabase(
     const taskDefinitions = [
       [
         "gavilan",
-        "Cerrar tercer guion de Gavilán",
+        "Cerrar tercer guion de Metauro",
         "urgent",
         "in_progress",
         at(1, 18),
@@ -1094,7 +1093,7 @@ export async function seedDatabase(
       ],
       [
         "gavilan",
-        "Editar reel Laguna de los Patos — detrás de escena",
+        "Editar reel Live Session — detrás de escena",
         "high",
         "in_progress",
         at(0, 17),
@@ -1112,7 +1111,7 @@ export async function seedDatabase(
       ],
       [
         "gavilan",
-        "Subir referencias para testimonios",
+        "Subir referencias de artistas",
         "medium",
         "completed",
         at(-3, 12),
@@ -1331,15 +1330,15 @@ export async function seedDatabase(
       for (const [index, contentId] of items
         .slice(0, Math.min(items.length, metricItemCount))
         .entries()) {
-        const isGavilanLaguna = slug === "gavilan" && index === 0;
+        const isGavilanHero = slug === "gavilan" && index === 0;
         const isLongInstitutional =
           slug === "gavilan" && (index === 5 || index === 6);
-        const views = isGavilanLaguna
+        const views = isGavilanHero
           ? 16240
           : isLongInstitutional
             ? 4380 + index * 140
             : 7200 + index * 970;
-        const retention = isGavilanLaguna
+        const retention = isGavilanHero
           ? 0.71
           : isLongInstitutional
             ? 0.29
@@ -1354,7 +1353,7 @@ export async function seedDatabase(
             at(-2, 9),
             Math.round(views * 0.81),
             views,
-            isGavilanLaguna ? 13.8 : isLongInstitutional ? 8.4 : 10.2 + index,
+            isGavilanHero ? 13.8 : isLongInstitutional ? 8.4 : 10.2 + index,
             retention,
             95 + index * 21,
             30 + index * 8,
@@ -1370,7 +1369,7 @@ export async function seedDatabase(
     const campaignDefinitions = [
       [
         gavilanId,
-        "Escapadas primavera",
+        "Agenda cultural de primavera",
         "Mensajes",
         "active",
         184320,
@@ -1379,11 +1378,11 @@ export async function seedDatabase(
         76.48,
         612.36,
         3.42,
-        "El reel Laguna aporta la mejor apertura; sostenerlo y probar una variante de CTA.",
+        "El reel de la Live Session aporta la mejor apertura; sostenerlo y probar una variante de CTA.",
       ],
       [
         gavilanId,
-        "Remarketing institucional",
+        "Presentación de salas",
         "Reproducciones",
         "paused",
         92750,
@@ -1474,7 +1473,7 @@ export async function seedDatabase(
             status === "paused" ? "paused" : "active",
             creative === 1
               ? "Una pausa posible, sin irte lejos."
-              : "Todo lo que incluye tu próxima escapada.",
+              : "Conocé las salas y la comunidad que hacen posible cada fecha.",
             Number(cpc) * Number(clicks) * (creative === 1 ? 0.58 : 0.42),
             Math.round(Number(impressions) * (creative === 1 ? 0.56 : 0.44)),
             Math.round(Number(clicks) * (creative === 1 ? 0.61 : 0.39)),
@@ -1516,7 +1515,7 @@ export async function seedDatabase(
     const gavilanThread = await one<IdRow>(
       tx,
       `insert into public.chat_threads (user_id, client_id, scope, title, source, last_message_at, created_at, updated_at)
-       values ($1,$2,'client','Gavilán con la supervisora','demo',$3,$4,$3) returning id`,
+       values ($1,$2,'client','Metauro con la supervisora','demo',$3,$4,$3) returning id`,
       [user.id, gavilanId, at(-1, 19), at(-15, 10)],
     );
     await tx.query(
@@ -1526,7 +1525,7 @@ export async function seedDatabase(
       [
         gavilanThread.id,
         at(-1, 18, 58),
-        "Porque en la última reunión acordaron probar experiencias concretas en vertical antes que otro institucional largo. Los dos largos retuvieron menos y el reel de Laguna quedó 38% arriba del promedio reciente. Es una hipótesis de formato, no causalidad probada.",
+        "Porque en la última reunión acordaron probar shows y artistas en vertical antes que otra presentación larga. Las piezas largas retuvieron menos y el reel de la Live Session quedó 38% arriba del promedio reciente. Es una hipótesis de formato, no causalidad probada.",
         at(-1, 18, 59),
       ],
     );
@@ -1543,14 +1542,14 @@ export async function seedDatabase(
         gavilanId,
         "client",
         "decision",
-        "Gavilán decidió probar videos cortos y verticales antes que nuevos institucionales largos.",
+        "Metauro decidió probar videos cortos y verticales de artistas antes que nuevas presentaciones largas.",
         5,
       ],
       [
         gavilanId,
         "client",
         "learning",
-        "El reel de Laguna de los Patos rindió 38% arriba del promedio reciente; tratarlo como señal para experimentar, no como causalidad.",
+        "El reel de la Live Session rindió 38% arriba del promedio reciente; tratarlo como señal para experimentar, no como causalidad.",
         4,
       ],
       [
@@ -1693,7 +1692,7 @@ export async function seedDatabase(
         gavilanId,
         "meeting.completed",
         "Martu completó la reunión",
-        "Reunión con Gavilán",
+        "Reunión con Metauro",
         "meeting",
         meetingIds.get("gavilan")![0],
         at(-1, 12),
@@ -1702,7 +1701,7 @@ export async function seedDatabase(
         gavilanId,
         "script.updated",
         "Martu actualizó el guion",
-        "Guion 3 · Escapada sin organizar de más",
+        "Guion 3 · Tu proyecto necesita escenario",
         "script",
         scriptIds.get("gavilan")![2],
         at(-1, 18, 42),
@@ -1720,7 +1719,7 @@ export async function seedDatabase(
         gavilanId,
         "content.published",
         "Martu publicó el reel",
-        "Un día en la Laguna de los Patos",
+        "Qué pasa en una Live Session",
         "content",
         contentIds.get("gavilan")![0],
         at(-7, 19),

@@ -14,7 +14,8 @@ import {
 } from "lucide-react";
 
 const CLIENT_ACCENTS: Record<string, string> = {
-  gavilan: "#4f7157",
+  gavilan: "#0d5870",
+  metauro: "#0d5870",
   "luma-estudio": "#9a755f",
   luma: "#9a755f",
   "casa-norte": "#a16947",
@@ -42,7 +43,7 @@ export function clientAccent(
   if (CLIENT_ACCENTS[slugToken]) return CLIENT_ACCENTS[slugToken];
   const nameToken = token(name);
   if (CLIENT_ACCENTS[nameToken]) return CLIENT_ACCENTS[nameToken];
-  return "#667085";
+  return "#64748b";
 }
 
 export function objectTypeLabel(value?: string | null) {

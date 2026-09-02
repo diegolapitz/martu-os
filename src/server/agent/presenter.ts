@@ -10,12 +10,19 @@ export function readFastPath(plan: AgentTurnPlan, context: AgentContext): AgentM
   if (plan.intent !== "READ" || plan.operation !== "read_work") return undefined;
   const slug = plan.clientSlug ?? context.currentClient?.slug;
   const client = context.clients.find((item) => item.slug === slug) ?? context.currentClient;
+  const linkedOpenEntityIds = new Set(
+    context.tasks
+      .filter((item) => (!slug || item.clientSlug === slug) && !CLOSED_STATUSES.has(String(item.status ?? "").toLocaleLowerCase("es-AR")))
+      .map((item) => item.metadata?.entity_id ?? item.metadata?.entityId)
+      .filter((value): value is string => typeof value === "string" && value.length > 0),
+  );
   const items = [...context.tasks, ...context.scripts, ...context.content]
     .filter((item) => !slug || item.clientSlug === slug)
     .filter((item) => !CLOSED_STATUSES.has(String(item.status ?? "").toLocaleLowerCase("es-AR")));
+  const distinctItems = items.filter((item) => item.type === "task" || !linkedOpenEntityIds.has(item.id));
   const today = localDateKey(context.now);
-  const dueNow = items.filter((item) => item.dueAt && localDateKey(item.dueAt) <= today);
-  const selected = (dueNow.length ? dueNow : items)
+  const dueNow = distinctItems.filter((item) => item.dueAt && localDateKey(item.dueAt) <= today);
+  const selected = (dueNow.length ? dueNow : distinctItems)
     .sort((a, b) => (a.dueAt ?? "9999").localeCompare(b.dueAt ?? "9999"))
     .filter((item, index, all) => all.findIndex((candidate) => candidate.title === item.title) === index)
     .slice(0, 4);
@@ -42,6 +49,17 @@ export function contextualNextStepFastPath(
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .toLocaleLowerCase("es-AR");
+  if (/\b(?:no llego|no llegamos|no doy mas|no da)\b.*\b(?:hoy|ahora)\b/.test(normalized)) {
+    const slug = plan.clientSlug ?? context.currentClient?.slug;
+    const priorities = [...context.tasks, ...context.scripts, ...context.content]
+      .filter((item) => !slug || item.clientSlug === slug)
+      .filter((item) => !CLOSED_STATUSES.has(String(item.status ?? "").toLocaleLowerCase("es-AR")))
+      .sort((a, b) => (a.dueAt ?? "9999").localeCompare(b.dueAt ?? "9999"))
+      .slice(0, 2)
+      .map((item) => `“${item.title}”`);
+    const first = priorities.length ? `Cerraría primero ${priorities.join(" y ")}. ` : "Elijamos una sola cosa para cerrar primero. ";
+    return directResult(`${first}Después vemos qué conviene mover; no toco nada todavía.`, plan);
+  }
   if (
     /\b(?:yo )?(?:arrancaria|empezaria)\b/.test(normalized) &&
     /\b(?:arranque|escapada|escapadita)\b/.test(normalized) &&
@@ -53,7 +71,7 @@ export function contextualNextStepFastPath(
     );
   }
   if (
-    !/\b(?:como (?:sigo|avanzo) con (?:esto|esta|este)|que hago con (?:esto|esta|este))\b/.test(
+    !/\b(?:como (?:sigo|seguir|avanzo) con (?:esto|esta|este)|que hago con (?:esto|esta|este))\b/.test(
       normalized,
     )
   )
@@ -145,6 +163,7 @@ function humanizeRawDates(value: string): string {
 }
 
 function actionMessage(plan: AgentTurnPlan, actions: AgentActionReceipt[]): string {
+  if (plan.operation === "update_communication_profile") return "Dale, bajo la insistencia. Lo importante lo sigo cuidando.";
   if (plan.intent === "MEMORY") return "Anotado. Lo voy a tener presente para este cliente.";
   if (plan.intent === "OPEN_LOOP") return "Quedó guardado como hilo abierto, sin inventarle una fecha.";
   const summaries = actions.map((action) => sanitizeAssistantMessage(action.summary)).join(" ");

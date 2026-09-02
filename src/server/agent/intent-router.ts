@@ -77,6 +77,15 @@ export function routeAgentTurn(request: AgentRequest, context: AgentContext): Ag
     });
   }
 
+  if (isOverwhelmedToday(normalized)) {
+    return plan({
+      intent: "CREATIVE_CHAT",
+      operation: "conversation",
+      clientSlug,
+      maxWords: 60,
+    });
+  }
+
   if (isOpenLoop(normalized)) {
     const title = cleanIdeaTitle(message, true);
     return plan({
@@ -115,6 +124,23 @@ export function routeAgentTurn(request: AgentRequest, context: AgentContext): Ag
   }
 
   const parsedIntent = parseDemoIntent(message, parsingContext);
+  if (parsedIntent.type === "reduce_insistence") {
+    return plan({
+      intent: "MEMORY",
+      operation: "update_communication_profile",
+      allowedTools: ["update_communication_profile"],
+      maxWords: 30,
+      directToolCall: {
+        name: "update_communication_profile",
+        arguments: {
+          insistenceLevel: 0.2,
+          preferenceKey: "reduced_from_chat",
+          preferenceValue: true,
+        },
+      },
+    });
+  }
+
   if (parsedIntent.type === "commitment") {
     return plan({
       intent: "COMMITMENT",
@@ -393,7 +419,11 @@ function isExplicitIdeaCapture(normalized: string): boolean {
 }
 
 function isCreativeChat(normalized: string): boolean {
-  return /\b(?:no me convence|que pensas|que te parece|como sigo|por donde sigo|que hago con esto|yo empezaria|arranque|hook|feedback|dame una idea|ayudame a pensar|creativo)\b/.test(normalized);
+  return /\b(?:no me convence|que pensas|que te parece|como sigo|como seguir|por donde sigo|que hago con esto|yo empezaria|arranque|hook|feedback|dame una idea|ayudame a pensar|creativo)\b/.test(normalized);
+}
+
+function isOverwhelmedToday(normalized: string): boolean {
+  return /\b(?:no llego|no llegamos|no doy mas|no da)\b.*\b(?:hoy|ahora)\b/.test(normalized);
 }
 
 function isAnalysis(normalized: string): boolean {

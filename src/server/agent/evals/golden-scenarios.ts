@@ -1,7 +1,7 @@
 import type { AgentIntent, AgentRequest, AgentToolName } from "../types";
 
 export interface AgentGoldenScenario {
-  id: "read" | "ambiguous" | "contextual_action" | "memory" | "scope" | "human" | "creative" | "open_loop" | "undo";
+  id: "read" | "ambiguous" | "contextual_action" | "memory" | "scope" | "current_view" | "reference" | "human" | "creative" | "open_loop" | "preference" | "undo";
   request: AgentRequest;
   expectedIntent: AgentIntent;
   expectedTool?: AgentToolName;
@@ -52,7 +52,26 @@ export const AGENT_GOLDEN_SCENARIOS: AgentGoldenScenario[] = [
     maximumWords: 45,
   },
   {
-    id: "human",
+    id: "current_view",
+    request: {
+      message: "No sé cómo seguir con esto.",
+      clientSlug: "gavilan",
+      currentView: {
+        pathname: "/clients/gavilan/ideas/idea-7",
+        section: "ideas",
+        clientSlug: "gavilan",
+        clientName: "Gavilán",
+        entityType: "idea",
+        entityId: "idea-7",
+        entityTitle: "Serie de microhistorias behind the scenes",
+      },
+    },
+    expectedIntent: "CREATIVE_CHAT",
+    maximumWrites: 0,
+    maximumWords: 60,
+  },
+  {
+    id: "reference",
     request: {
       message: "Ya está, lo terminé.",
       clientSlug: "gavilan",
@@ -62,6 +81,13 @@ export const AGENT_GOLDEN_SCENARIOS: AgentGoldenScenario[] = [
     expectedTool: "complete_task",
     maximumWrites: 1,
     maximumWords: 35,
+  },
+  {
+    id: "human",
+    request: { message: "No llego ni en pedo hoy.", clientSlug: "gavilan" },
+    expectedIntent: "CREATIVE_CHAT",
+    maximumWrites: 0,
+    maximumWords: 60,
   },
   {
     id: "creative",
@@ -77,6 +103,14 @@ export const AGENT_GOLDEN_SCENARIOS: AgentGoldenScenario[] = [
     expectedTool: "create_open_loop",
     maximumWrites: 1,
     maximumWords: 40,
+  },
+  {
+    id: "preference",
+    request: { message: "No me jodas más con esto." },
+    expectedIntent: "MEMORY",
+    expectedTool: "update_communication_profile",
+    maximumWrites: 1,
+    maximumWords: 30,
   },
   {
     id: "undo",

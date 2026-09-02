@@ -1,6 +1,7 @@
 node_modules/
 .next/
 .data/
+.tmp/
 .git/
 .env*
 !.env.example
@@ -15,3 +16,4 @@ tests/
 *.tsbuildinfo
 MASTER_PROMPT_CODEX_Martu_OS_V0.md
 Audios%20de%20Martu.md
+Rediseño de sitio Vercel.zip

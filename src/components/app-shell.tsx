@@ -30,7 +30,7 @@ import {
   Users,
   X,
 } from "lucide-react";
-import { Brand, SunMark } from "@/components/brand";
+import { Brand, ClientMark, SunMark } from "@/components/brand";
 import { Feedback, TimeAgo } from "@/components/ui";
 import {
   clientAccent,
@@ -84,13 +84,27 @@ const utilityNavItems: NavItem[] = [
 ];
 
 const clientLabels: Record<string, string> = {
-  gavilan: "Gavilán",
+  gavilan: "Metauro",
   "luma-estudio": "Luma Estudio",
   luma: "Luma Estudio",
   "casa-norte": "Casa Norte",
   brava: "Brava Fit",
   "brava-fit": "Brava Fit",
   nido: "Nido",
+};
+
+const sidebarClients = [
+  { slug: "gavilan", name: "Metauro" },
+  { slug: "luma-estudio", name: "Luma" },
+  { slug: "casa-norte", name: "Casa Norte" },
+  { slug: "brava-fit", name: "Brava Fit" },
+  { slug: "nido", name: "Nido" },
+] as const;
+type SidebarClient = {
+  slug: string;
+  name: string;
+  accent?: string | null;
+  logoUrl?: string | null;
 };
 
 const searchTargets = [
@@ -104,7 +118,7 @@ const searchTargets = [
   },
   {
     href: "/clients/gavilan",
-    label: "Gavilán",
+    label: "Metauro",
     shortLabel: "Cliente",
     icon: Users,
   },
@@ -651,6 +665,7 @@ export function AppShell({
   const [activeNudgeId, setActiveNudgeId] = useState<string | null>(null);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [notificationCount, setNotificationCount] = useState(0);
+  const [sidebarClientRows, setSidebarClientRows] = useState<SidebarClient[]>([...sidebarClients]);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [intentPrefetchHref, setIntentPrefetchHref] = useState<string | null>(
@@ -803,6 +818,29 @@ export function AppShell({
   }, []);
 
   useEffect(() => {
+    let active = true;
+    void fetch("/api/clients")
+      .then((response) => response.ok ? response.json() : Promise.reject())
+      .then((payload: { clients?: Array<{ slug: string; name: string; accent?: string | null; logoUrl?: string | null }> }) => {
+        if (!active || !payload.clients) return;
+        const known = new Map(payload.clients.map((client) => [client.slug, client]));
+        setSidebarClientRows(sidebarClients.map((fallback) => ({ ...fallback, ...known.get(fallback.slug) })));
+      })
+      .catch(() => undefined);
+    return () => { active = false; };
+  }, []);
+
+  useEffect(() => {
+    const updateIdentity = (event: Event) => {
+      const detail = (event as CustomEvent<{ slug: string; name?: string; accent?: string | null; logoUrl?: string | null }>).detail;
+      if (!detail?.slug) return;
+      setSidebarClientRows((current) => current.map((client) => client.slug === detail.slug ? { ...client, ...detail } : client));
+    };
+    window.addEventListener("martu:client-identity", updateIdentity);
+    return () => window.removeEventListener("martu:client-identity", updateIdentity);
+  }, []);
+
+  useEffect(() => {
     const timer = window.setTimeout(() => {
       const params = new URLSearchParams(window.location.search);
       const assistantAction = params.get("assistantAction");
@@ -859,7 +897,7 @@ export function AppShell({
         </div>
 
         <nav className="sidebar__nav" aria-label="Navegación principal">
-          {primaryNavItems.map(({ href, label, icon: Icon }) => {
+          {primaryNavItems.filter(({ href }) => href !== "/clients" && href !== "/supervisor").map(({ href, label, icon: Icon }) => {
             const active = isRouteActive(pathname, href);
             return (
               <Link
@@ -875,6 +913,31 @@ export function AppShell({
               >
                 <Icon size={20} />
                 <span>{label}</span>
+              </Link>
+            );
+          })}
+        </nav>
+
+        <div className="sidebar__client-heading">
+          <span>Clientes</span>
+          <Link href="/clients" aria-label="Ver clientes" prefetch={false}>+</Link>
+        </div>
+        <nav className="sidebar__clients" aria-label="Clientes">
+          {sidebarClientRows.map((client) => {
+            const href = `/clients/${client.slug}`;
+            const active = pathname === href || pathname.startsWith(`${href}/`);
+            return (
+              <Link
+                className={active ? "sidebar-client is-active" : "sidebar-client"}
+                href={href}
+                key={client.slug}
+                aria-current={active ? "page" : undefined}
+                prefetch={false}
+                onNavigate={() => beginLinkNavigation(href)}
+                style={{ "--client-accent": client.accent || clientAccent(client.slug, client.name) } as CSSProperties}
+              >
+                <ClientMark name={client.name} accent={client.accent || clientAccent(client.slug, client.name)} logoUrl={client.logoUrl} />
+                <span>{client.name}</span>
               </Link>
             );
           })}

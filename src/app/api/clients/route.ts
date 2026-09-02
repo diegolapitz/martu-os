@@ -5,8 +5,18 @@ import {
   createOnboardingClient,
   onboardingApiError,
 } from "@/server/onboarding";
+import { listClients } from "@/server/data";
 
 export const runtime = "nodejs";
+
+export async function GET() {
+  try {
+    await requireMartuSession();
+    return jsonOk({ clients: await listClients() });
+  } catch (error) {
+    return onboardingApiError(error, "No pude cargar los clientes.");
+  }
+}
 
 export async function POST(request: Request) {
   try {
@@ -20,4 +30,3 @@ export async function POST(request: Request) {
     return onboardingApiError(error, "No pude crear el cliente.");
   }
 }
-

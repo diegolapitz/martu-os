@@ -1,12 +1,13 @@
 "use client";
 
-import { FormEvent, useDeferredValue, useEffect, useMemo, useState } from "react";
+import { FormEvent, useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowUpRight, CalendarDays, CheckCircle2, ChevronRight, LoaderCircle, Plus, Search, Users, X } from "lucide-react";
+import { ArrowUpRight, CalendarDays, CheckCircle2, ChevronRight, ImagePlus, LoaderCircle, Plus, Search, Users, X } from "lucide-react";
 import { ClientMark } from "@/components/brand";
 import type { ClientSummary } from "@/components/types";
 import { Feedback } from "@/components/ui";
+import { prepareClientLogo, saveClientLogo, type PreparedClientLogo } from "@/lib/client-logo-browser";
 
 type Service = { id: string; name: string; icon: string; active: boolean };
 
@@ -14,12 +15,29 @@ function NewClientDialog({ onClose, onCreated }: { onClose: () => void; onCreate
   const router = useRouter();
   const [services, setServices] = useState<Service[]>([]);
   const [name, setName] = useState("");
-  const [logoUrl, setLogoUrl] = useState("");
+  const [logo, setLogo] = useState<PreparedClientLogo | null>(null);
+  const [showAccentSuggestion, setShowAccentSuggestion] = useState(false);
+  const logoInputRef = useRef<HTMLInputElement | null>(null);
   const [color, setColor] = useState("#4f7157");
   const [serviceIds, setServiceIds] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
   const [created, setCreated] = useState<ClientSummary | null>(null);
   const [error, setError] = useState("");
+
+  useEffect(() => () => { if (logo) URL.revokeObjectURL(logo.previewUrl); }, [logo]);
+
+  async function chooseLogo(file: File | undefined) {
+    if (!file) return;
+    setError("");
+    try {
+      const prepared = await prepareClientLogo(file);
+      setLogo((current) => { if (current) URL.revokeObjectURL(current.previewUrl); return prepared; });
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "No pude preparar la imagen.");
+    } finally {
+      if (logoInputRef.current) { logoInputRef.current.value = ""; logoInputRef.current.blur(); }
+    }
+  }
 
   useEffect(() => {
     let active = true;
@@ -42,7 +60,7 @@ function NewClientDialog({ onClose, onCreated }: { onClose: () => void; onCreate
       const response = await fetch("/api/clients", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: name.trim(), description: "", logoUrl: logoUrl.trim() || null, color, serviceIds }),
+        body: JSON.stringify({ name: name.trim(), description: "", logoUrl: null, color, serviceIds }),
       });
       const payload = await response.json() as { client?: { id: string; slug: string; name: string; description?: string; logoUrl?: string | null; color: string }; message?: string };
       if (!response.ok || !payload.client) throw new Error(payload.message || "No pude crear el cliente.");
@@ -55,11 +73,12 @@ function NewClientDialog({ onClose, onCreated }: { onClose: () => void; onCreate
         services: services.filter((service) => serviceIds.includes(service.id)).map((service) => service.name),
         serviceSlugs: [],
         accent: payload.client.color,
-        logoUrl: payload.client.logoUrl,
+        logoUrl: logo ? await saveClientLogo(payload.client.slug, logo.file) : payload.client.logoUrl,
         attention: "Recién creado",
       };
       setCreated(next);
       onCreated(next);
+      window.dispatchEvent(new CustomEvent("martu:client-identity", { detail: { slug: next.slug, name: next.name, accent: next.accent, logoUrl: next.logoUrl } }));
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "No pude crear el cliente.");
     } finally { setSaving(false); }
@@ -75,7 +94,7 @@ function NewClientDialog({ onClose, onCreated }: { onClose: () => void; onCreate
     </section> : <form className="modal__body new-client-dialog" onSubmit={submit} aria-busy={saving}>
       <header><div><p>Alta rápida</p><h2 id="new-client-title">Nuevo cliente</h2><span>Con nombre y servicios alcanza para arrancar.</span></div><button className="icon-button" type="button" onClick={onClose} aria-label="Cerrar"><X size={19} /></button></header>
       <div className="new-client-preview"><ClientMark name={name || "Cliente"} accent={color} large /><span><strong>{name || "Tu cliente"}</strong><small>Todo esto se puede editar después.</small></span></div>
-      <div className="new-client-grid"><label className="field"><span>Nombre</span><input autoFocus required value={name} onChange={(event) => setName(event.target.value)} placeholder="Ej. Gavilán" /></label><label className="field"><span>Color</span><input type="color" value={color} onChange={(event) => setColor(event.target.value)} /></label><label className="field field--wide"><span>Logo opcional</span><input value={logoUrl} onChange={(event) => setLogoUrl(event.target.value)} placeholder="Pegá una URL o dejalo para después" /></label></div>
+      <div className="new-client-grid"><label className="field"><span>Nombre</span><input autoFocus required value={name} onChange={(event) => setName(event.target.value)} placeholder="Ej. Gavilán" /></label><div className="client-color-field"><span>Color</span><input type="color" value={color} onFocus={() => setShowAccentSuggestion(true)} onClick={() => setShowAccentSuggestion(true)} onChange={(event) => setColor(event.target.value)} />{showAccentSuggestion && logo?.suggestedAccent && logo.suggestedAccent !== color ? <button className="client-color-field__suggestion" type="button" onClick={() => setColor(logo.suggestedAccent!)}><i style={{ backgroundColor: logo.suggestedAccent }} />Sugerido: {logo.suggestedAccent.toUpperCase()}</button> : null}</div><div className="client-logo-upload field--wide"><span>Logo o foto opcional</span><div className="client-logo-upload__row"><ClientMark name={name || "Cliente"} accent={color} logoUrl={logo?.previewUrl} large /><div className="client-logo-upload__details"><strong>{logo ? "Imagen lista" : "Sin imagen"}</strong><small>JPG, PNG o WebP</small><label className="client-logo-upload__choose"><ImagePlus size={14} aria-hidden="true" />{logo ? "Cambiar imagen" : "Elegir imagen"}<input ref={logoInputRef} type="file" accept="image/jpeg,image/png,image/webp" onChange={(event) => void chooseLogo(event.target.files?.[0])} /></label></div>{logo ? <button className="client-logo-upload__remove" type="button" onClick={() => setLogo((current) => { if (current) URL.revokeObjectURL(current.previewUrl); return null; })}>Quitar</button> : null}</div></div></div>
       <fieldset className="new-client-services"><legend>Servicios contratados</legend>{services.map((service) => <label key={service.id}><input type="checkbox" checked={serviceIds.includes(service.id)} onChange={(event) => setServiceIds((current) => event.target.checked ? [...new Set([...current, service.id])] : current.filter((id) => id !== service.id))} /><span>{service.name}</span></label>)}</fieldset>
       <Feedback message={error} tone="error" />
       <footer><button className="button button--secondary" type="button" onClick={onClose}>Cancelar</button><button className="button button--primary" type="submit" disabled={saving || !name.trim() || !serviceIds.length}>{saving ? <LoaderCircle className="spin" size={16} /> : <Plus size={16} />}Crear cliente</button></footer>

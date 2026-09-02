@@ -818,7 +818,6 @@ export function AiDrawer({
       className={open ? "ai-drawer is-open" : "ai-drawer"}
       aria-hidden={!open}
       aria-label="Supervisora"
-      aria-modal="true"
       data-runtime={initialAiMode}
       data-testid="ai-drawer"
       inert={!open ? true : undefined}

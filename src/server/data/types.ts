@@ -338,6 +338,33 @@ export interface ClientWorkspaceData {
   insights: InsightItem[];
   campaigns: CampaignItem[];
   activity: ActivityItem[];
+  instagram?: {
+    configured: boolean;
+    connected: boolean;
+    id?: string;
+    username?: string;
+    accountType?: string | null;
+    profilePictureUrl?: string | null;
+    status?: string;
+    connectedAt?: string;
+    lastSyncAt?: string | null;
+    lastError?: string | null;
+    expiresAt?: string | null;
+    media: Array<{
+      id: string;
+      instagramMediaId: string;
+      mediaType: string;
+      mediaProductType?: string | null;
+      caption?: string | null;
+      permalink?: string | null;
+      mediaUrl?: string | null;
+      thumbnailUrl?: string | null;
+      publishedAt?: string | null;
+      contentItemId?: string | null;
+      contentTitle?: string | null;
+      insights: Record<string, unknown>;
+    }>;
+  };
   workflowStates: Array<{
     id: Id;
     slug: string;

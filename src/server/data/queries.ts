@@ -2,6 +2,7 @@ import { addDays, startOfDay } from "date-fns";
 import { fromZonedTime, toZonedTime } from "date-fns-tz";
 
 import { query as dbQuery, type DatabaseRow } from "@/server/db";
+import { getInstagramConnectionDto } from "@/server/instagram/repository";
 
 import { listInsightsV1 } from "./insights";
 
@@ -113,7 +114,7 @@ async function servicesForClients(clientIds: string[]) {
 
 export async function listClients(): Promise<ClientSummary[]> {
   const rows = await dbQuery<Row>(
-    `select c.id, c.slug, c.name, c.description, c.summary, c.status, c.updated_at,
+    `select c.id, c.slug, c.name, c.description, c.summary, c.status, c.accent, c.logo_url, c.updated_at,
        (select min(t.due_at) from public.tasks t
         where t.client_id = c.id and t.archived_at is null and t.status in ('pending','in_progress','blocked')) as next_task_due,
        (select count(*)::text from public.tasks t
@@ -145,6 +146,8 @@ export async function listClients(): Promise<ClientSummary[]> {
       status: statusLabel(row.status),
       services: services.map((service) => String(service.short_name)),
       serviceSlugs: services.map((service) => String(service.slug)),
+      accent: row.accent ? String(row.accent) : null,
+      logoUrl: row.logo_url ? String(row.logo_url) : null,
       nextDeadline: row.next_task_due ? dueLabel(row.next_task_due) : null,
       nextDeadlineAt: nullableIso(row.next_task_due),
       attention,
@@ -542,6 +545,7 @@ export async function getClientWorkspace(
     creativeRows,
     activityRows,
     workflowRows,
+    instagram,
   ] = await Promise.all([
     dbQuery<Row>(
       `select s.slug, s.name, s.short_name, s.tab_key, s.sort_order from public.client_services cs
@@ -577,7 +581,7 @@ export async function getClientWorkspace(
        from public.scripts s where s.client_id = $1 and s.status <> 'archived' order by s.script_number nulls last, s.updated_at desc`,
     ),
     optionalQuery(
-      needs("resumen", "contenido", "calendario"),
+      needs("resumen", "contenido", "calendario", "metricas"),
       `select ci.*, ws.slug as workflow_state, ws.label as workflow_state_label,
         (select p.id from public.publications p where p.content_item_id = ci.id order by p.published_at desc nulls last, p.created_at desc limit 1) as publication_id
        from public.content_items ci left join public.content_workflow_states ws on ws.id = ci.workflow_state_id
@@ -635,6 +639,7 @@ export async function getClientWorkspace(
       from public.content_workflow_states ws join public.content_workflows w on w.id = ws.workflow_id
       where w.client_id = $1 and w.is_default and ws.is_visible order by ws.position`,
     ),
+    needs("metricas") ? getInstagramConnectionDto(slug) : Promise.resolve(undefined),
   ]);
 
   const search = options.query?.trim() ?? "";
@@ -942,6 +947,7 @@ export async function getClientWorkspace(
     insights,
     campaigns,
     activity,
+    instagram,
     workflowStates: workflowRows.map((row) => ({
       id: id(row.id),
       slug: String(row.slug),

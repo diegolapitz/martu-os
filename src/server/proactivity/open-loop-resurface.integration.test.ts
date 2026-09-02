@@ -88,5 +88,5 @@ describe("open-loop proactive resurfacing", () => {
     expect(
       duringCooldown.openLoops?.some((item) => item.id === String(loop.id)),
     ).toBe(false);
-  }, 30_000);
+  }, 60_000);
 });

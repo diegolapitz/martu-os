@@ -58,6 +58,14 @@ describe("Agent V1 mandatory golden evals", () => {
     expect(harness.provider.generate).not.toHaveBeenCalled();
   });
 
+  it("READ does not repeat an entity when a linked task already represents it", async () => {
+    const harness = createHarness();
+    const reply = await harness.agent.run({ message: "¿Qué tengo que cerrar hoy de Gavilán?", now: NOW });
+
+    expect(reply.message).toContain("Cerrar tercer guion de Gavilán");
+    expect(reply.message).not.toContain("Guion 3 · Escapadita");
+  });
+
   it("AMBIGUOUS and ambiguous HUMAN turns ask instead of writing", async () => {
     const harness = createHarness();
     const reschedule = await harness.agent.run({ message: "Pasalo al viernes.", now: NOW });
@@ -125,6 +133,81 @@ describe("Agent V1 mandatory golden evals", () => {
     expect(wordCount(reply.message)).toBeLessThanOrEqual(100);
   });
 
+  it("CURRENT_VIEW keeps an open idea grounded without calling the model", async () => {
+    const harness = createHarness();
+    const reply = await harness.agent.run({
+      message: "No sé cómo seguir con esto.",
+      clientSlug: "gavilan",
+      currentView: {
+        pathname: "/clients/gavilan/ideas/idea-7",
+        section: "ideas",
+        clientSlug: "gavilan",
+        clientName: "Gavilán",
+        entityType: "idea",
+        entityId: "idea-7",
+        entityTitle: "Serie de microhistorias behind the scenes",
+      },
+      now: NOW,
+    });
+
+    expect(reply.message).toContain("Serie de microhistorias behind the scenes");
+    expect(harness.toolCalls).toHaveLength(0);
+    expect(harness.provider.generate).not.toHaveBeenCalled();
+    expect(reply.timings?.fastPath).toBe(true);
+  });
+
+  it("HUMAN pressure asks Martu to prioritize without coaching or mutations", async () => {
+    const harness = createHarness();
+    const reply = await harness.agent.run({ message: "No llego ni en pedo hoy.", clientSlug: "gavilan", now: NOW });
+
+    expect(reply.intent).toBe("CREATIVE_CHAT");
+    expect(reply.message).toMatch(/priori|mover/i);
+    expect(harness.toolCalls).toHaveLength(0);
+    expect(harness.provider.generate).not.toHaveBeenCalled();
+    expect(reply.timings?.fastPath).toBe(true);
+  });
+
+  it("PREFERENCE lowers insistence explicitly instead of treating it as small talk", async () => {
+    const harness = createHarness();
+    const reply = await harness.agent.run({ message: "No me jodas más con esto.", now: NOW });
+
+    expect(reply.intent).toBe("MEMORY");
+    expect(harness.toolCalls).toEqual([
+      expect.objectContaining({
+        name: "update_communication_profile",
+        arguments: expect.objectContaining({ insistenceLevel: 0.2, preferenceKey: "reduced_from_chat" }),
+      }),
+    ]);
+    expect(reply.message).not.toMatch(/cancel|olvid/i);
+    expect(harness.provider.generate).not.toHaveBeenCalled();
+  });
+
+  it("MULTITURN preserves memory, prioritizes the visible object, and undoes only the last action", async () => {
+    const harness = createHarness();
+    const view = {
+      pathname: "/clients/gavilan/scripts/script-3",
+      section: "scripts",
+      clientSlug: "gavilan",
+      clientName: "Gavilán",
+      entityType: "script" as const,
+      entityId: "script-3",
+      entityTitle: "Guion 3 · Escapadita",
+    };
+
+    await harness.agent.run({ message: "A Gavilán no le gustan los videos institucionales. Acordate.", now: NOW });
+    const idea = await harness.agent.run({ message: "Dame una idea para Gavilán.", createNewThread: true, now: NOW });
+    const action = await harness.agent.run({ message: "Pasalo al viernes.", clientSlug: "gavilan", currentView: view, now: NOW });
+    const undo = await harness.agent.run({ message: "No, deshacelo.", clientSlug: "gavilan", now: NOW });
+    const pressure = await harness.agent.run({ message: "No llego ni en pedo hoy.", clientSlug: "gavilan", now: NOW });
+
+    expect(idea.message).toMatch(/evitar[ií]a lo institucional/i);
+    expect(action.action).toMatchObject({ type: "change_deadline", entity: { id: "script-3" } });
+    expect(undo.message).toMatch(/deshice/i);
+    expect(pressure.message).toMatch(/priori|mover/i);
+    expect(harness.toolCalls.map((call) => call.name)).toEqual(["save_memory", "change_deadline"]);
+    expect(harness.undoCalls).toEqual(["activity:reschedule-script-3"]);
+  });
+
   it("OPEN_LOOP persists an idea without inventing a deadline", async () => {
     const harness = createHarness();
     const reply = await harness.agent.run({
@@ -181,8 +264,8 @@ function createHarness() {
         clients,
         currentClient: client,
         tasks: [
-          { id: "task-1", type: "task", title: "Cerrar tercer guion de Gavilán", clientId: "1", clientSlug: "gavilan", status: "pending", dueAt: "2026-08-29T20:00:00.000Z" },
-          { id: "task-2", type: "task", title: "Revisar copy de Laguna", clientId: "1", clientSlug: "gavilan", status: "in_progress", dueAt: "2026-08-30T15:00:00.000Z" },
+          { id: "task-1", type: "task", title: "Cerrar tercer guion de Gavilán", clientId: "1", clientSlug: "gavilan", status: "pending", dueAt: "2026-08-29T20:00:00.000Z", metadata: { entity_id: "script-3" } },
+          { id: "task-2", type: "task", title: "Revisar copy de Gavilán", clientId: "1", clientSlug: "gavilan", status: "in_progress", dueAt: "2026-08-30T15:00:00.000Z" },
           { id: "task-3", type: "task", title: "Editar reel de Luma", clientId: "2", clientSlug: "luma-estudio", status: "pending", dueAt: "2026-08-29T21:00:00.000Z" },
         ],
         scripts: [
@@ -196,6 +279,17 @@ function createHarness() {
           middayCheckAt: "13:30", middayCheckEnabled: true, endOfDayEnabled: false, expressions: ["che"], preferences: {},
         },
         recentMessages: [],
+        currentView: input.currentView,
+        currentViewItem: input.currentView?.entityId && input.currentView.entityType && input.currentView.entityTitle
+          ? {
+            id: input.currentView.entityId,
+            type: input.currentView.entityType,
+            title: input.currentView.entityTitle,
+            clientId: input.currentView.clientId ?? undefined,
+            clientSlug: input.currentView.clientSlug ?? undefined,
+            status: "open",
+          }
+          : undefined,
         lastReferencedEntity: input.contextEntity ?? lastReferencedEntity,
         lastUndoToken,
         summary: client ? client.name : "Vista global",

@@ -30,6 +30,7 @@ import {
 
 import { Brand, ClientMark } from "@/components/brand";
 import { Feedback } from "@/components/ui";
+import { prepareClientLogo, removeClientLogo, saveClientLogo, type PreparedClientLogo } from "@/lib/client-logo-browser";
 
 type Step = "welcome" | "profile" | "services" | "client" | "brief" | "strategy" | "complete";
 type Service = { id: string; name: string; icon: string; sortOrder: number; active: boolean };
@@ -47,6 +48,7 @@ type ClientSetup = {
   nonBlocking: true;
 };
 type CreatedClient = { id: string; slug: string; name: string; color: string; logoUrl: string | null; serviceIds: string[] };
+type PreparedLogo = PreparedClientLogo;
 
 const STEPS: Step[] = ["welcome", "profile", "services", "client", "brief", "strategy", "complete"];
 const STEP_LABELS: Record<Step, string> = {
@@ -127,7 +129,11 @@ export function OnboardingWizard() {
   const [selectedServiceIds, setSelectedServiceIds] = useState<string[]>([]);
   const [customServices, setCustomServices] = useState<string[]>([]);
   const [customService, setCustomService] = useState("");
-  const [client, setClient] = useState({ name: "", description: "", logoUrl: "", color: "#4f7157", serviceIds: [] as string[] });
+  const [client, setClient] = useState({ name: "", description: "", color: "#4f7157", serviceIds: [] as string[] });
+  const [clientLogo, setClientLogo] = useState<PreparedLogo | null>(null);
+  const [clientLogoDirty, setClientLogoDirty] = useState(false);
+  const [clientLogoError, setClientLogoError] = useState<string | null>(null);
+  const [preparingLogo, setPreparingLogo] = useState(false);
   const [createdClient, setCreatedClient] = useState<CreatedClient | null>(null);
   const [setup, setSetup] = useState<ClientSetup | null>(null);
   const [briefMode, setBriefMode] = useState<"upload" | "voice" | "questions" | "later" | null>(null);
@@ -140,6 +146,7 @@ export function OnboardingWizard() {
   const [recordingFor, setRecordingFor] = useState<"profile" | "client" | "brief" | "strategy" | null>(null);
   const [transcribing, setTranscribing] = useState(false);
   const recorderRef = useRef<MediaRecorder | null>(null);
+  const logoInputRef = useRef<HTMLInputElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const chunksRef = useRef<Blob[]>([]);
 
@@ -163,6 +170,10 @@ export function OnboardingWizard() {
       streamRef.current?.getTracks().forEach((track) => track.stop());
     };
   }, []);
+
+  useEffect(() => () => {
+    if (clientLogo) URL.revokeObjectURL(clientLogo.previewUrl);
+  }, [clientLogo]);
 
   const activeStepNumber = Math.max(1, STEPS.indexOf(step));
   const progress = step === "welcome" ? 0 : step === "complete" ? 100 : Math.round((activeStepNumber / (STEPS.length - 1)) * 100);
@@ -331,6 +342,10 @@ export function OnboardingWizard() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ serviceIds: client.serviceIds }),
         });
+        const nextClient = clientLogoDirty
+          ? await syncClientLogo(createdClient, clientLogo)
+          : createdClient;
+        setCreatedClient(nextClient);
         await moveTo("brief", ["client"]);
         return;
       }
@@ -340,19 +355,57 @@ export function OnboardingWizard() {
         body: JSON.stringify({
           name: client.name.trim(),
           description: client.description.trim(),
-          logoUrl: client.logoUrl.trim() || null,
+          logoUrl: null,
           color: client.color,
           serviceIds: client.serviceIds,
         }),
       });
       setCreatedClient(payload.client);
       setSetup(payload.setup);
+      const nextClient = clientLogo
+        ? await syncClientLogo(payload.client, clientLogo)
+        : payload.client;
+      setCreatedClient(nextClient);
       await moveTo("brief", ["client"]);
     } catch (error) {
       setFeedback({ message: error instanceof Error ? error.message : "No pude crear el cliente.", tone: "error" });
     } finally {
       setBusy(false);
     }
+  }
+
+  async function syncClientLogo(current: CreatedClient, logo: PreparedLogo | null) {
+    if (!logo) {
+      await removeClientLogo(current.slug);
+      setClientLogoDirty(false);
+      return { ...current, logoUrl: null };
+    }
+    const logoUrl = await saveClientLogo(current.slug, logo.file);
+    setClientLogoDirty(false);
+    return { ...current, logoUrl };
+  }
+
+  async function chooseClientLogo(file: File | undefined) {
+    if (!file) return;
+    setPreparingLogo(true);
+    setClientLogoError(null);
+    try {
+      const prepared = await prepareClientLogo(file);
+      setClientLogo(prepared);
+      setClientLogoDirty(true);
+    } catch (error) {
+      setClientLogoError(error instanceof Error ? error.message : "No pude preparar esa imagen.");
+    } finally {
+      setPreparingLogo(false);
+      if (logoInputRef.current) logoInputRef.current.value = "";
+    }
+  }
+
+  function removeSelectedLogo() {
+    setClientLogo(null);
+    setClientLogoDirty(true);
+    setClientLogoError(null);
+    if (logoInputRef.current) logoInputRef.current.value = "";
   }
 
   async function saveBrief(skip = false) {
@@ -487,11 +540,28 @@ export function OnboardingWizard() {
             <span className="onboarding-eyebrow">Empecemos con uno</span>
             <h1>Ahora sí, carguemos tu primer cliente.</h1>
             <p>Con nombre + qué hacés para él ya podemos arrancar.</p>
-            <div className="onboarding-client-preview"><ClientMark name={client.name || "Cliente"} accent={client.color} large /><span><strong>{client.name || "Tu cliente"}</strong><small>{client.description || "Podés completar la descripción después"}</small></span></div>
+            <div className="onboarding-client-preview"><ClientMark name={client.name || "Cliente"} accent={client.color} logoUrl={clientLogo?.previewUrl ?? createdClient?.logoUrl} large /><span><strong>{client.name || "Tu cliente"}</strong><small>{client.description || "Podés completar la descripción después"}</small></span></div>
             <div className="onboarding-form-grid">
               <label className="onboarding-field"><span>Nombre</span><input autoFocus value={client.name} onChange={(event) => setClient((current) => ({ ...current, name: event.target.value }))} placeholder="Ej. Gavilán" /></label>
               <label className="onboarding-field"><span>Color</span><span className="onboarding-color"><input type="color" value={client.color} onChange={(event) => setClient((current) => ({ ...current, color: event.target.value }))} /><b>{client.color}</b></span></label>
-              <label className="onboarding-field onboarding-field--wide"><span>Logo opcional</span><input value={client.logoUrl} onChange={(event) => setClient((current) => ({ ...current, logoUrl: event.target.value }))} placeholder="Pegá una URL o dejalo para después" /><small>Si ahora no lo tenés a mano, seguimos igual.</small></label>
+              <div className="onboarding-field onboarding-field--wide onboarding-logo-field">
+                <span>Logo o foto <small>opcional</small></span>
+                <div className="onboarding-logo-picker">
+                  <ClientMark name={client.name || "Cliente"} accent={client.color} logoUrl={clientLogo?.previewUrl ?? createdClient?.logoUrl} large />
+                  <span className="onboarding-logo-picker__copy">
+                    <strong>{clientLogo ? clientLogo.file.name : createdClient?.logoUrl ? "Imagen guardada" : "Sumá una imagen"}</strong>
+                    <small>{clientLogo ? `${Math.max(1, Math.round(clientLogo.file.size / 1024))} KB · lista para subir` : "Desde tu galería, cámara o computadora"}</small>
+                  </span>
+                  <label className="button button--secondary onboarding-logo-picker__choose">
+                    {preparingLogo ? <LoaderCircle className="spin" size={17} /> : <Upload size={17} />}
+                    {clientLogo || createdClient?.logoUrl ? "Cambiar" : "Elegir imagen"}
+                    <input ref={logoInputRef} type="file" accept="image/jpeg,image/png,image/webp" disabled={preparingLogo || busy} onChange={(event) => void chooseClientLogo(event.target.files?.[0])} />
+                  </label>
+                  {clientLogo || createdClient?.logoUrl ? <button className="onboarding-logo-picker__remove" type="button" onClick={removeSelectedLogo} disabled={preparingLogo || busy}><X size={16} />Quitar</button> : null}
+                </div>
+                <small>La recortamos y optimizamos automáticamente para que cargue rápido.</small>
+                {clientLogoError ? <span className="onboarding-logo-error" role="alert">{clientLogoError}</span> : null}
+              </div>
               <label className="onboarding-field onboarding-field--wide"><span>Qué hacés para este cliente</span><textarea rows={4} value={client.description} onChange={(event) => setClient((current) => ({ ...current, description: event.target.value }))} placeholder="Ej. Estrategia, ideas, guiones y edición" /></label>
             </div>
             <button className="onboarding-voice-inline" type="button" onClick={() => void toggleRecording("client")}><Mic size={18} />{recordingFor === "client" ? "Terminar relato" : "Contármelo hablando"}</button>
@@ -538,7 +608,7 @@ export function OnboardingWizard() {
             <span className="onboarding-eyebrow">Ya podés empezar</span>
             <h1>Listo. Con esto alcanza.</h1>
             <p>No hace falta completar el 100% ahora. Te voy avisando cuando algo realmente empiece a hacer falta.</p>
-            {createdClient ? <div className="onboarding-completeness"><header><ClientMark name={createdClient.name} accent={createdClient.color} /><span><strong>{createdClient.name}</strong><small>{setup?.completeness ?? 0}% preparado</small></span><b>{setup?.completeness ?? 0}%</b></header><i><b style={{ width: `${setup?.completeness ?? 0}%` }} /></i>{setup?.sections.map((section) => <section key={section.id}><strong>{section.label}</strong>{section.items.map((item) => <span key={item.id}>{item.complete ? <Check size={15} /> : <i />}{item.label}<small>{!item.complete && item.optional ? "completar después" : ""}</small></span>)}</section>)}</div> : null}
+            {createdClient ? <div className="onboarding-completeness"><header><ClientMark name={createdClient.name} accent={createdClient.color} logoUrl={createdClient.logoUrl} /><span><strong>{createdClient.name}</strong><small>{setup?.completeness ?? 0}% preparado</small></span><b>{setup?.completeness ?? 0}%</b></header><i><b style={{ width: `${setup?.completeness ?? 0}%` }} /></i>{setup?.sections.map((section) => <section key={section.id}><strong>{section.label}</strong>{section.items.map((item) => <span key={item.id}>{item.complete ? <Check size={15} /> : <i />}{item.label}<small>{!item.complete && item.optional ? "completar después" : ""}</small></span>)}</section>)}</div> : null}
             <button className="button button--primary onboarding-finish" type="button" onClick={() => router.push(createdClient ? `/clients/${createdClient.slug}` : "/day")}>Entrar a Martu OS <ArrowRight size={18} /></button>
           </div>
         ) : null}
