@@ -1,5 +1,5 @@
 import { routeAgentTurn } from "./intent-router";
-import type { AgentConversationStore, AgentModelProvider, AgentModelResult, AgentToolExecutor, RequestPlanner } from "./ports";
+import type { AgentConversationStore, AgentModelProvider, AgentModelResult, AgentToolExecutor, RequestPlanner, ResponseDirector } from "./ports";
 import { authorizeToolCall, evaluateServiceScope, safeToolError } from "./policy";
 import {
   directResult,
@@ -7,6 +7,7 @@ import {
   timeoutResult,
 } from "./presenter";
 import { DeterministicRequestPlanner } from "./request-planner";
+import { DeterministicResponseDirector } from "./response-director";
 import { planRetrieval } from "./retrieval-planner";
 import {
   AGENT_CONTEXT_TIMEOUT_MS,
@@ -31,6 +32,7 @@ export class AgentOrchestrator {
     private readonly primaryProvider: AgentModelProvider,
     private readonly fallbackProvider?: AgentModelProvider,
     private readonly requestPlanner: RequestPlanner = new DeterministicRequestPlanner(),
+    private readonly responseDirector: ResponseDirector = new DeterministicResponseDirector(),
   ) {}
 
   async run(request: AgentRequest): Promise<AgentReply> {
@@ -179,7 +181,8 @@ export class AgentOrchestrator {
         const beforeModelTools = timing.toolMs;
         const modelStarted = performance.now();
         try {
-          generated = await this.generateWithDeadline(provider, request, message, threadId, turnId, now, context, plan, mutationContext, executeTool, startedAt, () => mutationInFlight);
+          const responseDirection = await this.responseDirector.direct({ request: { ...request, message, threadId, turnId, now }, context, plan });
+          generated = await this.generateWithDeadline(provider, request, message, threadId, turnId, now, context, plan, mutationContext, executeTool, startedAt, () => mutationInFlight, responseDirection);
         } catch (error) {
           if (executedActions.length) {
             generated = directResult("", plan, executedActions);
@@ -189,7 +192,8 @@ export class AgentOrchestrator {
           } else if (this.fallbackProvider && this.fallbackProvider !== provider) {
             provider = this.fallbackProvider;
             try {
-              generated = await this.generateWithDeadline(provider, request, message, threadId, turnId, now, context, plan, mutationContext, executeTool, startedAt, () => mutationInFlight);
+              const responseDirection = await this.responseDirector.direct({ request: { ...request, message, threadId, turnId, now }, context, plan });
+              generated = await this.generateWithDeadline(provider, request, message, threadId, turnId, now, context, plan, mutationContext, executeTool, startedAt, () => mutationInFlight, responseDirection);
             } catch (fallbackError) {
               if (executedActions.length) generated = directResult("", plan, executedActions);
               else if (isAgentTimeout(fallbackError)) {
@@ -302,12 +306,14 @@ export class AgentOrchestrator {
     executeTool: AgentToolExecutor["execute"],
     startedAt: number,
     isMutationInFlight: () => boolean,
+    responseDirection?: import("./types").ResponseDirection,
   ): Promise<AgentModelResult> {
     const remaining = Math.max(1, AGENT_TURN_TIMEOUT_MS - (performance.now() - startedAt));
     return withAgentTimeout((signal) => provider.generate({
       request: { ...request, message, threadId, turnId, now },
       context,
       plan,
+      responseDirection,
       mutationContext,
       executeTool,
       signal,

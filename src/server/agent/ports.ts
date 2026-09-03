@@ -7,6 +7,7 @@ import type {
   AgentRetrievalPlan,
   AgentRequest,
   RequestPlan,
+  ResponseDirection,
   AgentSource,
   AgentTurnPlan,
   ClientRef,
@@ -98,6 +99,10 @@ export interface RequestPlanner {
   plan(input: RequestPlannerInput): Promise<RequestPlan>;
 }
 
+export interface ResponseDirector {
+  direct(input: { request: AgentRequest; context: AgentContext; plan: AgentTurnPlan; signal?: AbortSignal }): Promise<ResponseDirection>;
+}
+
 export interface AgentToolExecutor {
   execute(call: ToolCall, context: AgentMutationContext): Promise<AgentActionReceipt>;
   undo(token: string, context: AgentMutationContext): Promise<AgentActionReceipt | undefined>;
@@ -107,6 +112,7 @@ export interface AgentModelInput {
   request: AgentRequest;
   context: AgentContext;
   plan: AgentTurnPlan;
+  responseDirection?: ResponseDirection;
   mutationContext: AgentMutationContext;
   executeTool: AgentToolExecutor["execute"];
   signal?: AbortSignal;

@@ -173,6 +173,16 @@ export interface AgentRetrievalPlan {
   clientSlug?: string;
 }
 
+export interface ResponseDirection {
+  conclusion: string;
+  depth: "short" | "medium" | "deep";
+  tone: "direct" | "warm" | "focused" | "reflective";
+  maxWords: number;
+  structure: "paragraph" | "briefing" | "bullets" | "question";
+  evidence: string[];
+  offerNextAction: boolean;
+}
+
 export interface AgentRequest {
   message: string;
   clientSlug?: string;

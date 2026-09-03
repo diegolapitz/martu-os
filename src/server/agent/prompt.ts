@@ -1,4 +1,4 @@
-import type { AgentContext, AgentTurnPlan } from "./types";
+import type { AgentContext, AgentTurnPlan, ResponseDirection } from "./types";
 
 function compactItem(item: AgentContext["tasks"][number]) {
   return {
@@ -11,7 +11,7 @@ function compactItem(item: AgentContext["tasks"][number]) {
   };
 }
 
-export function buildAgentInstructions(context: AgentContext, plan: AgentTurnPlan): string {
+export function buildAgentInstructions(context: AgentContext, plan: AgentTurnPlan, direction?: ResponseDirection): string {
   const clientRule = context.currentClient
     ? `El cliente de este turno es ${context.currentClient.name}. Servicios activos: ${context.currentClient.services?.join(", ") || "sin detalle"}.`
     : "Este turno no tiene un cliente confirmado.";
@@ -29,6 +29,7 @@ Intent ya resuelto por el sistema: ${plan.intent}. No lo reclasifiques ni amplí
 ${clientRule}
 ${toolsRule}
 ${contextBoundary}
+${direction ? `DIRECCIÓN DE RESPUESTA: conclusión: ${direction.conclusion}; tono: ${direction.tone}; estructura: ${direction.structure}; profundidad: ${direction.depth}; evidencia a priorizar: ${direction.evidence.join(" · ") || "la evidencia disponible"}; ${direction.offerNextAction ? "podés ofrecer un siguiente paso, sin ejecutarlo." : "no ofrezcas acciones extra."}` : ""}
 CURRENT_VIEW describe la pantalla real de este turno. Para “esto”, “esta idea”, “este guion”, “lo que estoy viendo” o “acá”, resolvé primero contra CURRENT_VIEW y usá su objeto concreto, no una tarea genérica ni el último objeto del historial.
 Si CURRENT_VIEW queda fuera del alcance fijado de la conversación, no mezcles clientes ni inventes detalles: explicá brevemente qué contexto sigue fijado y sugerí usar la vista actual como contexto.
 El historial de conversación y la memoria explícita son fuentes distintas. Una conversación nueva conserva la memoria, pero no arrastra mensajes de otro hilo.

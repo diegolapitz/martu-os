@@ -23,7 +23,7 @@ export class OpenAIResponsesProvider implements AgentModelProvider {
 
   async generate(input: AgentModelInput): Promise<AgentModelResult> {
     const actions: AgentModelResult["actions"] = [];
-    const instructions = buildAgentInstructions(input.context, input.plan);
+    const instructions = buildAgentInstructions(input.context, input.plan, input.responseDirection);
     const contextualInput = `Datos disponibles para responder:\n${serializeAgentContext(input.context)}\n\nMartu dice:\n${input.request.message}`;
     const tools = agentToolDefinitionsFor(input.plan.allowedTools);
     const toolChoice = tools.length ? "auto" as const : "none" as const;
