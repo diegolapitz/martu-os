@@ -34,7 +34,9 @@ export class DeterministicResponseDirector implements ResponseDirector {
   async direct(input: Parameters<ResponseDirector["direct"]>[0]): Promise<ResponseDirection> {
     const job = input.plan.requestPlan?.job;
     const items = evidence(input);
-    return { conclusion: job === "prepare_interaction" ? "Preparar a Martu con lo que necesita tener fresco." : job === "prioritize" ? "Proponer una prioridad sin modificar nada." : "Responder con la evidencia más relevante disponible.", depth: input.plan.requestPlan?.response.depth ?? "medium", tone: job === "reflect" ? "reflective" : "direct", maxWords: input.plan.maxWords, structure: job === "prepare_interaction" ? "briefing" : "paragraph", evidence: items.slice(0, 4), offerNextAction: !input.plan.directToolCall && !input.plan.requiresClarification };
+    const requested = input.plan.requestPlan?.response.type;
+    const structure = requested === "briefing" || requested === "decision_support" || items.length >= 3 ? "briefing" : "paragraph";
+    return { conclusion: job === "prepare_interaction" ? "Preparar a Martu con lo que necesita tener fresco." : job === "prioritize" ? "Tomar una postura sobre qué hacer primero, sin modificar nada." : "Dar una respuesta operativa con la evidencia más relevante.", depth: input.plan.requestPlan?.response.depth ?? "medium", tone: job === "reflect" ? "reflective" : "direct", maxWords: Math.min(input.plan.maxWords, structure === "briefing" ? 140 : 90), structure, evidence: items.slice(0, 4), offerNextAction: !input.plan.directToolCall && !input.plan.requiresClarification && requested === "decision_support" };
   }
 }
 

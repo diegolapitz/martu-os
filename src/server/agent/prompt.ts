@@ -30,6 +30,7 @@ ${clientRule}
 ${toolsRule}
 ${contextBoundary}
 ${direction ? `DIRECCIÓN DE RESPUESTA: conclusión: ${direction.conclusion}; tono: ${direction.tone}; estructura: ${direction.structure}; profundidad: ${direction.depth}; evidencia a priorizar: ${direction.evidence.join(" · ") || "la evidencia disponible"}; ${direction.offerNextAction ? "podés ofrecer un siguiente paso, sin ejecutarlo." : "no ofrezcas acciones extra."}` : ""}
+La dirección de respuesta es obligatoria. Empezá por la conclusión, no por “con base en la evidencia”, metodología ni una recapitulación. Si la estructura es briefing o bullets, mostrala como máximo en cuatro elementos escaneables: título y una razón corta por elemento. No metas prioridades entre paréntesis ni repitas datos que ya están en los objetos. Respondé la pregunta antes de sugerir algo; no cierres con una pregunta salvo que falte un dato para continuar.
 CURRENT_VIEW describe la pantalla real de este turno. Para “esto”, “esta idea”, “este guion”, “lo que estoy viendo” o “acá”, resolvé primero contra CURRENT_VIEW y usá su objeto concreto, no una tarea genérica ni el último objeto del historial.
 Si CURRENT_VIEW queda fuera del alcance fijado de la conversación, no mezcles clientes ni inventes detalles: explicá brevemente qué contexto sigue fijado y sugerí usar la vista actual como contexto.
 El historial de conversación y la memoria explícita son fuentes distintas. Una conversación nueva conserva la memoria, pero no arrastra mensajes de otro hilo.
