@@ -31,7 +31,7 @@ type AuthIdentity = {
   name: string;
 };
 
-const testUserScope = new AsyncLocalStorage<string>();
+const appUserScope = new AsyncLocalStorage<string>();
 
 const DEFAULT_SERVICES = [
   ["strategy", "Estrategia", "compass"],
@@ -52,7 +52,7 @@ const DEFAULT_SERVICES = [
 export async function requireAppUser(
   executor: Executor = { query },
 ): Promise<AppUser> {
-  const scopedId = testUserScope.getStore();
+  const scopedId = appUserScope.getStore();
   if (scopedId) {
     const rows = await executor.query<UserRow>(
       "select * from public.users where id = $1 limit 1",
@@ -135,7 +135,15 @@ export async function runAsTestUser<T>(
   if (process.env.NODE_ENV === "production") {
     throw new Error("La suplantación de usuario está deshabilitada en producción.");
   }
-  return testUserScope.run(userId, work);
+  return appUserScope.run(userId, work);
+}
+
+/** Binds an already-authorized server job to the single alpha workspace. */
+export async function runAsSystemUser<T>(
+  userId: string,
+  work: () => Promise<T>,
+): Promise<T> {
+  return appUserScope.run(userId, work);
 }
 
 export class AppAuthenticationError extends Error {
