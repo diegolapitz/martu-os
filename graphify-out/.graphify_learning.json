@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-08-30T22:24:03.963302+00:00",
+  "generated_at": "2026-09-04T21:20:29.477391+00:00",
   "nodes": {
     "data_repository_martuproactivitydatarepository": {
-      "code_fingerprint": "d632817fd29db5bbce72595f191454596f0450738e685219e4304542e47653a1",
+      "code_fingerprint": "82ed319c28634394147ff107ff37c2db71e04804672dfa971b76bdd7b046d277",
       "label": "MartuProactivityDataRepository",
       "last": "2026-08-30T22:19:18.212658+00:00",
       "provenance": [
@@ -12,13 +12,13 @@
           "q": "¿Cómo fluyen los estados de ai_nudges desde GET /api/nudges hasta el badge y el panel de notificaciones en AppShell?"
         }
       ],
-      "score": 0.999923588,
+      "score": 0.891739809,
       "source_file": "data-repository.ts",
       "status": "tentative",
       "uses": 1
     },
     "data_repository_martuproactivitydatarepository_listforcenter": {
-      "code_fingerprint": "d632817fd29db5bbce72595f191454596f0450738e685219e4304542e47653a1",
+      "code_fingerprint": "82ed319c28634394147ff107ff37c2db71e04804672dfa971b76bdd7b046d277",
       "label": ".listForCenter()",
       "last": "2026-08-30T22:19:18.212658+00:00",
       "provenance": [
@@ -28,7 +28,7 @@
           "q": "¿Cómo fluyen los estados de ai_nudges desde GET /api/nudges hasta el badge y el panel de notificaciones en AppShell?"
         }
       ],
-      "score": 0.999923588,
+      "score": 0.891739809,
       "source_file": "data-repository.ts",
       "status": "tentative",
       "uses": 1
@@ -44,7 +44,7 @@
           "q": "¿Cómo fluyen los estados de ai_nudges desde GET /api/nudges hasta el badge y el panel de notificaciones en AppShell?"
         }
       ],
-      "score": 0.999923588,
+      "score": 0.891739809,
       "source_file": "types.ts",
       "status": "tentative",
       "uses": 1

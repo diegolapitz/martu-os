@@ -531,7 +531,11 @@ export function OnboardingWizard() {
     let text: string;
     try {
       if (/\.pdf$/i.test(file.name)) {
-        const { getDocument } = await import("pdfjs-dist");
+        const pdfjs = await import("pdfjs-dist");
+        // PDF.js needs an explicit worker in bundled browser apps. Resolving it
+        // through the module lets Next emit the worker with the application.
+        pdfjs.GlobalWorkerOptions.workerSrc = new URL("pdfjs-dist/build/pdf.worker.min.mjs", import.meta.url).toString();
+        const { getDocument } = pdfjs;
         const loadingTask = getDocument({ data: new Uint8Array(await file.arrayBuffer()) });
         const document = await loadingTask.promise;
         const pages = await Promise.all(Array.from({ length: Math.min(document.numPages, 50) }, async (_, index) => {
