@@ -1506,13 +1506,14 @@ svg {
   font-weight: 720;
   gap: 5px;
   min-height: 28px;
+  margin: 0;
   padding: 0;
   text-decoration: underline;
   text-underline-offset: 3px;
   transition: color 140ms ease;
 }
 .client-logo-upload__choose:hover { color: var(--moss); }
-.client-logo-upload__choose:focus-within { outline: 2px solid var(--moss); outline-offset: 3px; }
+.client-logo-upload__choose:focus-visible { outline: 2px solid var(--moss); outline-offset: 3px; }
 .client-logo-upload__row .client-mark--large { flex: 0 0 46px; height: 46px; width: 46px; }
 .client-logo-upload__details { display: grid; gap: 1px; min-width: 0; }
 .client-logo-upload__details strong { color: var(--ink); font-size: 10px; line-height: 1.2; }
@@ -1533,7 +1534,7 @@ svg {
   padding: 0 10px;
 }
 .client-logo-upload__remove:hover { border-color: var(--moss); }
-.client-logo-upload__choose input { height: 1px; opacity: 0; overflow: hidden; position: absolute; width: 1px; }
+.client-logo-upload__input { display: none; }
 .client-color-field { display: grid; gap: 7px; min-width: 0; }
 .client-color-field > span { color: var(--muted); font-size: 9px; font-weight: 700; text-transform: uppercase; }
 .client-color-field input[type="color"] { cursor: pointer; height: 42px; padding: 4px; width: 100%; }

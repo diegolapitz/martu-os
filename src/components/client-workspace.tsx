@@ -534,9 +534,7 @@ function ClientDialog({
             <span>Logo o foto</span>
             <div className="client-logo-upload__row">
               <ClientMark name={name || data.client.name} accent={accent} logoUrl={logo?.previewUrl ?? (removeLogo ? null : data.client.logoUrl)} large />
-              <div className="client-logo-upload__details"><strong>{logo || (!removeLogo && data.client.logoUrl) ? "Imagen del cliente" : "Sin imagen"}</strong><small>JPG, PNG o WebP</small><label className="client-logo-upload__choose"><ImagePlus size={14} aria-hidden="true" />{logo || (!removeLogo && data.client.logoUrl) ? "Cambiar imagen" : "Elegir imagen"}
-                <input ref={logoInputRef} type="file" accept="image/jpeg,image/png,image/webp" onChange={(event) => void chooseLogo(event.target.files?.[0])} />
-              </label></div>
+              <div className="client-logo-upload__details"><strong>{logo || (!removeLogo && data.client.logoUrl) ? "Imagen del cliente" : "Sin imagen"}</strong><small>JPG, PNG o WebP</small><button className="client-logo-upload__choose" type="button" onClick={() => logoInputRef.current?.click()}><ImagePlus size={14} aria-hidden="true" />{logo || (!removeLogo && data.client.logoUrl) ? "Cambiar imagen" : "Elegir imagen"}</button><input className="client-logo-upload__input" ref={logoInputRef} type="file" accept="image/jpeg,image/png,image/webp" tabIndex={-1} onChange={(event) => void chooseLogo(event.target.files?.[0])} /></div>
               {logo || (!removeLogo && data.client.logoUrl) ? <button className="client-logo-upload__remove" type="button" onClick={clearLogo}>Quitar</button> : null}
             </div>
           </div>
