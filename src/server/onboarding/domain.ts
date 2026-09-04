@@ -6,6 +6,7 @@ import {
   type DatabaseRow,
   type DbExecutor,
 } from "@/server/db";
+import { requireAppUserSlug } from "@/server/auth";
 
 import type {
   ClientSetupPatchInput,
@@ -22,6 +23,7 @@ import type {
   FreelancerService,
   OnboardingBundle,
   OnboardingClient,
+  OnboardingUserProfile,
   OnboardingState,
   OnboardingStep,
   OnboardingStatus,
@@ -73,7 +75,7 @@ export async function getOnboardingBundle(
       listServicesForUser(tx, userId, true),
       listOnboardingClients(tx, userId),
     ]);
-    return { onboarding, services, clients };
+    return onboardingBundle(tx, userId, onboarding, services, clients);
   });
 }
 
@@ -86,7 +88,10 @@ export async function updateOnboarding(
     const current = await ensureOnboardingState(tx, userId, true);
 
     const changesProfile =
-      input.profileText !== undefined || input.confirmedServiceIds !== undefined;
+      input.profileText !== undefined ||
+      input.profileName !== undefined ||
+      input.timezone !== undefined ||
+      input.confirmedServiceIds !== undefined;
     if (changesProfile && input.confirmed !== true) {
       throw new OnboardingConflictError(
         "Confirmá lo que entendimos antes de guardarlo.",
@@ -95,6 +100,28 @@ export async function updateOnboarding(
 
     if (input.confirmedServiceIds) {
       await requireOwnedActiveServices(tx, userId, input.confirmedServiceIds);
+    }
+
+    if (
+      input.profileName !== undefined ||
+      input.timezone !== undefined ||
+      input.profileText !== undefined
+    ) {
+      await tx.query(
+        `update public.users set
+          name = coalesce($2, name),
+          preferred_name = coalesce($2, preferred_name),
+          timezone = coalesce($3, timezone),
+          profile_description = coalesce($4, profile_description),
+          updated_at = now()
+        where id = $1`,
+        [
+          userId,
+          input.profileName ?? null,
+          input.timezone ?? null,
+          input.profileText ?? null,
+        ],
+      );
     }
 
     const completed = input.completed ?? current.completed;
@@ -152,12 +179,72 @@ export async function updateOnboarding(
       listServicesForUser(tx, userId, true),
       listOnboardingClients(tx, userId),
     ]);
-    return {
-      onboarding: onboardingDto(rows[0]!),
+    return onboardingBundle(
+      tx,
+      userId,
+      onboardingDto(rows[0]!),
       services,
       clients,
-    };
+    );
   });
+}
+
+async function onboardingBundle(
+  executor: Executor,
+  userId: string,
+  onboarding: OnboardingState,
+  services: FreelancerService[],
+  clients: OnboardingClient[],
+): Promise<OnboardingBundle> {
+  const rows = await executor.query<Row>(
+    "select * from public.users where id = $1 limit 1",
+    [userId],
+  );
+  const row = rows[0]!;
+  const name = String(row.name ?? "Freelancer");
+  const user: OnboardingUserProfile = {
+    name,
+    preferredName: String(row.preferred_name ?? name),
+    email: row.email == null ? null : String(row.email),
+    timezone: String(row.timezone ?? "America/Argentina/Buenos_Aires"),
+    avatarUrl: row.avatar_url == null ? null : String(row.avatar_url),
+    description: String(row.profile_description ?? ""),
+  };
+  const profileDone =
+    onboarding.completed.includes("profile") ||
+    Boolean(onboarding.profileText.trim());
+  const servicesDone =
+    onboarding.completed.includes("services") ||
+    onboarding.confirmedServiceIds.length > 0;
+  const hasClient = clients.length > 0;
+  const stage =
+    onboarding.status === "completed" || (profileDone && servicesDone && hasClient)
+      ? "active"
+      : onboarding.status === "skipped"
+        ? "client_optional"
+        : !onboarding.startedAt
+          ? "account_ready"
+          : !profileDone
+            ? "profile_pending"
+            : !servicesDone
+              ? "services_pending"
+              : "client_pending";
+  return {
+    onboarding,
+    user,
+    firstRun: {
+      stage,
+      minimumReady: servicesDone,
+      nextPath:
+        stage === "active"
+          ? clients[0]
+            ? `/clients/${clients[0].slug}`
+            : "/day"
+          : "/onboarding",
+    },
+    services,
+    clients,
+  };
 }
 
 export async function listFreelancerServices(
@@ -465,6 +552,10 @@ export async function updateClientSetup(
 }
 
 async function ownedUserId(executor: Executor, slug: string): Promise<string> {
+  const authenticatedSlug = await requireAppUserSlug(executor);
+  if (authenticatedSlug !== slug) {
+    throw new OnboardingNotFoundError("No encontré tu perfil.");
+  }
   const rows = await executor.query<Row>(
     "select id from public.users where slug = $1 limit 1",
     [slug],
@@ -538,7 +629,7 @@ async function listOnboardingClients(
   const rows = await executor.query<Row>(
     `select id, slug, name, accent, logo_url from public.clients
     where user_id = $1 and archived_at is null and status <> 'archived'
-    order by created_at, id`,
+    order by created_at desc, id desc`,
     [userId],
   );
   return rows.map((row) => ({

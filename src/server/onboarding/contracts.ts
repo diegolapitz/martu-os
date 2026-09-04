@@ -39,6 +39,8 @@ export const onboardingPatchSchema = z
       .refine(uniqueIds, "No repitas pasos salteados.")
       .optional(),
     profileText: z.string().trim().max(20_000).optional(),
+    profileName: z.string().trim().min(1, "Decinos cómo querés que te llamemos.").max(120).optional(),
+    timezone: z.string().trim().min(1).max(100).regex(/^[A-Za-z_]+(?:\/[A-Za-z0-9_+\-]+)+$/, "La zona horaria no es válida.").optional(),
     confirmedServiceIds: z
       .array(numericIdSchema)
       .min(1, "Elegí al menos un servicio.")
@@ -49,7 +51,7 @@ export const onboardingPatchSchema = z
   })
   .superRefine((value, context) => {
     const changesProfile =
-      value.profileText !== undefined || value.confirmedServiceIds !== undefined;
+      value.profileText !== undefined || value.profileName !== undefined || value.timezone !== undefined || value.confirmedServiceIds !== undefined;
     if (changesProfile && value.confirmed !== true) {
       context.addIssue({
         code: "custom",

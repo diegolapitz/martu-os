@@ -3,6 +3,7 @@
 import type { ComponentType } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import {
   ArrowLeft,
   ArrowRight,
@@ -47,7 +48,8 @@ type ClientSetup = {
   sections: Array<{ id: string; label: string; items: Array<{ id: string; label: string; complete: boolean; optional: boolean }> }>;
   nonBlocking: true;
 };
-type CreatedClient = { id: string; slug: string; name: string; color: string; logoUrl: string | null; serviceIds: string[] };
+type CreatedClient = { id: string; slug: string; name: string; description: string; color: string; logoUrl: string | null; serviceIds: string[] };
+type UserProfile = { name: string; preferredName: string; email: string | null; timezone: string; avatarUrl: string | null; description: string };
 type PreparedLogo = PreparedClientLogo;
 
 const STEPS: Step[] = ["welcome", "profile", "services", "client", "brief", "strategy", "complete"];
@@ -125,6 +127,12 @@ export function OnboardingWizard() {
   const [services, setServices] = useState<Service[]>([]);
   const [step, setStep] = useState<Step>("welcome");
   const [profileText, setProfileText] = useState("");
+  const [profileName, setProfileName] = useState("");
+  const [timezone, setTimezone] = useState("America/Argentina/Buenos_Aires");
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [avatar, setAvatar] = useState<PreparedLogo | null>(null);
+  const [avatarDirty, setAvatarDirty] = useState(false);
+  const avatarInputRef = useRef<HTMLInputElement | null>(null);
   const [profileMode, setProfileMode] = useState<"voice" | "services" | "write" | null>(null);
   const [selectedServiceIds, setSelectedServiceIds] = useState<string[]>([]);
   const [customServices, setCustomServices] = useState<string[]>([]);
@@ -152,15 +160,26 @@ export function OnboardingWizard() {
 
   useEffect(() => {
     let active = true;
-    void api<{ onboarding: OnboardingState; services: Service[] }>("/api/onboarding")
-      .then((payload) => {
+    void api<{ onboarding: OnboardingState; services: Service[]; user: UserProfile; clients?: Array<{ id: string; slug: string; name: string; color: string; logoUrl: string | null }> }>("/api/onboarding")
+      .then(async (payload) => {
         if (!active) return;
         setState(payload.onboarding);
         setServices(payload.services.filter((service) => service.active));
         setStep(payload.onboarding.step);
         setProfileText(payload.onboarding.profileText || "");
+        setProfileName(payload.user.preferredName || payload.user.name || "");
+        setTimezone(payload.user.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone || "America/Argentina/Buenos_Aires");
+        setAvatarUrl(payload.user.avatarUrl);
         setSelectedServiceIds(payload.onboarding.confirmedServiceIds || []);
         setClient((current) => ({ ...current, serviceIds: payload.onboarding.confirmedServiceIds || [] }));
+        const existingClient = payload.clients?.[0];
+        if (existingClient && STEPS.indexOf(payload.onboarding.step) >= STEPS.indexOf("brief")) {
+          const saved = await api<{ client: CreatedClient; setup: ClientSetup }>(`/api/clients/${encodeURIComponent(existingClient.slug)}/setup`);
+          if (!active) return;
+          setCreatedClient(saved.client);
+          setSetup(saved.setup);
+          setClient({ name: saved.client.name, description: saved.client.description, color: saved.client.color, serviceIds: saved.client.serviceIds });
+        }
       })
       .catch((error) => setFeedback({ message: error instanceof Error ? error.message : "No pude abrir el onboarding.", tone: "error" }))
       .finally(() => { if (active) setLoading(false); });
@@ -173,7 +192,8 @@ export function OnboardingWizard() {
 
   useEffect(() => () => {
     if (clientLogo) URL.revokeObjectURL(clientLogo.previewUrl);
-  }, [clientLogo]);
+    if (avatar) URL.revokeObjectURL(avatar.previewUrl);
+  }, [clientLogo, avatar]);
 
   const activeStepNumber = Math.max(1, STEPS.indexOf(step));
   const progress = step === "welcome" ? 0 : step === "complete" ? 100 : Math.round((activeStepNumber / (STEPS.length - 1)) * 100);
@@ -296,7 +316,7 @@ export function OnboardingWizard() {
   }
 
   async function confirmServices() {
-    if (!state || (!selectedServiceIds.length && !customServices.length)) {
+    if (!state || !profileName.trim() || (!selectedServiceIds.length && !customServices.length)) {
       setFeedback({ message: "Elegí al menos un servicio. Después podés cambiarlo.", tone: "error" });
       return;
     }
@@ -309,12 +329,26 @@ export function OnboardingWizard() {
         body: JSON.stringify({ name, icon: "briefcase-business" }),
       })));
       const allIds = [...new Set([...selectedServiceIds, ...created.map((item) => item.service.id)])];
+      if (avatarDirty) {
+        if (avatar) {
+          const form = new FormData();
+          form.set("image", avatar.file);
+          const result = await api<{ avatarUrl: string }>("/api/profile/avatar", { method: "POST", body: form });
+          setAvatarUrl(result.avatarUrl);
+        } else {
+          await api("/api/profile/avatar", { method: "DELETE" });
+          setAvatarUrl(null);
+        }
+        setAvatarDirty(false);
+      }
       const next = await patchOnboarding({
         status: "in_progress",
         step: "client",
         completed: nextCompleted(state, "welcome", "profile", "services"),
         skipped: state.skipped.filter((item) => !["welcome", "profile", "services"].includes(item)),
         profileText: profileText.trim(),
+        profileName: profileName.trim(),
+        timezone,
         confirmedServiceIds: allIds,
         confirmed: true,
       });
@@ -328,6 +362,22 @@ export function OnboardingWizard() {
     }
   }
 
+  async function chooseAvatar(file: File | undefined) {
+    if (!file) return;
+    setPreparingLogo(true);
+    setFeedback(null);
+    try {
+      const prepared = await prepareClientLogo(file);
+      setAvatar(prepared);
+      setAvatarDirty(true);
+    } catch (error) {
+      setFeedback({ message: error instanceof Error ? error.message : "No pude preparar tu foto.", tone: "error" });
+    } finally {
+      setPreparingLogo(false);
+      if (avatarInputRef.current) avatarInputRef.current.value = "";
+    }
+  }
+
   async function createFirstClient() {
     if (!state || !client.name.trim() || client.serviceIds.length === 0) {
       setFeedback({ message: "Con nombre y al menos un servicio ya podemos arrancar.", tone: "error" });
@@ -337,6 +387,15 @@ export function OnboardingWizard() {
     setFeedback(null);
     try {
       if (createdClient) {
+        await api(`/api/clients/${encodeURIComponent(createdClient.slug)}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: client.name.trim(),
+            description: client.description.trim(),
+            accent: client.color,
+          }),
+        });
         await api(`/api/clients/${encodeURIComponent(createdClient.slug)}/setup`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
@@ -529,15 +588,25 @@ export function OnboardingWizard() {
         {step === "profile" ? (
           <div>
             <span className="onboarding-eyebrow">Primero, vos</span>
-            <h1>Contame un poco qué hacés.</h1>
-            <p>No hace falta que lo dejes perfecto. Después podés cambiar todo.</p>
+            <h1>Armemos tu perfil de trabajo.</h1>
+            <p>Con tu nombre y una idea de lo que hacés alcanza. Todo se puede cambiar después.</p>
+            <div className="onboarding-profile-basics">
+              <div className="onboarding-profile-photo">
+                {avatar?.previewUrl || avatarUrl ? <Image src={avatar?.previewUrl ?? avatarUrl ?? ""} alt="Vista previa de tu foto" width={58} height={58} unoptimized /> : <span aria-hidden="true">{(profileName.trim()[0] || "M").toLocaleUpperCase("es")}</span>}
+                <label className="button button--secondary">{preparingLogo ? <LoaderCircle className="spin" size={16} /> : <Upload size={16} />}Foto opcional<input ref={avatarInputRef} type="file" accept="image/jpeg,image/png,image/webp" disabled={busy || preparingLogo} onChange={(event) => void chooseAvatar(event.target.files?.[0])} /></label>
+                {avatar || avatarUrl ? <button type="button" onClick={() => { setAvatar(null); setAvatarDirty(true); }}>Quitar</button> : null}
+              </div>
+              <label className="onboarding-field"><span>¿Cómo querés que te llamemos?</span><input autoFocus autoComplete="name" value={profileName} onChange={(event) => setProfileName(event.target.value)} placeholder="Tu nombre" /></label>
+              <label className="onboarding-field"><span>Zona horaria</span><input value={timezone} onChange={(event) => setTimezone(event.target.value)} aria-describedby="timezone-help" /><small id="timezone-help">La usamos para agenda y recordatorios.</small></label>
+            </div>
+            <h2 className="onboarding-subtitle">¿Qué hacés?</h2>
             <div className="onboarding-choice-grid">
               <button className={profileMode === "voice" ? "is-selected" : ""} type="button" onClick={() => { setProfileMode("voice"); void toggleRecording("profile"); }}><Mic size={22} /><span><strong>{recordingFor === "profile" ? "Terminá cuando quieras" : "Contármelo hablando"}</strong><small>{recordingFor === "profile" ? "Tocá para terminar" : "Lo paso a texto para que lo revises"}</small></span></button>
               <button className={profileMode === "services" ? "is-selected" : ""} type="button" onClick={() => { setProfileMode("services"); setStep("services"); }}><BriefcaseBusiness size={22} /><span><strong>Elegir servicios</strong><small>Marcá lo que ya ofrecés</small></span></button>
               <button className={profileMode === "write" ? "is-selected" : ""} type="button" onClick={() => setProfileMode("write")}><PencilLine size={22} /><span><strong>Escribirlo</strong><small>En tus palabras</small></span></button>
             </div>
             {(profileMode === "write" || profileMode === "voice" || profileText) ? <label className="onboarding-field"><span>Esto es lo que entendí</span><textarea rows={5} value={profileText} onChange={(event) => setProfileText(event.target.value)} placeholder="Ej. Manejo redes, hago estrategia, contenido, guiones y pauta…" /><small>Revisalo tranquila: todavía no guardé nada.</small></label> : null}
-            <OnboardingNav onBack={() => setStep("welcome")} onNext={continueProfile} nextDisabled={transcribing || (!profileText.trim() && profileMode !== "services")} busy={busy || transcribing} nextLabel={transcribing ? "Pasando a texto…" : "Continuar"} />
+            <OnboardingNav onBack={() => setStep("welcome")} onNext={continueProfile} nextDisabled={!profileName.trim() || transcribing || (!profileText.trim() && profileMode !== "services")} busy={busy || transcribing} nextLabel={transcribing ? "Pasando a texto…" : "Continuar"} />
           </div>
         ) : null}
 

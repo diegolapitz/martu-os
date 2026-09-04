@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useSyncExternalStore } from "react";
+import { useRouter } from "next/navigation";
 import {
   Archive,
   ArrowDown,
@@ -13,6 +14,7 @@ import {
   Cloud,
   Instagram,
   Link2,
+  LogOut,
   Megaphone,
   MessageCircle,
   Plus,
@@ -223,6 +225,7 @@ function ServicesSettings() {
 }
 
 export function SettingsView() {
+  const router = useRouter();
   const [profile, setProfile] = useState({
     morningBriefingEnabled: true,
     middayCheckEnabled: true,
@@ -231,6 +234,9 @@ export function SettingsView() {
     quietHoursStart: "22:30",
     quietHoursEnd: "08:30",
     explicitPreferences: "Rioplatense, directa, breve y con un poco de humor. Sin tono de coach.",
+    name: "",
+    timezone: "America/Argentina/Buenos_Aires",
+    description: "",
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -251,6 +257,7 @@ export function SettingsView() {
             quietHoursEnd: string;
             explicitPreferences: string[];
           };
+          user?: { preferredName: string; name: string; timezone: string; description: string };
           message?: string;
         };
         if (!response.ok || !payload.profile) throw new Error(payload.message || "No pude cargar tus preferencias.");
@@ -265,6 +272,9 @@ export function SettingsView() {
           explicitPreferences: Array.isArray(payload.profile.explicitPreferences)
             ? payload.profile.explicitPreferences.join("\n")
             : "",
+          name: payload.user?.preferredName || payload.user?.name || "",
+          timezone: payload.user?.timezone || "America/Argentina/Buenos_Aires",
+          description: payload.user?.description || "",
         });
       })
       .catch((error: unknown) => {
@@ -301,6 +311,19 @@ export function SettingsView() {
     }
   }
 
+  async function logOut() {
+    setSaving(true);
+    try {
+      const response = await fetch("/api/auth/logout", { method: "POST" });
+      if (!response.ok) throw new Error("No pude cerrar la sesión.");
+      router.push("/");
+      router.refresh();
+    } catch (error) {
+      setFeedback({ message: error instanceof Error ? error.message : "No pude cerrar la sesión.", tone: "error" });
+      setSaving(false);
+    }
+  }
+
   const checkins = {
     morning: profile.morningBriefingEnabled,
     midday: profile.middayCheckEnabled,
@@ -315,6 +338,15 @@ export function SettingsView() {
   return (
     <div className="standard-page settings-page">
       <header className="standard-heading"><div><p>Cómo querés que te acompañe</p><h1>Configuración</h1><span>La insistencia se adapta a vos; los compromisos importantes no se pierden.</span></div></header>
+      <section className="settings-section">
+        <SectionTitle icon={<BriefcaseBusiness size={18} />}>Tu perfil</SectionTitle>
+        <div className="settings-grid">
+          <label><span>Nombre</span><input autoComplete="name" disabled={loading || saving} value={profile.name} onChange={(event) => setProfile((current) => ({ ...current, name: event.target.value }))} /></label>
+          <label><span>Zona horaria</span><input disabled={loading || saving} value={profile.timezone} onChange={(event) => setProfile((current) => ({ ...current, timezone: event.target.value }))} /></label>
+          <label className="settings-wide"><span>Qué hacés</span><textarea disabled={loading || saving} value={profile.description} onChange={(event) => setProfile((current) => ({ ...current, description: event.target.value }))} rows={3} /></label>
+        </div>
+        <div className="settings-profile-actions"><button className="button button--primary" type="button" disabled={loading || saving || !profile.name.trim()} onClick={() => void savePreferences()}><Save size={16} />Guardar perfil</button><button className="button button--secondary" type="button" disabled={saving} onClick={() => void logOut()}><LogOut size={16} />Cerrar sesión</button></div>
+      </section>
       <PushSettings />
       <ServicesSettings />
       <section className="settings-section">

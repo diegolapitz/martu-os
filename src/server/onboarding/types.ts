@@ -47,8 +47,31 @@ export type OnboardingClient = {
   logoUrl: string | null;
 };
 
+export type OnboardingUserProfile = {
+  name: string;
+  preferredName: string;
+  email: string | null;
+  timezone: string;
+  avatarUrl: string | null;
+  description: string;
+};
+
+export type FirstRunStage =
+  | "account_ready"
+  | "profile_pending"
+  | "services_pending"
+  | "client_pending"
+  | "client_optional"
+  | "active";
+
 export type OnboardingBundle = {
   onboarding: OnboardingState;
+  user: OnboardingUserProfile;
+  firstRun: {
+    stage: FirstRunStage;
+    minimumReady: boolean;
+    nextPath: string;
+  };
   services: FreelancerService[];
   clients?: OnboardingClient[];
 };
