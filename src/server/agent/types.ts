@@ -245,6 +245,7 @@ export interface AgentTurnTimings {
   routingMs: number;
   contextMs: number;
   modelMs: number;
+  directorMs: number;
   toolMs: number;
   persistenceMs: number;
   fastPath: boolean;

@@ -41,6 +41,7 @@ export class AgentOrchestrator {
       routingMs: 0,
       contextMs: 0,
       modelMs: 0,
+      directorMs: 0,
       toolMs: 0,
       persistenceMs: 0,
       fastPath: false,
@@ -181,7 +182,9 @@ export class AgentOrchestrator {
         const beforeModelTools = timing.toolMs;
         const modelStarted = performance.now();
         try {
-          const responseDirection = await this.responseDirector.direct({ request: { ...request, message, threadId, turnId, now }, context, plan });
+          const directionStarted = performance.now();
+          const responseDirection = await this.directResponse({ request: { ...request, message, threadId, turnId, now }, context, plan }, startedAt);
+          timing.directorMs += performance.now() - directionStarted;
           generated = await this.generateWithDeadline(provider, request, message, threadId, turnId, now, context, plan, mutationContext, executeTool, startedAt, () => mutationInFlight, responseDirection);
         } catch (error) {
           if (executedActions.length) {
@@ -192,7 +195,9 @@ export class AgentOrchestrator {
           } else if (this.fallbackProvider && this.fallbackProvider !== provider) {
             provider = this.fallbackProvider;
             try {
-              const responseDirection = await this.responseDirector.direct({ request: { ...request, message, threadId, turnId, now }, context, plan });
+              const directionStarted = performance.now();
+              const responseDirection = await this.directResponse({ request: { ...request, message, threadId, turnId, now }, context, plan }, startedAt);
+              timing.directorMs += performance.now() - directionStarted;
               generated = await this.generateWithDeadline(provider, request, message, threadId, turnId, now, context, plan, mutationContext, executeTool, startedAt, () => mutationInFlight, responseDirection);
             } catch (fallbackError) {
               if (executedActions.length) generated = directResult("", plan, executedActions);
@@ -239,6 +244,7 @@ export class AgentOrchestrator {
       routingMs: rounded(timing.routingMs),
       contextMs: rounded(timing.contextMs),
       modelMs: rounded(timing.modelMs),
+      directorMs: rounded(timing.directorMs),
       toolMs: rounded(timing.toolMs),
       persistenceMs: rounded(timing.persistenceMs),
       fastPath: timing.fastPath,
@@ -361,6 +367,25 @@ export class AgentOrchestrator {
     return withAgentTimeout((signal) => this.requestPlanner.plan({ request, context, signal }), remaining, () => false);
   }
 
+  private async directResponse(
+    input: Parameters<ResponseDirector["direct"]>[0],
+    startedAt: number,
+  ) {
+    const remaining = Math.max(1, AGENT_TURN_TIMEOUT_MS - (performance.now() - startedAt));
+    try {
+      return await withAgentTimeout(
+        (signal) => this.responseDirector.direct({ ...input, signal }),
+        Math.min(2_500, remaining),
+        () => false,
+      );
+    } catch (error) {
+      // Composition quality may degrade on a slow auxiliary call; availability
+      // of an otherwise answerable turn must not.
+      if (!isAgentTimeout(error)) throw error;
+      return new DeterministicResponseDirector().direct(input);
+    }
+  }
+
   private async timeoutBeforePlan(input: {
     request: AgentRequest;
     threadId: string;
@@ -371,6 +396,7 @@ export class AgentOrchestrator {
       routingMs: number;
       contextMs: number;
       modelMs: number;
+      directorMs: number;
       toolMs: number;
       persistenceMs: number;
       fastPath: boolean;
@@ -415,6 +441,7 @@ export class AgentOrchestrator {
         routingMs: rounded(input.timing.routingMs),
         contextMs: rounded(input.timing.contextMs),
         modelMs: rounded(input.timing.modelMs),
+        directorMs: rounded(input.timing.directorMs),
         toolMs: rounded(input.timing.toolMs),
         persistenceMs: rounded(input.timing.persistenceMs),
         fastPath: input.timing.fastPath,
