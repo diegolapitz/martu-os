@@ -461,11 +461,35 @@ export function OnboardingWizard() {
   }
 
   async function readTextFile(file: File, target: "brief" | "strategy") {
-    if (!/\.(txt|md)$/i.test(file.name)) {
-      setFeedback({ message: "Por ahora puedo leer .txt o .md acá. Un PDF o Word lo podés sumar después desde Archivos.", tone: "error" });
+    if (!/\.(txt|md|pdf)$/i.test(file.name)) {
+      setFeedback({ message: "Subí un archivo .txt, .md o .pdf.", tone: "error" });
       return;
     }
-    const text = await file.text();
+    if (file.size > 20_000_000) {
+      setFeedback({ message: "Ese archivo pesa más de 20 MB. Probá con una versión más liviana.", tone: "error" });
+      return;
+    }
+    let text: string;
+    try {
+      if (/\.pdf$/i.test(file.name)) {
+        const { getDocument } = await import("pdfjs-dist");
+        const loadingTask = getDocument({ data: new Uint8Array(await file.arrayBuffer()) });
+        const document = await loadingTask.promise;
+        const pages = await Promise.all(Array.from({ length: Math.min(document.numPages, 50) }, async (_, index) => {
+          const page = await document.getPage(index + 1);
+          const content = await page.getTextContent();
+          return content.items.map((item) => "str" in item ? item.str : "").join(" ");
+        }));
+        await loadingTask.destroy();
+        text = pages.join("\n\n").replace(/\s+\n/g, "\n").trim();
+        if (!text) throw new Error("El PDF no tiene texto seleccionable. Subí una versión con texto o pegá el contenido.");
+      } else {
+        text = await file.text();
+      }
+    } catch (error) {
+      setFeedback({ message: error instanceof Error ? error.message : "No pude leer ese PDF.", tone: "error" });
+      return;
+    }
     if (target === "brief") {
       setBrief((current) => ({ ...current, businessDescription: text, fileName: file.name }));
       setBriefMode("upload");
@@ -576,7 +600,7 @@ export function OnboardingWizard() {
             <h1>Para entenderlo bien, necesito un poco de contexto.</h1>
             <p>Si ya tenés un brief, genial. Si no, te hago unas preguntas rápidas. También podés dejarlo para después.</p>
             <div className="onboarding-choice-grid onboarding-choice-grid--four">
-              <label className={briefMode === "upload" ? "is-selected onboarding-file-choice" : "onboarding-file-choice"}><Upload size={21} /><span><strong>Subir brief</strong><small>.txt o .md</small></span><input type="file" accept=".txt,.md,.pdf,.doc,.docx" onChange={(event) => { const file = event.target.files?.[0]; if (file) void readTextFile(file, "brief"); }} /></label>
+              <label className={briefMode === "upload" ? "is-selected onboarding-file-choice" : "onboarding-file-choice"}><Upload size={21} /><span><strong>Subir brief</strong><small>.pdf, .txt o .md</small></span><input type="file" accept=".pdf,application/pdf,.txt,text/plain,.md,text/markdown" onChange={(event) => { const file = event.target.files?.[0]; if (file) void readTextFile(file, "brief"); }} /></label>
               <button className={briefMode === "voice" ? "is-selected" : ""} type="button" onClick={() => void toggleRecording("brief")}><Mic size={21} /><span><strong>Contármelo hablando</strong><small>{recordingFor === "brief" ? "Tocá para terminar" : "Después lo revisás"}</small></span></button>
               <button className={briefMode === "questions" ? "is-selected" : ""} type="button" onClick={() => setBriefMode("questions")}><FileText size={21} /><span><strong>Preguntas rápidas</strong><small>Completá lo que sepas</small></span></button>
               <button type="button" onClick={() => void saveBrief(true)}><ArrowRight size={21} /><span><strong>Después</strong><small>No bloquea por ahora</small></span></button>
@@ -592,7 +616,7 @@ export function OnboardingWizard() {
             <h1>¿Ya existe una estrategia?</h1>
             <p>Traé lo que tengas. Si todavía no existe, la armamos más adelante.</p>
             <div className="onboarding-choice-grid onboarding-choice-grid--four">
-              <label className={strategyMode === "upload" ? "is-selected onboarding-file-choice" : "onboarding-file-choice"}><Upload size={21} /><span><strong>Subir documento</strong><small>.txt o .md</small></span><input type="file" accept=".txt,.md,.pdf,.doc,.docx" onChange={(event) => { const file = event.target.files?.[0]; if (file) void readTextFile(file, "strategy"); }} /></label>
+              <label className={strategyMode === "upload" ? "is-selected onboarding-file-choice" : "onboarding-file-choice"}><Upload size={21} /><span><strong>Subir documento</strong><small>.pdf, .txt o .md</small></span><input type="file" accept=".pdf,application/pdf,.txt,text/plain,.md,text/markdown" onChange={(event) => { const file = event.target.files?.[0]; if (file) void readTextFile(file, "strategy"); }} /></label>
               <button className={strategyMode === "paste" ? "is-selected" : ""} type="button" onClick={() => setStrategyMode("paste")}><FileText size={21} /><span><strong>Pegar texto</strong><small>Lo ordenamos después</small></span></button>
               <button className={strategyMode === "voice" ? "is-selected" : ""} type="button" onClick={() => void toggleRecording("strategy")}><Mic size={21} /><span><strong>Contármela hablando</strong><small>{recordingFor === "strategy" ? "Tocá para terminar" : "La pasamos a texto"}</small></span></button>
               <button type="button" onClick={() => void saveStrategy(true)}><ArrowRight size={21} /><span><strong>Crear más adelante</strong><small>No bloquea</small></span></button>
