@@ -50,6 +50,7 @@ export type DayData = {
   agenda: AgendaItem[];
   clientsNeedingAttention: AttentionClient[];
   stats?: Record<string, number>;
+  hasClients?: boolean;
 };
 
 export type ClientSummary = {

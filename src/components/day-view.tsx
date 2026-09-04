@@ -172,6 +172,34 @@ export function DayView({ data }: { data: DayData }) {
     }
   }
 
+  if (data.hasClients === false && actionCount === 0 && agenda.length === 0) {
+    return (
+      <div className="day-layout day-layout--first-run">
+        <section className="day-main">
+          <header className="page-heading page-heading--day">
+            <div className="day-heading__copy">
+              <p>{formatDay(data.date)}</p>
+              <h1 data-testid="day-heading">{data.greeting}</h1>
+              <span>Tu espacio está listo. Lo vamos completando a medida que lo uses.</span>
+            </div>
+          </header>
+          <section className="first-run-empty" aria-labelledby="first-run-empty-title">
+            <span className="first-run-empty__number">01</span>
+            <div>
+              <p>Primer paso útil</p>
+              <h2 id="first-run-empty-title">Cargá un cliente cuando estés lista.</h2>
+              <span>Todavía no hay urgencias, tareas ni contenido. Con nombre y servicios alcanza para empezar; brief y estrategia pueden esperar.</span>
+              <div className="first-run-empty__actions">
+                <Link className="button button--primary" href="/clients" prefetch={false}>Agregar mi primer cliente</Link>
+                <Link className="button button--secondary" href="/onboarding" prefetch={false}>Retomar la configuración</Link>
+              </div>
+            </div>
+          </section>
+        </section>
+      </div>
+    );
+  }
+
   return (
     <div className="day-layout">
       <section className="day-main">

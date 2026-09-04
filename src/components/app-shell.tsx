@@ -10,6 +10,7 @@ import {
 } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import {
   Bell,
@@ -83,23 +84,6 @@ const utilityNavItems: NavItem[] = [
   },
 ];
 
-const clientLabels: Record<string, string> = {
-  gavilan: "Metauro",
-  "luma-estudio": "Luma Estudio",
-  luma: "Luma Estudio",
-  "casa-norte": "Casa Norte",
-  brava: "Brava Fit",
-  "brava-fit": "Brava Fit",
-  nido: "Nido",
-};
-
-const sidebarClients = [
-  { slug: "gavilan", name: "Metauro" },
-  { slug: "luma-estudio", name: "Luma" },
-  { slug: "casa-norte", name: "Casa Norte" },
-  { slug: "brava-fit", name: "Brava Fit" },
-  { slug: "nido", name: "Nido" },
-] as const;
 type SidebarClient = {
   slug: string;
   name: string;
@@ -116,31 +100,6 @@ const searchTargets = [
     shortLabel: "Configuración",
     icon: Settings,
   },
-  {
-    href: "/clients/gavilan",
-    label: "Metauro",
-    shortLabel: "Cliente",
-    icon: Users,
-  },
-  {
-    href: "/clients/luma-estudio",
-    label: "Luma Estudio",
-    shortLabel: "Cliente",
-    icon: Users,
-  },
-  {
-    href: "/clients/casa-norte",
-    label: "Casa Norte",
-    shortLabel: "Cliente",
-    icon: Users,
-  },
-  {
-    href: "/clients/brava-fit",
-    label: "Brava Fit",
-    shortLabel: "Cliente",
-    icon: Users,
-  },
-  { href: "/clients/nido", label: "Nido", shortLabel: "Cliente", icon: Users },
 ];
 
 type NotificationItem = {
@@ -649,9 +608,13 @@ function NotificationCenter({
 export function AppShell({
   children,
   aiMode,
+  user,
+  initialClients,
 }: {
   children: ReactNode;
   aiMode: "demo" | "real";
+  user: { name: string; avatarUrl: string | null };
+  initialClients: SidebarClient[];
 }) {
   const pathname = usePathname();
   const router = useRouter();
@@ -665,7 +628,7 @@ export function AppShell({
   const [activeNudgeId, setActiveNudgeId] = useState<string | null>(null);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [notificationCount, setNotificationCount] = useState(0);
-  const [sidebarClientRows, setSidebarClientRows] = useState<SidebarClient[]>([...sidebarClients]);
+  const [sidebarClientRows, setSidebarClientRows] = useState<SidebarClient[]>(initialClients);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [intentPrefetchHref, setIntentPrefetchHref] = useState<string | null>(
@@ -684,12 +647,11 @@ export function AppShell({
     return {
       slug,
       name:
-        clientLabels[slug] ??
-        slug
+        sidebarClientRows.find((client) => client.slug === slug)?.name ?? slug
           .replace(/-/g, " ")
           .replace(/\b\w/g, (letter) => letter.toUpperCase()),
     };
-  }, [pathname]);
+  }, [pathname, sidebarClientRows]);
 
   const currentViewLabel = useMemo(() => {
     if (currentClient.name) {
@@ -718,14 +680,23 @@ export function AppShell({
   }, [currentClient.name, pathname]);
 
   const filteredSearchTargets = useMemo(() => {
+    const availableTargets = [
+      ...searchTargets,
+      ...sidebarClientRows.map((client) => ({
+        href: `/clients/${client.slug}`,
+        label: client.name,
+        shortLabel: "Cliente",
+        icon: Users,
+      })),
+    ];
     const normalized = searchQuery.trim().toLocaleLowerCase("es");
-    if (!normalized) return searchTargets;
-    return searchTargets.filter((item) =>
+    if (!normalized) return availableTargets;
+    return availableTargets.filter((item) =>
       `${item.label} ${item.shortLabel}`
         .toLocaleLowerCase("es")
         .includes(normalized),
     );
-  }, [searchQuery]);
+  }, [searchQuery, sidebarClientRows]);
 
   const markNavigationIntent = useCallback((href: string) => {
     setIntentPrefetchHref(href);
@@ -818,23 +789,12 @@ export function AppShell({
   }, []);
 
   useEffect(() => {
-    let active = true;
-    void fetch("/api/clients")
-      .then((response) => response.ok ? response.json() : Promise.reject())
-      .then((payload: { clients?: Array<{ slug: string; name: string; accent?: string | null; logoUrl?: string | null }> }) => {
-        if (!active || !payload.clients) return;
-        const known = new Map(payload.clients.map((client) => [client.slug, client]));
-        setSidebarClientRows(sidebarClients.map((fallback) => ({ ...fallback, ...known.get(fallback.slug) })));
-      })
-      .catch(() => undefined);
-    return () => { active = false; };
-  }, []);
-
-  useEffect(() => {
     const updateIdentity = (event: Event) => {
       const detail = (event as CustomEvent<{ slug: string; name?: string; accent?: string | null; logoUrl?: string | null }>).detail;
       if (!detail?.slug) return;
-      setSidebarClientRows((current) => current.map((client) => client.slug === detail.slug ? { ...client, ...detail } : client));
+      setSidebarClientRows((current) => current.some((client) => client.slug === detail.slug)
+        ? current.map((client) => client.slug === detail.slug ? { ...client, ...detail } : client)
+        : [...current, { slug: detail.slug, name: detail.name || detail.slug, accent: detail.accent, logoUrl: detail.logoUrl }]);
     };
     window.addEventListener("martu:client-identity", updateIdentity);
     return () => window.removeEventListener("martu:client-identity", updateIdentity);
@@ -973,9 +933,9 @@ export function AppShell({
             onNavigate={() => beginLinkNavigation("/settings")}
           >
             <span className="avatar">
-              M<span aria-hidden="true" />
+              {user.avatarUrl ? <Image src={user.avatarUrl} alt="" width={40} height={40} unoptimized /> : user.name.slice(0, 1).toLocaleUpperCase("es")}<span aria-hidden="true" />
             </span>
-            <strong>Martu</strong>
+            <strong>{user.name}</strong>
             <ChevronDown size={16} />
           </Link>
           <div className="demo-mode">
@@ -1030,11 +990,11 @@ export function AppShell({
             <Link
               className="topbar-avatar"
               href="/settings"
-              aria-label="Abrir configuración de Martu"
+              aria-label={`Abrir configuración de ${user.name}`}
               prefetch={false}
               onNavigate={() => beginLinkNavigation("/settings")}
             >
-              M
+              {user.avatarUrl ? <Image src={user.avatarUrl} alt="" width={32} height={32} unoptimized /> : user.name.slice(0, 1).toLocaleUpperCase("es")}
             </Link>
           </div>
         </header>

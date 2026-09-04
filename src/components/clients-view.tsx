@@ -136,7 +136,7 @@ export function ClientsView({ clients }: { clients: ClientSummary[] }) {
             <ChevronRight size={19} />
           </Link>
         ))}
-        {filtered.length === 0 ? <div className="directory-empty"><Search size={23} /><strong>No encontré ese cliente</strong><p>Probá buscar por un servicio, por ejemplo “pauta”.</p></div> : null}
+        {filtered.length === 0 ? <div className="directory-empty">{rows.length === 0 ? <Users size={23} /> : <Search size={23} />}<strong>{rows.length === 0 ? "Todavía no cargaste clientes" : "No encontré ese cliente"}</strong><p>{rows.length === 0 ? "Con nombre y servicios alcanza. El brief y la estrategia pueden esperar." : "Probá buscar por un servicio, por ejemplo “pauta”."}</p>{rows.length === 0 ? <button className="button button--primary button--small" type="button" onClick={() => setDialogOpen(true)}><Plus size={16} />Agregar mi primer cliente</button> : null}</div> : null}
       </section>
 
       <footer className="portfolio-note"><ArrowUpRight size={17} /><span>La vista de cada cliente cambia según los servicios que realmente contrató.</span></footer>
