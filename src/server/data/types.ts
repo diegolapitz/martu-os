@@ -53,6 +53,7 @@ export interface DayData {
   agenda: AgendaItem[];
   clientsNeedingAttention: AttentionClient[];
   stats: { openTasks: number; overdueTasks: number; pendingNudges: number };
+  hasClients?: boolean;
 }
 
 export interface ClientSummary {

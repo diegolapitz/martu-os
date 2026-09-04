@@ -4,6 +4,7 @@ import {
   type DatabaseRow,
   type DbExecutor,
 } from "@/server/db";
+import { requireAppUserId } from "@/server/auth";
 
 import {
   id,
@@ -72,11 +73,7 @@ function serializableRow(row: Row): SerializableRow {
 }
 
 async function userId(tx: DbExecutor): Promise<string> {
-  const rows = await tx.query<Row>(
-    "select id from public.users where slug = 'martu' limit 1",
-  );
-  if (!rows[0]) throw new Error("La usuaria demo Martu no está inicializada.");
-  return id(rows[0].id);
+  return requireAppUserId(tx);
 }
 
 async function clientRef(
@@ -84,10 +81,11 @@ async function clientRef(
   slug?: string | null,
 ): Promise<{ id: string; slug: string; name: string } | null> {
   if (!slug) return null;
+  const ownerId = await requireAppUserId(tx);
   const rows = await tx.query<Row>(
-    `select c.id, c.slug, c.name from public.clients c join public.users u on u.id = c.user_id
-     where u.slug = 'martu' and c.slug = $1 and c.status <> 'archived'`,
-    [slug],
+    `select c.id, c.slug, c.name from public.clients c
+     where c.user_id = $2 and c.slug = $1 and c.status <> 'archived'`,
+    [slug, ownerId],
   );
   if (!rows[0]) throw new Error(`No existe el cliente ${slug}.`);
   return {
@@ -916,9 +914,10 @@ export async function updateCommunicationProfile(
     params.push(input[key]);
     return `${column} = $${params.length}`;
   });
+  params.push(await requireAppUserId());
   const rows = await dbQuery<Row>(
     `update public.communication_profiles set ${sets.join(", ")}
-     where user_id = (select id from public.users where slug = 'martu') returning *`,
+     where user_id = $${params.length} returning *`,
     params,
   );
   if (!rows[0]) throw new Error("No encontré el perfil de comunicación.");
@@ -961,13 +960,15 @@ export async function upsertNudge(input: {
   quickActions?: Nudge["quickActions"];
   metadata?: Record<string, unknown>;
 }): Promise<SerializableRow | null> {
+  const ownerId = await requireAppUserId();
   const rows = await dbQuery<Row>(
     `insert into public.ai_nudges (
        user_id, client_id, task_id, commitment_id, reminder_id, kind, severity, title,
        message, dedupe_key, deliver_after, cooldown_until, target_path, quick_actions, metadata
-     ) values ((select id from public.users where slug = 'martu'),$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13::jsonb,$14::jsonb)
+     ) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14::jsonb,$15::jsonb)
      on conflict do nothing returning *`,
     [
+      ownerId,
       input.clientId ?? null,
       input.taskId ?? null,
       input.commitmentId ?? null,
@@ -991,20 +992,23 @@ export async function markNudgeDelivered(
   nudgeId: string,
   input: { deliveredAt?: string; metadata?: Record<string, unknown> } = {},
 ) {
+  const ownerId = await requireAppUserId();
   const rows = await dbQuery<Row>(
-    "update public.ai_nudges set status = 'delivered', delivered_at = $2, metadata = metadata || $3::jsonb where id = $1 returning *",
+    "update public.ai_nudges set status = 'delivered', delivered_at = $2, metadata = metadata || $3::jsonb where id = $1 and user_id = $4 returning *",
     [
       nudgeId,
       input.deliveredAt ?? new Date().toISOString(),
       JSON.stringify(input.metadata ?? {}),
+      ownerId,
     ],
   );
   return rows[0] ? serializableRow(rows[0]) : null;
 }
 export async function dismissNudge(nudgeId: string, reason = "dismissed") {
+  const ownerId = await requireAppUserId();
   const rows = await dbQuery<Row>(
-    "update public.ai_nudges set status = 'dismissed', metadata = metadata || $2::jsonb where id = $1 returning *",
-    [nudgeId, JSON.stringify({ dismissalReason: reason })],
+    "update public.ai_nudges set status = 'dismissed', metadata = metadata || $2::jsonb where id = $1 and user_id = $3 returning *",
+    [nudgeId, JSON.stringify({ dismissalReason: reason }), ownerId],
   );
   return rows[0] ? serializableRow(rows[0]) : null;
 }
@@ -1012,9 +1016,10 @@ export async function markNudgeActed(
   nudgeId: string,
   metadata: Record<string, unknown> = {},
 ) {
+  const ownerId = await requireAppUserId();
   const rows = await dbQuery<Row>(
-    "update public.ai_nudges set status = 'acted', acted_at = now(), metadata = metadata || $2::jsonb where id = $1 returning *",
-    [nudgeId, JSON.stringify(metadata)],
+    "update public.ai_nudges set status = 'acted', acted_at = now(), metadata = metadata || $2::jsonb where id = $1 and user_id = $3 returning *",
+    [nudgeId, JSON.stringify(metadata), ownerId],
   );
   return rows[0] ? serializableRow(rows[0]) : null;
 }
@@ -1030,12 +1035,13 @@ export async function upsertPushSubscription(input: {
   const auth = input.keys?.auth ?? input.auth;
   if (!input.endpoint || !p256dh || !auth)
     throw new Error("Suscripción push incompleta.");
+  const ownerId = await requireAppUserId();
   const rows = await dbQuery<Row>(
     `insert into public.push_subscriptions (user_id, endpoint, p256dh, auth, user_agent)
-     values ((select id from public.users where slug = 'martu'),$1,$2,$3,$4)
+     values ($1,$2,$3,$4,$5)
      on conflict (endpoint) do update set p256dh = excluded.p256dh, auth = excluded.auth,
        user_agent = excluded.user_agent, status = 'active', failure_count = 0 returning *`,
-    [input.endpoint, p256dh, auth, input.userAgent ?? null],
+    [ownerId, input.endpoint, p256dh, auth, input.userAgent ?? null],
   );
   const row = serializableRow(rows[0]!);
   return Object.assign(row, {

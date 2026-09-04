@@ -21,12 +21,15 @@
     "db:migrate": "tsx scripts/db-migrate.ts",
     "db:seed": "tsx scripts/db-seed.ts",
     "db:reset:demo": "tsx scripts/db-reset.ts",
+    "db:reset:first-run": "tsx scripts/reset-first-run.ts",
     "db:cron:setup": "tsx scripts/setup-supabase-cron.ts",
     "vapid:generate": "tsx scripts/generate-vapid.ts",
     "push:smoke": "tsx scripts/send-test-push.ts"
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.3.14",
+    "@supabase/ssr": "^0.12.5",
+    "@supabase/supabase-js": "^2.115.0",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "date-fns-tz": "^3.2.0",

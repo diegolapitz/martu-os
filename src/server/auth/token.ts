@@ -4,10 +4,12 @@ export const MARTU_SESSION_COOKIE = "martu_session";
 export const MARTU_SESSION_MAX_AGE = 60 * 60 * 24 * 30;
 
 export interface MartuSession {
-  userSlug: "martu";
+  userId?: string;
+  userSlug: string;
+  authUserId?: string | null;
   issuedAt: number;
   expiresAt: number;
-  version: 1;
+  version: 1 | 2;
 }
 
 function production() {
@@ -58,7 +60,7 @@ export function verifySessionToken(token: string | undefined, now = new Date()):
     if (!encoded || !provided || extra || !safeEqual(signature(encoded), provided)) return null;
     const payload = JSON.parse(decode(encoded)) as Partial<MartuSession>;
     const current = Math.floor(now.getTime() / 1000);
-    if (payload.userSlug !== "martu" || payload.version !== 1) return null;
+    if (!payload.userSlug || payload.version !== 1) return null;
     if (!Number.isInteger(payload.issuedAt) || !Number.isInteger(payload.expiresAt)) return null;
     if (Number(payload.issuedAt) > current + 60 || Number(payload.expiresAt) <= current) return null;
     return payload as MartuSession;

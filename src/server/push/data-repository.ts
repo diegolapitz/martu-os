@@ -1,6 +1,7 @@
 import "server-only";
 
 import { query } from "@/server/data";
+import { requireAppUserId } from "@/server/auth";
 
 import type { PushSubscriptionInput, PushSubscriptionRepository, StoredPushSubscription } from "./types";
 
@@ -41,9 +42,7 @@ export class MartuPushSubscriptionRepository implements PushSubscriptionReposito
 }
 
 async function martuUserId(): Promise<string> {
-  const rows = await query<Row>("select id from public.users where slug = 'martu' limit 1");
-  if (!rows[0]) throw new Error("La usuaria demo Martu no está inicializada.");
-  return String(rows[0].id);
+  return requireAppUserId();
 }
 
 function mapSubscription(row: Row): StoredPushSubscription {

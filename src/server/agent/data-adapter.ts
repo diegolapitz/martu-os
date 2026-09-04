@@ -1,4 +1,5 @@
 import "server-only";
+import { requireAppUserId } from "@/server/auth";
 
 import {
   appendActivity,
@@ -519,9 +520,7 @@ export class MartuAgentDataAdapter implements AgentConversationStore, AgentMutat
 }
 
 async function martuUserId(signal?: AbortSignal): Promise<string> {
-  const rows = await contextRead(signal, () => query<Row>("select id from public.users where slug = 'martu' limit 1"));
-  if (!rows[0]) throw new Error("La usuaria demo Martu no está inicializada.");
-  return String(rows[0].id);
+  return contextRead(signal, () => requireAppUserId());
 }
 
 async function requiredClient(slug?: string): Promise<ClientRef> {
@@ -532,13 +531,13 @@ async function requiredClient(slug?: string): Promise<ClientRef> {
 }
 
 async function loadClients(signal?: AbortSignal): Promise<ClientRef[]> {
+  const userId = await martuUserId(signal);
   const rows = await contextRead(signal, () => query<Row>(`select c.id, c.slug, c.name,
       coalesce(array_agg(s.slug order by s.sort_order) filter (where cs.is_active), '{}') as services
     from public.clients c
     left join public.client_services cs on cs.client_id = c.id
     left join public.services s on s.id = cs.service_id
-    join public.users u on u.id = c.user_id and u.slug = 'martu'
-    where c.status = 'active' and c.archived_at is null group by c.id order by c.name`));
+    where c.user_id = $1 and c.status = 'active' and c.archived_at is null group by c.id order by c.name`, [userId]));
   return rows.map((row) => ({ id: String(row.id), slug: String(row.slug), name: String(row.name), services: toStringArray(row.services) }));
 }
 
@@ -546,10 +545,11 @@ async function loadThreadScope(threadId: string, signal?: AbortSignal): Promise<
   scope: "global" | "client";
   clientSlug?: string;
 } | undefined> {
+  const userId = await martuUserId(signal);
   const rows = await contextRead(signal, () => query<Row>(`select t.scope, c.slug as client_slug
     from public.chat_threads t join public.users u on u.id = t.user_id
     left join public.clients c on c.id = t.client_id
-    where t.id = $1 and u.slug = 'martu' limit 1`, [threadId]));
+    where t.id = $1 and u.id = $2 limit 1`, [threadId, userId]));
   if (!rows[0]) return undefined;
   return {
     scope: rows[0].scope === "client" ? "client" : "global",

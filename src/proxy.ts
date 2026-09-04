@@ -2,24 +2,38 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 import { MARTU_SESSION_COOKIE, verifySessionToken } from "@/server/auth/token";
+import { authMode } from "@/server/auth/config";
+import { refreshSupabaseSession } from "@/server/auth/proxy-session";
 
 const publicPaths = new Set([
   "/",
   "/api/session/start",
+  "/api/auth/login",
+  "/api/auth/register",
+  "/api/auth/reset",
+  "/auth/callback",
+  "/auth/update-password",
   "/api/scheduler/tick",
   "/api/push/public-key",
   "/api/push/test",
 ]);
 
-export function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname;
-  const session = verifySessionToken(request.cookies.get(MARTU_SESSION_COOKIE)?.value);
+  const supabaseAuth = authMode() === "supabase";
+  const refreshed = supabaseAuth
+    ? await refreshSupabaseSession(request)
+    : null;
+  const authenticated = refreshed
+    ? refreshed.authenticated
+    : Boolean(
+        verifySessionToken(request.cookies.get(MARTU_SESSION_COOKIE)?.value),
+      );
 
-  if (path === "/" && session) {
-    return NextResponse.redirect(new URL("/day", request.url));
+  if (publicPaths.has(path) || path.startsWith("/api/auth/")) {
+    return refreshed?.response ?? NextResponse.next();
   }
-  if (publicPaths.has(path)) return NextResponse.next();
-  if (session) return NextResponse.next();
+  if (authenticated) return refreshed?.response ?? NextResponse.next();
 
   if (path.startsWith("/api/")) {
     return NextResponse.json({ message: "Necesitás iniciar sesión." }, { status: 401 });

@@ -4,6 +4,7 @@ import {
   type DatabaseRow,
   type DbExecutor,
 } from "@/server/db";
+import { requireAppUserId } from "@/server/auth";
 
 type Row = DatabaseRow;
 type Executor = Pick<DbExecutor, "query">;
@@ -70,19 +71,15 @@ function present(value: unknown) {
 }
 
 async function martuUserId(executor: Executor = { query }): Promise<string> {
-  const rows = await executor.query<Row>(
-    "select id from public.users where slug = 'martu' limit 1",
-  );
-  if (!rows[0]) throw new Error("La usuaria Martu no está inicializada.");
-  return String(rows[0].id);
+  return requireAppUserId(executor);
 }
 
 async function ownedClient(executor: Executor, slug: string): Promise<Row> {
+  const userId = await requireAppUserId(executor);
   const rows = await executor.query<Row>(
     `select c.* from public.clients c
-    join public.users u on u.id = c.user_id
-    where u.slug = 'martu' and c.slug = $1 and c.archived_at is null limit 1`,
-    [slug],
+    where c.slug = $1 and c.user_id = $2 and c.archived_at is null limit 1`,
+    [slug, userId],
   );
   if (!rows[0]) throw new Error("No encontré ese cliente.");
   return rows[0];
@@ -92,11 +89,11 @@ async function ownedClientById(
   executor: Executor,
   clientId: string,
 ): Promise<Row> {
+  const userId = await requireAppUserId(executor);
   const rows = await executor.query<Row>(
     `select c.* from public.clients c
-    join public.users u on u.id = c.user_id
-    where u.slug = 'martu' and c.id = $1 and c.archived_at is null limit 1`,
-    [clientId],
+    where c.id = $1 and c.user_id = $2 and c.archived_at is null limit 1`,
+    [clientId, userId],
   );
   if (!rows[0]) throw new Error("No encontré ese cliente.");
   return rows[0];
@@ -107,6 +104,7 @@ export async function clientHasService(
   serviceSlug: string,
   executor: Executor = { query },
 ): Promise<boolean> {
+  await ownedClientById(executor, clientId);
   const rows = await executor.query<Row>(
     `select exists(
       select 1 from public.client_services cs join public.services s on s.id = cs.service_id
@@ -366,8 +364,9 @@ export async function listIdeasV1(
     limit?: number;
   } = {},
 ) {
+  const userId = await requireAppUserId();
   const rows = await query<Row>(
-    `${ideaSelect()} where u.slug = 'martu'
+    `${ideaSelect()} where u.id = $6
     and ($1::text is null or c.slug = $1) and ($2::text is null or i.status = $2)
     and ($3 or (i.archived_at is null and i.deleted_at is null))
     and ($4::text is null or i.title ilike '%' || $4 || '%' or i.description ilike '%' || $4 || '%')
@@ -378,15 +377,17 @@ export async function listIdeasV1(
       options.includeArchived ?? false,
       options.search?.trim() || null,
       Math.min(options.limit ?? 100, 200),
+      userId,
     ],
   );
   return rows.map(domainDto);
 }
 
 export async function getIdeaV1(id: string, executor: Executor = { query }) {
+  const userId = await requireAppUserId(executor);
   const rows = await executor.query<Row>(
-    `${ideaSelect()} where u.slug = 'martu' and i.id = $1 limit 1`,
-    [id],
+    `${ideaSelect()} where u.id = $2 and i.id = $1 limit 1`,
+    [id, userId],
   );
   if (!rows[0]) throw new Error("No encontré la idea.");
   return rows[0];
@@ -592,8 +593,9 @@ export async function listScriptsV1(
     limit?: number;
   } = {},
 ) {
+  const userId = await requireAppUserId();
   const rows = await query<Row>(
-    `${scriptSelect()} where u.slug = 'martu'
+    `${scriptSelect()} where u.id = $5
     and ($1::text is null or c.slug = $1) and ($2::text is null or s.status = $2)
     and ($3::text is null or s.title ilike '%' || $3 || '%' or s.body ilike '%' || $3 || '%')
     order by s.updated_at desc limit $4`,
@@ -602,15 +604,17 @@ export async function listScriptsV1(
       options.status ?? null,
       options.search?.trim() || null,
       Math.min(options.limit ?? 100, 200),
+      userId,
     ],
   );
   return rows.map(domainDto);
 }
 
 export async function getScriptV1(id: string, executor: Executor = { query }) {
+  const userId = await requireAppUserId(executor);
   const rows = await executor.query<Row>(
-    `${scriptSelect()} where u.slug = 'martu' and s.id = $1 limit 1`,
-    [id],
+    `${scriptSelect()} where u.id = $2 and s.id = $1 limit 1`,
+    [id, userId],
   );
   if (!rows[0]) throw new Error("No encontré el guion.");
   return rows[0];
@@ -870,8 +874,9 @@ export async function listContentV1(
     limit?: number;
   } = {},
 ) {
+  const userId = await requireAppUserId();
   const rows = await query<Row>(
-    `${contentSelect()} where u.slug = 'martu'
+    `${contentSelect()} where u.id = $6
     and ($1::text is null or c.slug = $1)
     and ($2::text is null or coalesce(ws.slug,ci.status) = $2)
     and ($3 or ci.archived_at is null)
@@ -883,15 +888,17 @@ export async function listContentV1(
       options.includeArchived ?? false,
       options.search?.trim() || null,
       Math.min(options.limit ?? 100, 200),
+      userId,
     ],
   );
   return rows.map(domainDto);
 }
 
 export async function getContentV1(id: string, executor: Executor = { query }) {
+  const userId = await requireAppUserId(executor);
   const rows = await executor.query<Row>(
-    `${contentSelect()} where u.slug = 'martu' and ci.id = $1 limit 1`,
-    [id],
+    `${contentSelect()} where u.id = $2 and ci.id = $1 limit 1`,
+    [id, userId],
   );
   if (!rows[0]) throw new Error("No encontré el contenido.");
   return rows[0];
@@ -1281,8 +1288,9 @@ export async function listWorkV1(
     limit?: number;
   } = {},
 ) {
+  const userId = await requireAppUserId();
   const rows = await query<Row>(
-    `${workSelect()} where u.slug = 'martu'
+    `${workSelect()} where u.id = $8
     and ($1::text is null or c.slug = $1) and ($2::text is null or t.status = $2)
     and ($3::text is null or t.bucket = $3) and ($4::text is null or t.work_kind = $4)
     and ($5 or t.archived_at is null)
@@ -1297,15 +1305,17 @@ export async function listWorkV1(
       options.includeArchived ?? false,
       options.search?.trim() || null,
       Math.min(options.limit ?? 150, 300),
+      userId,
     ],
   );
   return rows.map(domainDto);
 }
 
 export async function getWorkV1(id: string, executor: Executor = { query }) {
+  const userId = await requireAppUserId(executor);
   const rows = await executor.query<Row>(
-    `${workSelect()} where u.slug = 'martu' and t.id = $1 limit 1`,
-    [id],
+    `${workSelect()} where u.id = $2 and t.id = $1 limit 1`,
+    [id, userId],
   );
   if (!rows[0]) throw new Error("No encontré el trabajo.");
   return rows[0];
@@ -1492,7 +1502,8 @@ export async function listCalendarEventsV1(
   const from =
     options.from ?? new Date(Date.now() - 30 * 86_400_000).toISOString();
   const to = options.to ?? new Date(Date.now() + 90 * 86_400_000).toISOString();
-  const params = [from, to, options.clientSlug ?? null, options.kind ?? null];
+  const userId = await requireAppUserId();
+  const params = [from, to, options.clientSlug ?? null, options.kind ?? null, userId];
   const [manual, tasks, meetings, content] = await Promise.all([
     query<Row>(
       `select ce.id::text as id, ce.title, ce.description, ce.starts_at, ce.ends_at, ce.all_day,
@@ -1500,7 +1511,7 @@ export async function listCalendarEventsV1(
       c.id as client_id, c.slug as client_slug, c.name as client_name
       from public.calendar_events ce join public.users u on u.id = ce.user_id
       left join public.clients c on c.id = ce.client_id
-      where u.slug = 'martu' and ce.archived_at is null and ce.starts_at < $2
+      where u.id = $5 and ce.archived_at is null and ce.starts_at < $2
         and coalesce(ce.ends_at,ce.starts_at) >= $1 and ($3::text is null or c.slug = $3)
         and ($4::text is null or ce.kind = $4) order by ce.starts_at`,
       params,
@@ -1512,7 +1523,7 @@ export async function listCalendarEventsV1(
        '/work?item=' || t.id::text as target_path,
       c.id as client_id, c.slug as client_slug, c.name as client_name
       from public.tasks t join public.users u on u.id = t.user_id left join public.clients c on c.id = t.client_id
-      where u.slug = 'martu' and t.archived_at is null and coalesce(t.starts_at,t.due_at) >= $1
+      where u.id = $5 and t.archived_at is null and coalesce(t.starts_at,t.due_at) >= $1
         and coalesce(t.starts_at,t.due_at) < $2 and ($3::text is null or c.slug = $3)
         and ($4::text is null or $4 = 'task')`,
       params,
@@ -1524,7 +1535,7 @@ export async function listCalendarEventsV1(
        '/clients/' || c.slug || '/notas/' || m.id::text as target_path,
       c.id as client_id, c.slug as client_slug, c.name as client_name
       from public.meetings m join public.clients c on c.id = m.client_id join public.users u on u.id = c.user_id
-      where u.slug = 'martu' and m.starts_at >= $1 and m.starts_at < $2
+      where u.id = $5 and m.starts_at >= $1 and m.starts_at < $2
         and ($3::text is null or c.slug = $3) and ($4::text is null or $4 = 'meeting')`,
       params,
     ),
@@ -1536,7 +1547,7 @@ export async function listCalendarEventsV1(
       c.id as client_id, c.slug as client_slug, c.name as client_name
       from public.content_items ci join public.clients c on c.id = ci.client_id join public.users u on u.id = c.user_id
       left join public.content_workflow_states ws on ws.id = ci.workflow_state_id
-      where u.slug = 'martu' and ci.archived_at is null and coalesce(ci.scheduled_at,ci.due_at,ci.published_at) >= $1
+      where u.id = $5 and ci.archived_at is null and coalesce(ci.scheduled_at,ci.due_at,ci.published_at) >= $1
         and coalesce(ci.scheduled_at,ci.due_at,ci.published_at) < $2
         and ($3::text is null or c.slug = $3) and ($4::text is null or $4 = 'content')`,
       params,
@@ -1596,11 +1607,12 @@ export async function getManualCalendarEventV1(
   id: string,
   executor: Executor = { query },
 ) {
+  const userId = await requireAppUserId(executor);
   const rows = await executor.query<Row>(
     `select ce.*, c.slug as client_slug, c.name as client_name
     from public.calendar_events ce join public.users u on u.id = ce.user_id
-    left join public.clients c on c.id = ce.client_id where u.slug = 'martu' and ce.id = $1 limit 1`,
-    [id],
+    left join public.clients c on c.id = ce.client_id where u.id = $2 and ce.id = $1 limit 1`,
+    [id, userId],
   );
   if (!rows[0]) throw new Error("No encontré el evento manual.");
   return rows[0];
@@ -1682,22 +1694,25 @@ export async function archiveCalendarEventV1(id: string) {
 }
 
 export async function listClientChoicesV1() {
-  const rows =
-    await query<Row>(`select c.slug, c.name, c.accent from public.clients c
-    join public.users u on u.id = c.user_id
-    where u.slug = 'martu' and c.status <> 'archived' and c.archived_at is null
-    order by c.name`);
+  const userId = await requireAppUserId();
+  const rows = await query<Row>(
+    `select c.slug, c.name, c.accent from public.clients c
+    where c.user_id = $1 and c.status <> 'archived' and c.archived_at is null
+    order by c.name`,
+    [userId],
+  );
   return rows.map(domainDto);
 }
 
 export async function listOpenLoopsV1(
   options: { status?: string; clientSlug?: string; limit?: number } = {},
 ) {
+  const userId = await requireAppUserId();
   const rows = await query<Row>(
     `select ol.*, c.slug as client_slug, c.name as client_name
     from public.open_loops ol join public.users u on u.id = ol.user_id
     left join public.clients c on c.id = ol.client_id
-    where u.slug = 'martu' and ol.archived_at is null
+    where u.id = $4 and ol.archived_at is null
       and ($1::text is null or ol.status = $1)
       and ($2::text is null or c.slug = $2)
     order by ol.salience desc, ol.updated_at desc limit $3`,
@@ -1705,6 +1720,7 @@ export async function listOpenLoopsV1(
       options.status ?? "open",
       options.clientSlug ?? null,
       Math.min(options.limit ?? 50, 100),
+      userId,
     ],
   );
   return rows.map(domainDto);
@@ -1719,6 +1735,7 @@ export async function updateOpenLoopV1(
     nextEligibleAt?: string | null;
   },
 ) {
+  const userId = await requireAppUserId();
   const rows = await query<Row>(
     `update public.open_loops ol set
       status = case when $2 then $3 else status end,
@@ -1726,7 +1743,7 @@ export async function updateOpenLoopV1(
       body = case when $6 then $7 else body end,
       next_eligible_at = case when $8 then $9 else next_eligible_at end,
       archived_at = case when $2 and $3 = 'archived' then now() else archived_at end
-    from public.users u where ol.user_id = u.id and u.slug = 'martu' and ol.id = $1 returning ol.*`,
+    from public.users u where ol.user_id = u.id and u.id = $10 and ol.id = $1 returning ol.*`,
     [
       id,
       present(input.status),
@@ -1737,6 +1754,7 @@ export async function updateOpenLoopV1(
       input.body ?? null,
       present(input.nextEligibleAt),
       input.nextEligibleAt ?? null,
+      userId,
     ],
   );
   if (!rows[0]) throw new Error("No encontré ese pendiente.");
@@ -1750,17 +1768,19 @@ export async function listThreadsV1(
     includeArchived?: boolean;
   } = {},
 ) {
+  const userId = await requireAppUserId();
   const rows = await query<Row>(
     `select t.*, c.slug as client_slug, c.name as client_name
     from public.chat_threads t join public.users u on u.id = t.user_id
     left join public.clients c on c.id = t.client_id
-    where u.slug = 'martu' and ($1::text is null or c.slug = $1)
+    where u.id = $4 and ($1::text is null or c.slug = $1)
       and ($2 or t.archived_at is null)
     order by coalesce(t.last_message_at,t.created_at) desc limit $3`,
     [
       options.clientSlug ?? null,
       options.includeArchived ?? false,
       Math.min(options.limit ?? 30, 100),
+      userId,
     ],
   );
   return rows.map(domainDto);
@@ -1770,12 +1790,13 @@ export async function getThreadV1(
   id: string,
   options: { limit?: number } = {},
 ) {
+  const userId = await requireAppUserId();
   const threads = await query<Row>(
     `select t.*, c.slug as client_slug, c.name as client_name
     from public.chat_threads t join public.users u on u.id = t.user_id
     left join public.clients c on c.id = t.client_id
-    where u.slug = 'martu' and t.id = $1 limit 1`,
-    [id],
+    where u.id = $2 and t.id = $1 limit 1`,
+    [id, userId],
   );
   if (!threads[0]) throw new Error("No encontré esa conversación.");
   const messages = await query<Row>(

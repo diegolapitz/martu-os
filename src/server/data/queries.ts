@@ -2,6 +2,7 @@ import { addDays, startOfDay } from "date-fns";
 import { fromZonedTime, toZonedTime } from "date-fns-tz";
 
 import { query as dbQuery, type DatabaseRow } from "@/server/db";
+import { requireAppUser, requireAppUserId } from "@/server/auth";
 import { getInstagramConnectionDto } from "@/server/instagram/repository";
 
 import { listInsightsV1 } from "./insights";
@@ -113,6 +114,7 @@ async function servicesForClients(clientIds: string[]) {
 }
 
 export async function listClients(): Promise<ClientSummary[]> {
+  const userId = await requireAppUserId();
   const rows = await dbQuery<Row>(
     `select c.id, c.slug, c.name, c.description, c.summary, c.status, c.accent, c.logo_url, c.updated_at,
        (select min(t.due_at) from public.tasks t
@@ -121,9 +123,9 @@ export async function listClients(): Promise<ClientSummary[]> {
         where t.client_id = c.id and t.archived_at is null and t.status in ('pending','in_progress','blocked') and t.due_at < now()) as overdue_count,
        (select b.status from public.briefs b where b.client_id = c.id) as brief_status
      from public.clients c
-     join public.users u on u.id = c.user_id
-     where u.slug = 'martu' and c.status <> 'archived' and c.archived_at is null
-     order by case c.slug when 'gavilan' then 0 else 1 end, c.name`,
+     where c.user_id = $1 and c.status <> 'archived' and c.archived_at is null
+     order by c.created_at, c.name`,
+    [userId],
   );
   const serviceRows = await servicesForClients(rows.map((row) => id(row.id)));
 
@@ -161,6 +163,8 @@ export async function getDayData(
 ): Promise<DayData> {
   const now = options.now ?? new Date();
   const { start, end } = dayBounds(now);
+  const user = await requireAppUser();
+  const userId = user.id;
 
   // The cloud client intentionally uses a single Supavisor connection per
   // serverless runtime. Issue this dashboard's independent reads in the same
@@ -171,8 +175,7 @@ export async function getDayData(
     `select t.*, c.name as client_name, c.slug as client_slug
        from public.tasks t
        left join public.clients c on c.id = t.client_id
-       join public.users u on u.id = t.user_id
-       where u.slug = 'martu' and t.archived_at is null and t.status in ('pending','in_progress','blocked')
+       where t.user_id = $1 and t.archived_at is null and t.status in ('pending','in_progress','blocked')
          and (t.client_id is null or c.archived_at is null)
          and (t.snoozed_until is null or t.snoozed_until <= now())
        order by
@@ -180,34 +183,37 @@ export async function getDayData(
          t.due_at asc nulls last,
          case t.priority when 'urgent' then 0 when 'high' then 1 when 'medium' then 2 else 3 end,
        t.updated_at desc`,
+    [userId],
   );
   const meetingRows = await dbQuery<Row>(
     `select m.id, m.title, m.starts_at, c.name as client_name, c.slug as client_slug
        from public.meetings m join public.clients c on c.id = m.client_id
-       where c.archived_at is null and m.starts_at >= $1 and m.starts_at < $2 order by m.starts_at`,
-    [start, end],
+       where c.user_id = $1 and c.archived_at is null and m.starts_at >= $2 and m.starts_at < $3 order by m.starts_at`,
+    [userId, start, end],
   );
   const contentRows = await dbQuery<Row>(
     `select ci.id, ci.title, ci.due_at, ci.status, c.name as client_name, c.slug as client_slug
        from public.content_items ci join public.clients c on c.id = ci.client_id
        left join public.content_workflow_states ws on ws.id = ci.workflow_state_id
-        where ci.archived_at is null and c.archived_at is null and ws.terminal_kind is null
-          and ci.due_at >= $1 and ci.due_at < $2 and ci.status not in ('published','delivered')
+        where c.user_id = $1 and ci.archived_at is null and c.archived_at is null and ws.terminal_kind is null
+          and ci.due_at >= $2 and ci.due_at < $3 and ci.status not in ('published','delivered')
        order by ci.due_at`,
-    [start, end],
+    [userId, start, end],
   );
   const countRows = await dbQuery<Row>(
     `select
          count(*) filter (where status in ('pending','in_progress','blocked'))::text as open_count,
          count(*) filter (where status in ('pending','in_progress','blocked') and due_at < now())::text as overdue_count
-       from public.tasks t where t.archived_at is null and
+       from public.tasks t where t.user_id = $1 and t.archived_at is null and
          (t.client_id is null or exists (select 1 from public.clients c where c.id = t.client_id and c.archived_at is null))`,
+    [userId],
   );
   const pendingNudgeRows = await dbQuery<Row>(
     `select count(*)::text as count from public.ai_nudges
-       where status in ('pending','delivered','seen')
+       where user_id = $1 and status in ('pending','delivered','seen')
          and lifecycle_state in ('active','snoozed')
          and (snoozed_until is null or snoozed_until <= now())`,
+    [userId],
   );
   const clients = await listClients();
 
@@ -371,7 +377,8 @@ export async function getDayData(
 
   return {
     date: now.toISOString(),
-    greeting: "Buen día, Martu.",
+    greeting: `Buen día, ${user.preferredName || user.name}.`,
+    hasClients: clients.length > 0,
     supervisorMessage,
     spotlight,
     priorities,
@@ -491,10 +498,11 @@ export async function getClientWorkspace(
   slug: string,
   options: { tab?: string; query?: string } = {},
 ): Promise<ClientWorkspaceData> {
+  const userId = await requireAppUserId();
   const clients = await dbQuery<Row>(
-    `select c.* from public.clients c join public.users u on u.id = c.user_id
-     where u.slug = 'martu' and c.slug = $1 and c.status <> 'archived'`,
-    [slug],
+    `select c.* from public.clients c
+     where c.user_id = $2 and c.slug = $1 and c.status <> 'archived'`,
+    [slug, userId],
   );
   const clientRow = clients[0];
   if (!clientRow) throw new ClientNotFoundError(slug);
@@ -968,15 +976,16 @@ export async function listNudges(
   } = {},
 ): Promise<Nudge[]> {
   const status = options.status ?? "active";
+  const userId = await requireAppUserId();
   const rows = await dbQuery<Row>(
     `select n.*, c.slug as client_slug, c.name as client_name from public.ai_nudges n
      left join public.clients c on c.id = n.client_id
-     where ($1 = 'active' and n.status in ('pending','delivered','seen') or n.status = $1)
+     where n.user_id = $4 and ($1 = 'active' and n.status in ('pending','delivered','seen') or n.status = $1)
        and n.lifecycle_state in ('active','snoozed') and (n.snoozed_until is null or n.snoozed_until <= now())
        and ($2::text is null or c.slug = $2)
      order by case n.severity when 'urgent' then 0 when 'high' then 1 when 'medium' then 2 else 3 end,
        n.deliver_after asc limit $3`,
-    [status, options.clientSlug ?? null, Math.min(options.limit ?? 50, 100)],
+    [status, options.clientSlug ?? null, Math.min(options.limit ?? 50, 100), userId],
   );
   return rows.map((row) => ({
     id: id(row.id),
@@ -1022,10 +1031,13 @@ export async function listChatMessages(
     typeof threadIdOrOptions === "string"
       ? options.limit
       : threadIdOrOptions.limit;
+  const userId = await requireAppUserId();
   const rows = await dbQuery<Row>(
-    `select * from (select * from public.chat_messages where thread_id = $1 order by created_at desc limit $2) recent
+    `select * from (select m.* from public.chat_messages m
+       join public.chat_threads t on t.id = m.thread_id
+       where m.thread_id = $1 and t.user_id = $3 order by m.created_at desc limit $2) recent
      order by created_at`,
-    [threadId, Math.min(limit ?? 40, 100)],
+    [threadId, Math.min(limit ?? 40, 100), userId],
   );
   return rows.map(
     (row) =>
@@ -1048,18 +1060,18 @@ export async function listChatMessages(
 export async function getChatThread(
   options: { threadId?: string; clientSlug?: string; limit?: number } = {},
 ): Promise<ChatThread | null> {
+  const userId = await requireAppUserId();
   const rows = options.threadId
     ? await dbQuery<Row>(
         `select t.*, c.slug as client_slug from public.chat_threads t left join public.clients c on c.id = t.client_id
-       where t.id = $1`,
-        [options.threadId],
+       where t.id = $1 and t.user_id = $2`,
+        [options.threadId, userId],
       )
     : await dbQuery<Row>(
         `select t.*, c.slug as client_slug from public.chat_threads t left join public.clients c on c.id = t.client_id
-       join public.users u on u.id = t.user_id
-       where u.slug = 'martu' and (($1::text is null and t.scope = 'global') or c.slug = $1)
+       where t.user_id = $2 and (($1::text is null and t.scope = 'global') or c.slug = $1)
        order by t.updated_at desc limit 1`,
-        [options.clientSlug ?? null],
+        [options.clientSlug ?? null, userId],
       );
   const row = rows[0];
   if (!row) return null;
@@ -1084,13 +1096,14 @@ export async function listMemories(
     limit?: number;
   } = {},
 ): Promise<Array<Memory & Row>> {
+  const userId = await requireAppUserId();
   const rows = await dbQuery<Row>(
     `select m.*, c.slug as client_slug from public.memories m left join public.clients c on c.id = m.client_id
-     join public.users u on u.id = m.user_id
-     where u.slug = 'martu' and m.lifecycle_status = 'active' and (
-       ($1::text is null and $2::bigint is null and m.scope = 'global') or c.slug = $1 or m.client_id = $2 or ($3 and m.scope = 'global')
-     ) order by m.importance desc, m.updated_at desc limit $4`,
+     where m.user_id = $1 and m.lifecycle_status = 'active' and (
+       ($2::text is null and $3::bigint is null and m.scope = 'global') or c.slug = $2 or m.client_id = $3 or ($4 and m.scope = 'global')
+     ) order by m.importance desc, m.updated_at desc limit $5`,
     [
+      userId,
       options.clientSlug ?? null,
       options.clientId ?? null,
       options.includeGlobal ?? true,
@@ -1118,8 +1131,10 @@ export async function listMemories(
 export async function getCommunicationProfile(): Promise<
   CommunicationProfile & Row
 > {
+  const userId = await requireAppUserId();
   const rows = await dbQuery<Row>(
-    `select cp.* from public.communication_profiles cp join public.users u on u.id = cp.user_id where u.slug = 'martu'`,
+    `select cp.* from public.communication_profiles cp where cp.user_id = $1`,
+    [userId],
   );
   const row = rows[0];
   if (!row) throw new Error("Communication profile is not initialized");
@@ -1150,10 +1165,11 @@ export async function getCommunicationProfile(): Promise<
 export async function listPushSubscriptions(
   options: { activeOnly?: boolean } = {},
 ): Promise<PushSubscriptionRecord[]> {
+  const userId = await requireAppUserId();
   const rows = await dbQuery<Row>(
-    `select ps.* from public.push_subscriptions ps join public.users u on u.id = ps.user_id
-     where u.slug = 'martu' and ($1 = false or ps.status = 'active') order by ps.updated_at desc`,
-    [options.activeOnly ?? true],
+    `select ps.* from public.push_subscriptions ps
+     where ps.user_id = $2 and ($1 = false or ps.status = 'active') order by ps.updated_at desc`,
+    [options.activeOnly ?? true, userId],
   );
   return rows.map((row) => ({
     id: id(row.id),

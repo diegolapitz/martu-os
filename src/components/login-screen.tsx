@@ -1,87 +1,119 @@
 "use client";
 
-import { FormEvent, useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
-import { ArrowRight, CheckCircle2, Circle, Plus, Sparkles } from "lucide-react";
+import { FormEvent, useState } from "react";
+import { ArrowLeft, ArrowRight, Check, KeyRound, Mail, ShieldCheck, UserRound } from "lucide-react";
+
 import { Brand, SunMark } from "@/components/brand";
+import type { AuthMode } from "@/server/auth/config";
 
-const demoRows = ["Cerrar guion de Gavilán", "Editar reel de Luma", "Aprobar historias"];
+type View = "login" | "register" | "reset";
 
-export function LoginScreen() {
-  const router = useRouter();
-  const [error, setError] = useState("");
-  const [code, setCode] = useState("");
-  const [submitting, setSubmitting] = useState(false);
-  const [isPending, startTransition] = useTransition();
-  const busy = submitting || isPending;
+export function LoginScreen({ authMode, initialError = "", nextPath = "/day" }: { authMode: AuthMode; initialError?: string; nextPath?: string }) {
+  const [view, setView] = useState<View>("login");
+  const [error, setError] = useState(initialError);
+  const [notice, setNotice] = useState("");
+  const [busy, setBusy] = useState(false);
 
-  async function enter(event: FormEvent<HTMLFormElement>) {
+  function changeView(next: View) {
+    setView(next);
+    setError("");
+    setNotice("");
+  }
+
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (busy) return;
-    setSubmitting(true);
+    const payload = Object.fromEntries(new FormData(event.currentTarget).entries());
+    setBusy(true);
     setError("");
+    setNotice("");
     try {
-      const response = await fetch("/api/session/start", {
+      const endpoint = authMode === "legacy"
+        ? "/api/session/start"
+        : view === "register"
+          ? "/api/auth/register"
+          : view === "reset"
+            ? "/api/auth/reset"
+            : "/api/auth/login";
+      const body = authMode === "legacy" ? { code: String(payload.code || "") } : payload;
+      const response = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code: code.trim() || undefined }),
+        body: JSON.stringify(body),
       });
-      const payload = await response.json().catch(() => ({})) as { message?: string };
-      if (!response.ok) throw new Error(payload.message || "No pude iniciar la sesión.");
-      const requested = new URLSearchParams(window.location.search).get("next");
-      let destination = requested?.startsWith("/") && !requested.startsWith("//") ? requested : "/day";
-      if (!requested) {
-        const onboardingResponse = await fetch("/api/onboarding");
-        if (onboardingResponse.ok) {
-          const onboardingPayload = await onboardingResponse.json() as { onboarding?: { status?: string } };
-          if (!["completed", "skipped"].includes(onboardingPayload.onboarding?.status || "")) destination = "/onboarding";
-        }
+      const result = (await response.json().catch(() => ({}))) as { message?: string; confirmationRequired?: boolean };
+      if (!response.ok) throw new Error(result.message || "No pude continuar.");
+      if (view === "reset") {
+        setNotice("Si existe una cuenta con ese email, te mandamos un enlace para recuperar el acceso.");
+        return;
       }
-      startTransition(() => router.push(destination));
+      if (view === "register" && result.confirmationRequired) {
+        setNotice("Ya casi está. Revisá tu email y confirmá la cuenta; después volvés acá y entrás.");
+        return;
+      }
+      window.location.assign(view === "register" ? "/onboarding" : nextPath);
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "No pude iniciar la sesión.");
-      setSubmitting(false);
+      setError(caught instanceof Error ? caught.message : "No pude continuar.");
+    } finally {
+      setBusy(false);
     }
   }
 
+  const title = view === "register" ? "Creá tu espacio en Martu OS." : view === "reset" ? "Recuperemos tu acceso." : "Volvé a tu trabajo.";
+  const description = view === "register"
+    ? "Te llevo de la mano. En unos minutos vas a tener tu forma de trabajar y tu primer cliente listos."
+    : view === "reset"
+      ? "Decime con qué email te registraste y te mando un enlace seguro."
+      : "Entrá y seguí exactamente donde lo dejaste.";
+
   return (
-    <main className="login-page">
+    <main className="login-page auth-entry">
       <div className="login-page__brand"><Brand /></div>
-      <section className="login-copy">
-        <span className="login-copy__eyebrow">Tu operación, en un solo lugar</span>
-        <h1>Entrá a Martu OS.</h1>
-        <p>Clientes, trabajo, calendario y una supervisora que conserva el contexto.</p>
-        <form className="login-form" onSubmit={enter}>
-          <label><span>Código de acceso</span><input type="password" autoComplete="current-password" value={code} onChange={(event) => setCode(event.target.value)} placeholder="Tu código" disabled={busy} /></label>
-          <button
-            className="button button--primary login-button"
-            type="submit"
-            disabled={busy}
-            data-testid="login-enter"
-          >
-            {busy ? "Entrando…" : "Entrar a laburar"}
+      <section className="login-copy auth-entry__panel">
+        {view === "reset" ? (
+          <button className="auth-entry__back" type="button" onClick={() => changeView("login")}><ArrowLeft size={17} /> Volver</button>
+        ) : authMode === "supabase" ? (
+          <div className="auth-entry__tabs" role="tablist" aria-label="Acceso a Martu OS">
+            <button role="tab" aria-selected={view === "login"} type="button" onClick={() => changeView("login")}>Iniciar sesión</button>
+            <button role="tab" aria-selected={view === "register"} type="button" onClick={() => changeView("register")}>Crear cuenta</button>
+          </div>
+        ) : null}
+
+        <span className="login-copy__eyebrow">{view === "register" ? "Tu espacio personal" : "Martu OS"}</span>
+        <h1>{title}</h1>
+        <p>{description}</p>
+
+        <form className="login-form auth-entry__form" onSubmit={submit}>
+          {authMode === "legacy" ? (
+            <label><span>Código de acceso</span><div className="auth-entry__input"><KeyRound size={18} /><input name="code" type="password" autoComplete="current-password" placeholder="Tu código" disabled={busy} /></div></label>
+          ) : (
+            <>
+              {view === "register" ? <label><span>Tu nombre</span><div className="auth-entry__input"><UserRound size={18} /><input name="name" autoComplete="name" placeholder="¿Cómo te llamás?" required minLength={2} disabled={busy} /></div></label> : null}
+              <label><span>Email</span><div className="auth-entry__input"><Mail size={18} /><input name="email" type="email" inputMode="email" autoComplete="email" placeholder="vos@ejemplo.com" required disabled={busy} /></div></label>
+              {view !== "reset" ? <label><span>Contraseña</span><div className="auth-entry__input"><KeyRound size={18} /><input name="password" type="password" autoComplete={view === "register" ? "new-password" : "current-password"} placeholder={view === "register" ? "Al menos 8 caracteres" : "Tu contraseña"} required minLength={8} disabled={busy} /></div></label> : null}
+            </>
+          )}
+          <button className="button button--primary login-button" type="submit" disabled={busy} data-testid="login-enter">
+            {busy ? "Un momento…" : view === "register" ? "Crear mi cuenta" : view === "reset" ? "Mandar enlace" : authMode === "legacy" ? "Entrar a laburar" : "Iniciar sesión"}
             <ArrowRight size={19} />
           </button>
         </form>
-        <div className="login-promise"><SunMark size={27} />Los compromisos importantes no se pierden.</div>
+
+        {view === "login" && authMode === "supabase" ? <button className="auth-entry__forgot" type="button" onClick={() => changeView("reset")}>No puedo entrar</button> : null}
+        {notice ? <p className="auth-entry__notice" role="status"><Check size={18} />{notice}</p> : null}
         {error ? <p className="login-error" role="alert">{error}</p> : null}
+        <div className="login-promise"><ShieldCheck size={23} />Tu espacio y tus clientes quedan separados de cualquier otra cuenta.</div>
       </section>
 
-      <aside className="login-preview" aria-hidden="true">
-        <div className="login-orbit"><span /></div>
-        <div className="login-preview__sun"><SunMark size={31} /></div>
-        <div className="login-preview__sheet">
-          {demoRows.map((row, index) => (
-            <div className={index === 0 ? "login-preview__row is-active" : "login-preview__row"} key={row}>
-              <span>{index + 1}</span>
-              {index === 0 ? <CheckCircle2 size={20} /> : <Circle size={20} />}
-              <div><b>{row}</b><small>vence {index === 0 ? "mañana" : "esta semana"}</small></div>
-              <ArrowRight size={14} />
-            </div>
-          ))}
-          <div className="login-preview__capture"><Plus size={18} /><span>Anotá algo…</span><Sparkles size={16} /><b>Supervisora</b></div>
-        </div>
-        <blockquote>Hoy hay tres<br />cosas que yo<br />no patearía.</blockquote>
+      <aside className="login-preview auth-entry__guide" aria-hidden="true">
+        <div className="auth-entry__guide-mark"><SunMark size={30} /></div>
+        <p>Primero te conozco a vos.</p>
+        <ol>
+          <li><span>1</span><div><strong>Cómo trabajás</strong><small>Perfil y servicios</small></div></li>
+          <li><span>2</span><div><strong>Tu primer cliente</strong><small>Con lo mínimo alcanza</small></div></li>
+          <li><span>3</span><div><strong>Empezar</strong><small>El resto puede esperar</small></div></li>
+        </ol>
+        <blockquote>No hace falta que dejes todo perfecto ahora.</blockquote>
       </aside>
     </main>
   );

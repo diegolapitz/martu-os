@@ -6,6 +6,7 @@ import {
   type DatabaseRow,
   type DbExecutor,
 } from "@/server/db";
+import { requireAppUserId } from "@/server/auth";
 
 type Row = DatabaseRow;
 type Executor = Pick<DbExecutor, "query">;
@@ -49,12 +50,13 @@ export async function listManagedMemories(
     limit?: number;
   } = {},
 ): Promise<ManagedMemory[]> {
+  const userId = await requireAppUserId();
   const rows = await query<Row>(
     `select m.*, c.slug as client_slug, c.name as client_name
     from public.memories m
     join public.users u on u.id = m.user_id
     left join public.clients c on c.id = m.client_id
-    where u.slug = 'martu' and m.lifecycle_status = 'active'
+    where u.id = $5 and m.lifecycle_status = 'active'
       and (m.client_id is null or c.archived_at is null)
       and ($1::text = 'all' or m.scope = $1)
       and (
@@ -69,6 +71,7 @@ export async function listManagedMemories(
       options.clientSlug ?? null,
       options.includeGlobal ?? false,
       Math.min(200, Math.max(1, options.limit ?? 100)),
+      userId,
     ],
   );
   return rows.map(memoryDto);
@@ -216,11 +219,7 @@ export async function archiveManagedMemory(
 }
 
 async function martuUserId(executor: Executor): Promise<string> {
-  const rows = await executor.query<Row>(
-    "select id from public.users where slug = 'martu' limit 1",
-  );
-  if (!rows[0]) throw new Error("La usuaria Martu no está inicializada.");
-  return String(rows[0].id);
+  return requireAppUserId(executor);
 }
 
 async function resolveClient(
@@ -231,26 +230,28 @@ async function resolveClient(
   if (scope === "global") return undefined;
   if (!clientSlug)
     throw new Error("La memoria de cliente necesita un cliente.");
+  const userId = await requireAppUserId(executor);
   const rows = await executor.query<Row>(
     `select c.id, c.slug, c.name from public.clients c
     join public.users u on u.id = c.user_id
-    where u.slug = 'martu' and c.slug = $1 and c.archived_at is null
+    where u.id = $2 and c.slug = $1 and c.archived_at is null
     limit 1`,
-    [clientSlug],
+    [clientSlug, userId],
   );
   if (!rows[0]) throw new Error("No encontré ese cliente.");
   return rows[0];
 }
 
 async function ownedMemory(executor: Executor, id: string): Promise<Row> {
+  const userId = await requireAppUserId(executor);
   const rows = await executor.query<Row>(
     `select m.*, c.slug as client_slug, c.name as client_name
     from public.memories m
     join public.users u on u.id = m.user_id
     left join public.clients c on c.id = m.client_id
-    where u.slug = 'martu' and m.id = $1
+    where u.id = $2 and m.id = $1
     limit 1 for update of m`,
-    [id],
+    [id, userId],
   );
   if (!rows[0]) throw new Error("No encontré esa memoria.");
   if (String(rows[0].lifecycle_status) !== "active") {

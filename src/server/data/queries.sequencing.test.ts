@@ -41,6 +41,15 @@ vi.mock("@/server/db", () => ({
   }),
 }));
 
+vi.mock("@/server/auth", () => ({
+  requireAppUser: vi.fn(async () => ({
+    id: "1",
+    name: "QA",
+    preferredName: "QA",
+  })),
+  requireAppUserId: vi.fn(async () => "1"),
+}));
+
 import { getDayData } from "./queries";
 
 describe("getDayData query scheduling", () => {

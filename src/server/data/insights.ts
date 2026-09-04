@@ -4,6 +4,7 @@ import {
   type DatabaseRow,
   type DbExecutor,
 } from "@/server/db";
+import { requireAppUserId } from "@/server/auth";
 
 import { id, iso, jsonObject, number } from "./serialize";
 import type {
@@ -121,23 +122,25 @@ export function mapInsightRow(row: Row): InsightItem {
 }
 
 async function ownedClient(executor: Executor, slug: string): Promise<Row> {
+  const userId = await requireAppUserId(executor);
   const rows = await executor.query<Row>(
     `select c.* from public.clients c
     join public.users u on u.id = c.user_id
-    where u.slug = 'martu' and c.slug = $1 and c.archived_at is null
+    where u.id = $2 and c.slug = $1 and c.archived_at is null
     limit 1`,
-    [slug],
+    [slug, userId],
   );
   if (!rows[0]) throw new Error("No encontré ese cliente.");
   return rows[0];
 }
 
 async function ownedInsight(executor: Executor, insightId: string): Promise<Row> {
+  const userId = await requireAppUserId(executor);
   const rows = await executor.query<Row>(
     `${INSIGHT_SELECT}
-    where u.slug = 'martu' and i.id = $1
+    where u.id = $2 and i.id = $1
     limit 1`,
-    [insightId],
+    [insightId, userId],
   );
   if (!rows[0]) throw new Error("No encontré ese insight.");
   return rows[0];
@@ -234,9 +237,10 @@ export async function listInsightsV1(input: {
   limit?: number;
 }): Promise<InsightItem[]> {
   const limit = Math.min(Math.max(Math.trunc(input.limit ?? 100), 1), 200);
+  const userId = await requireAppUserId();
   const rows = await query<Row>(
     `${INSIGHT_SELECT}
-    where u.slug = 'martu' and c.slug = $1
+    where u.id = $5 and c.slug = $1
       and ($2::boolean or i.archived_at is null)
       and (
         $3::text is null
@@ -259,7 +263,7 @@ export async function listInsightsV1(input: {
       end,
       i.created_at desc
     limit $4`,
-    [input.clientSlug, Boolean(input.includeArchived), input.surface ?? null, limit],
+    [input.clientSlug, Boolean(input.includeArchived), input.surface ?? null, limit, userId],
   );
   return rows.map(mapInsightRow);
 }

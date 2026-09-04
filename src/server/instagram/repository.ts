@@ -1,4 +1,5 @@
 import { query, transaction, type DbExecutor } from "@/server/db";
+import { requireAppUserId } from "@/server/auth";
 import type {
   InstagramConnectionDto,
   InstagramConnectionSecret,
@@ -63,13 +64,14 @@ export async function upsertInstagramConnection(input: {
   expiresAt?: string;
   scopes: readonly string[];
 }): Promise<InstagramConnectionSecret> {
+  const userId = await requireAppUserId();
   const rows = await query<Row>(
     `insert into public.instagram_connections
       (client_id, instagram_account_id, username, account_type, profile_picture_url,
        encrypted_access_token, expires_at, scopes, status, connected_at, last_error)
      select c.id, $2, $3, $4, $5, $6, $7, $8, 'connected', now(), null
      from public.clients c join public.users u on u.id = c.user_id
-     where c.slug = $1 and u.slug = 'martu' and c.archived_at is null
+     where c.slug = $1 and u.id = $9 and c.archived_at is null
      on conflict (client_id) do update set
        instagram_account_id = excluded.instagram_account_id,
        username = excluded.username,
@@ -84,29 +86,32 @@ export async function upsertInstagramConnection(input: {
        last_error = null
      returning *`,
     [input.clientSlug, input.profile.id, input.profile.username, input.profile.accountType ?? null,
-      input.profile.profilePictureUrl ?? null, input.encryptedAccessToken, input.expiresAt ?? null, [...input.scopes]],
+      input.profile.profilePictureUrl ?? null, input.encryptedAccessToken, input.expiresAt ?? null, [...input.scopes], userId],
   );
   if (!rows[0]) throw new Error("No encontré el cliente al que querés conectar Instagram.");
   return { ...mapSecret(rows[0]), clientSlug: input.clientSlug };
 }
 
 export async function getInstagramConnectionSecret(clientSlug: string): Promise<InstagramConnectionSecret | null> {
+  const userId = await requireAppUserId();
   const rows = await query<Row>(
     `select ic.*, c.slug as client_slug from public.instagram_connections ic
      join public.clients c on c.id = ic.client_id join public.users u on u.id = c.user_id
-     where c.slug = $1 and u.slug = 'martu' limit 1`,
-    [clientSlug],
+     where c.slug = $1 and u.id = $2 limit 1`,
+    [clientSlug, userId],
   );
   return rows[0] ? mapSecret(rows[0]) : null;
 }
 
 export async function acquireInstagramSync(connectionId: string): Promise<void> {
+  const userId = await requireAppUserId();
   const rows = await query<Row>(
-    `update public.instagram_connections set status = 'syncing', sync_started_at = now(), last_error = null
-     where id = $1 and encrypted_access_token <> '' and status <> 'disconnected'
-       and (status <> 'syncing' or sync_started_at < now() - interval '10 minutes')
-     returning id`,
-    [connectionId],
+    `update public.instagram_connections ic set status = 'syncing', sync_started_at = now(), last_error = null
+     from public.clients c where ic.id = $1 and ic.client_id = c.id and c.user_id = $2
+       and ic.encrypted_access_token <> '' and ic.status <> 'disconnected'
+       and (ic.status <> 'syncing' or ic.sync_started_at < now() - interval '10 minutes')
+     returning ic.id`,
+    [connectionId, userId],
   );
   if (!rows[0]) throw new InstagramSyncInProgressError();
 }
@@ -151,7 +156,15 @@ export async function saveInstagramSync(input: {
   encryptedAccessToken?: string;
   expiresAt?: string;
 }): Promise<{ mediaCount: number; insightsCount: number }> {
+  const userId = await requireAppUserId();
   return transaction(async (tx) => {
+    const owned = await tx.query<Row>(
+      `select ic.id from public.instagram_connections ic
+       join public.clients c on c.id = ic.client_id
+       where ic.id = $1 and c.user_id = $2 limit 1`,
+      [input.connection.id, userId],
+    );
+    if (!owned[0]) throw new Error("No encontré esa conexión de Instagram.");
     let insightsCount = 0;
     for (const { item, insights } of input.media) {
       const mediaId = await upsertMedia(tx, input.connection, item);
@@ -197,19 +210,22 @@ export async function saveInstagramSync(input: {
 }
 
 export async function markInstagramSyncFailed(connectionId: string, message: string, needsReauth: boolean): Promise<void> {
+  const userId = await requireAppUserId();
   await query(
-    `update public.instagram_connections set status = $2, sync_started_at = null, last_error = $3 where id = $1`,
-    [connectionId, needsReauth ? "needs_reauth" : "error", message.slice(0, 500)],
+    `update public.instagram_connections ic set status = $2, sync_started_at = null, last_error = $3
+     from public.clients c where ic.id = $1 and ic.client_id = c.id and c.user_id = $4`,
+    [connectionId, needsReauth ? "needs_reauth" : "error", message.slice(0, 500), userId],
   );
 }
 
 export async function disconnectInstagram(clientSlug: string): Promise<void> {
+  const userId = await requireAppUserId();
   const rows = await query<Row>(
     `update public.instagram_connections ic set status = 'disconnected', encrypted_access_token = '',
        expires_at = null, sync_started_at = null, last_error = null
      from public.clients c join public.users u on u.id = c.user_id
-     where ic.client_id = c.id and c.slug = $1 and u.slug = 'martu' returning ic.id`,
-    [clientSlug],
+     where ic.client_id = c.id and c.slug = $1 and u.id = $2 returning ic.id`,
+    [clientSlug, userId],
   );
   if (!rows[0]) throw new Error("No encontré una conexión de Instagram para este cliente.");
 }
@@ -219,27 +235,29 @@ export async function linkInstagramMedia(input: {
   mediaId: string;
   contentItemId: string | null;
 }): Promise<void> {
+  const userId = await requireAppUserId();
   const rows = await query<Row>(
     `update public.instagram_media im set content_item_id = $3
      from public.instagram_connections ic join public.clients c on c.id = ic.client_id
      join public.users u on u.id = c.user_id
-     where im.connection_id = ic.id and c.slug = $1 and u.slug = 'martu' and im.id = $2
+     where im.connection_id = ic.id and c.slug = $1 and u.id = $4 and im.id = $2
        and ($3::bigint is null or exists (
          select 1 from public.content_items ci where ci.id = $3 and ci.client_id = c.id and ci.archived_at is null
        )) returning im.id`,
-    [input.clientSlug, input.mediaId, input.contentItemId],
+    [input.clientSlug, input.mediaId, input.contentItemId, userId],
   );
   if (!rows[0]) throw new Error("No encontré esa publicación o el contenido no pertenece al cliente.");
 }
 
 export async function getInstagramConnectionDto(clientSlug: string): Promise<InstagramConnectionDto> {
+  const userId = await requireAppUserId();
   const connectionRows = await query<Row>(
     `select ic.id, ic.username, ic.account_type, ic.profile_picture_url, ic.status,
        ic.connected_at, ic.last_sync_at, ic.last_error, ic.expires_at
      from public.instagram_connections ic join public.clients c on c.id = ic.client_id
      join public.users u on u.id = c.user_id
-     where c.slug = $1 and u.slug = 'martu' limit 1`,
-    [clientSlug],
+     where c.slug = $1 and u.id = $2 limit 1`,
+    [clientSlug, userId],
   );
   const connection = connectionRows[0];
   if (!connection) return { configured: isConfigured(), connected: false, media: [] };

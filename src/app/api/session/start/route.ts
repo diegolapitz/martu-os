@@ -6,9 +6,16 @@ import {
   setMartuSessionCookie,
   verifyAccessCode,
 } from "@/server/auth";
+import { authMode } from "@/server/auth/config";
 
 export async function POST(request: Request) {
   try {
+  if (authMode() === "supabase") {
+      return NextResponse.json(
+        { message: "Usá tu email y contraseña para entrar." },
+        { status: 410 },
+      );
+    }
     assertAccessConfiguration();
     const raw = await request.text();
     const body = raw ? JSON.parse(raw) as { code?: unknown } : {};
