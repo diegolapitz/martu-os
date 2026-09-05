@@ -171,6 +171,7 @@ describe("onboarding V2.1 domain", () => {
         audience: "Dueños de comercios chicos.",
         desiredOutcomes: ["Conseguir consultas"],
         source: "voice",
+        sourceText: "Brief de referencia con detalles que se conservan fuera de la ficha breve.",
         confirmed: true,
       },
       strategy: { deferred: true },
@@ -199,6 +200,9 @@ describe("onboarding V2.1 domain", () => {
     const persisted = await getClientSetup("martu", created.client.slug);
     expect(persisted.setup.brief?.businessDescription).toBe(
       "Ayuda a comercios de cercanía.",
+    );
+    expect(persisted.setup.brief?.sourceText).toBe(
+      "Brief de referencia con detalles que se conservan fuera de la ficha breve.",
     );
     expect(persisted.setup.pending).toContain("strategy");
 

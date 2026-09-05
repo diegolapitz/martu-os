@@ -133,6 +133,7 @@ export const clientSetupPatchSchema = z
         avoidances: textListSchema.optional(),
         relevantLinks: z.array(urlOrPathSchema).max(30).optional(),
         source: z.enum(["manual", "voice", "upload", "questions"]).optional(),
+        sourceText: z.string().max(500_000).optional(),
         confirmed: z.boolean().optional(),
       })
       .optional(),

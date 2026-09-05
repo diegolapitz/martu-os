@@ -828,6 +828,7 @@ async function upsertBrief(
   const avoidances = input.avoidances ?? stringArray(current?.avoidances);
   const relevantLinks =
     input.relevantLinks ?? stringArray(current?.relevant_links);
+  const sourceText = input.sourceText ?? String(current?.source_text ?? "");
   const hasContentChange = Object.keys(input).some(
     (key) => !["status", "confirmed"].includes(key),
   );
@@ -852,8 +853,8 @@ async function upsertBrief(
     `insert into public.briefs
       (client_id, status, business_description, positioning, objectives,
        audience, differentiators, tone, competitors, desired_outcomes,
-       avoidances, constraints, relevant_links, source, confirmed_at)
-    values ($1,$2,$3,$3,$4,$5,$6,$7,$8,$9,$10,$10,$11,$12,$13)
+       avoidances, constraints, relevant_links, source, source_text, confirmed_at)
+    values ($1,$2,$3,$3,$4,$5,$6,$7,$8,$9,$10,$10,$11,$12,$13,$14)
     on conflict (client_id) do update set
       status = excluded.status,
       business_description = excluded.business_description,
@@ -868,6 +869,7 @@ async function upsertBrief(
       constraints = excluded.constraints,
       relevant_links = excluded.relevant_links,
       source = excluded.source,
+      source_text = excluded.source_text,
       confirmed_at = excluded.confirmed_at`,
     [
       clientId,
@@ -882,6 +884,7 @@ async function upsertBrief(
       avoidances,
       relevantLinks,
       input.source ?? String(current?.source ?? "manual"),
+      sourceText,
       confirmedAt,
     ],
   );
@@ -1095,6 +1098,7 @@ function briefDto(row: Row): ClientBrief {
     avoidances: stringArray(row.avoidances),
     relevantLinks: stringArray(row.relevant_links),
     source: String(row.source ?? "manual"),
+    sourceText: String(row.source_text ?? ""),
     confirmedAt: nullableIso(row.confirmed_at),
   };
 }

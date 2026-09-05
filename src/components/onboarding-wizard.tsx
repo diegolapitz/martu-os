@@ -31,6 +31,7 @@ import {
 
 import { Brand, ClientMark } from "@/components/brand";
 import { Feedback } from "@/components/ui";
+import { BRIEF_FIELD_MAX_CHARS, prepareBriefImport } from "@/lib/brief-import";
 import { prepareClientLogo, removeClientLogo, saveClientLogo, type PreparedClientLogo } from "@/lib/client-logo-browser";
 
 type Step = "welcome" | "profile" | "services" | "client" | "brief" | "strategy" | "complete";
@@ -145,7 +146,7 @@ export function OnboardingWizard() {
   const [createdClient, setCreatedClient] = useState<CreatedClient | null>(null);
   const [setup, setSetup] = useState<ClientSetup | null>(null);
   const [briefMode, setBriefMode] = useState<"upload" | "voice" | "questions" | "later" | null>(null);
-  const [brief, setBrief] = useState({ businessDescription: "", objective: "", audience: "", tone: "", avoidances: "", fileName: "" });
+  const [brief, setBrief] = useState({ businessDescription: "", objective: "", audience: "", tone: "", avoidances: "", fileName: "", sourceText: "", hasExcerpt: false, wasTruncated: false });
   const [strategyMode, setStrategyMode] = useState<"upload" | "paste" | "write" | "voice" | "later" | null>(null);
   const [strategy, setStrategy] = useState({ title: "Estrategia inicial", text: "", fileName: "" });
   const [busy, setBusy] = useState(false);
@@ -451,6 +452,9 @@ export function OnboardingWizard() {
     try {
       const prepared = await prepareClientLogo(file);
       setClientLogo(prepared);
+      if (prepared.suggestedAccent) {
+        setClient((current) => ({ ...current, color: prepared.suggestedAccent! }));
+      }
       setClientLogoDirty(true);
     } catch (error) {
       setClientLogoError(error instanceof Error ? error.message : "No pude preparar esa imagen.");
@@ -482,6 +486,7 @@ export function OnboardingWizard() {
           tone: brief.tone.trim(),
           avoidances: brief.avoidances.trim() ? [brief.avoidances.trim()] : [],
           source: briefMode === "voice" ? "voice" : briefMode === "upload" ? "upload" : "questions",
+          sourceText: brief.sourceText || undefined,
           confirmed: !skip,
         } }),
       });
@@ -554,8 +559,24 @@ export function OnboardingWizard() {
       return;
     }
     if (target === "brief") {
-      setBrief((current) => ({ ...current, businessDescription: text, fileName: file.name }));
+      const prepared = prepareBriefImport(text);
+      setBrief((current) => ({
+        ...current,
+        businessDescription: prepared.editableText,
+        sourceText: prepared.sourceText,
+        fileName: file.name,
+        hasExcerpt: prepared.hasExcerpt,
+        wasTruncated: prepared.wasTruncated,
+      }));
       setBriefMode("upload");
+      setFeedback({
+        message: prepared.wasTruncated
+          ? "El archivo es muy extenso. Guardamos la primera parte como referencia y podés continuar con esta ficha."
+          : prepared.hasExcerpt
+            ? "Guardamos el brief completo como referencia. Te mostramos un extracto para completar la ficha."
+            : "Brief listo para revisar.",
+        tone: "success",
+      });
     } else {
       setStrategy((current) => ({ ...current, text, fileName: file.name }));
       setStrategyMode("upload");
@@ -678,7 +699,7 @@ export function OnboardingWizard() {
               <button className={briefMode === "questions" ? "is-selected" : ""} type="button" onClick={() => setBriefMode("questions")}><FileText size={21} /><span><strong>Preguntas rápidas</strong><small>Completá lo que sepas</small></span></button>
               <button type="button" onClick={() => void saveBrief(true)}><ArrowRight size={21} /><span><strong>Después</strong><small>No bloquea por ahora</small></span></button>
             </div>
-            {briefMode && briefMode !== "later" ? <div className="onboarding-form-grid onboarding-review"><p className="onboarding-review__title">¿Lo entendí bien? Podés editar todo.</p><label className="onboarding-field onboarding-field--wide"><span>Qué hace</span><textarea rows={4} value={brief.businessDescription} onChange={(event) => setBrief((current) => ({ ...current, businessDescription: event.target.value }))} /></label><label className="onboarding-field"><span>Objetivo</span><input value={brief.objective} onChange={(event) => setBrief((current) => ({ ...current, objective: event.target.value }))} /></label><label className="onboarding-field"><span>Público</span><input value={brief.audience} onChange={(event) => setBrief((current) => ({ ...current, audience: event.target.value }))} /></label><label className="onboarding-field"><span>Tono</span><input value={brief.tone} onChange={(event) => setBrief((current) => ({ ...current, tone: event.target.value }))} /></label><label className="onboarding-field"><span>Qué evita o no quiere</span><input value={brief.avoidances} onChange={(event) => setBrief((current) => ({ ...current, avoidances: event.target.value }))} /></label></div> : null}
+            {briefMode && briefMode !== "later" ? <div className="onboarding-form-grid onboarding-review"><p className="onboarding-review__title">¿Lo entendí bien? Podés editar todo.</p><label className="onboarding-field onboarding-field--wide"><span>Qué hace</span><textarea rows={4} maxLength={BRIEF_FIELD_MAX_CHARS} value={brief.businessDescription} onChange={(event) => setBrief((current) => ({ ...current, businessDescription: event.target.value }))} />{brief.hasExcerpt && !brief.wasTruncated ? <small>{brief.fileName} queda guardado completo como referencia. Acá ves un extracto editable para la ficha.</small> : null}{brief.wasTruncated ? <small>El archivo superó el límite de referencia. Podés continuar con esta ficha o elegir una versión más breve.</small> : null}</label><label className="onboarding-field"><span>Objetivo</span><input value={brief.objective} onChange={(event) => setBrief((current) => ({ ...current, objective: event.target.value }))} /></label><label className="onboarding-field"><span>Público</span><input value={brief.audience} onChange={(event) => setBrief((current) => ({ ...current, audience: event.target.value }))} /></label><label className="onboarding-field"><span>Tono</span><input value={brief.tone} onChange={(event) => setBrief((current) => ({ ...current, tone: event.target.value }))} /></label><label className="onboarding-field"><span>Qué evita o no quiere</span><input value={brief.avoidances} onChange={(event) => setBrief((current) => ({ ...current, avoidances: event.target.value }))} /></label></div> : null}
             <OnboardingNav onBack={() => setStep("client")} onNext={() => void saveBrief(false)} nextDisabled={!briefMode || !brief.businessDescription.trim()} busy={busy || transcribing} nextLabel="Confirmar brief" secondaryLabel="Dejar para después" onSecondary={() => void saveBrief(true)} />
           </div>
         ) : null}

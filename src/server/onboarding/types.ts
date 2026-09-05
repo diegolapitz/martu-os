@@ -116,6 +116,7 @@ export type ClientBrief = {
   avoidances: string[];
   relevantLinks: string[];
   source: string;
+  sourceText: string;
   confirmedAt: string | null;
 };
 
