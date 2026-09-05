@@ -5,11 +5,12 @@ Responsable: Tech lead / integrador
 
 ## Candidato integrado
 
-- Código canónico integrado: `87d0143` (`merge: add conversational quality contracts`), que incorpora `22fb93c` sobre la humanización de Supervisora `145b1f5` y la versión de briefs/PDF `06908b9`.
+- Código canónico integrado: `96dbf27` (`merge: add day empty-state activation`), que incorpora el diseño de activación `1e343b6` junto con los contratos de Supervisora `22fb93c`, la humanización `145b1f5` y briefs/PDF `06908b9`.
 - La historia integrada incluye `3dfeea2`, `3100fbd`, `ed4d261` y `66dd907` de `codex/onboarding/first-run-auth`, más `a1bf1dac1a389d85e1cbed44deb7f9176cc60068`, que corrige el `ON CONFLICT` del índice parcial de `auth_user_id`.
 - `06908b9` conserva el texto fuente completo de briefs en `briefs.source_text`, limita a 8.000 caracteres el extracto editable, comunica claramente el recorte y aplica el color de acento sugerido al crear el primer cliente. No incluye trabajo nuevo de Instagram.
 - `145b1f5` hace que las respuestas de Supervisora sean más conversacionales: mantiene la dirección editorial como criterio interno, evita encabezados de informe, prioriza una recomendación concreta y limita las preguntas de seguimiento. No cambia modelos, base de datos, integraciones ni UI.
 - `22fb93c` agrega 24 contratos de conversación y evita que una pregunta semánticamente de solo lectura sea reemplazada por una aclaración del parser legacy; las posibles escrituras conservan el bloqueo seguro.
+- `1e343b6` incorpora el estado visual de primer uso en Mi día: captura de primer pendiente, acceso a idea o fecha, y apertura directa de las creaciones correspondientes. Sus consultas cuentan exclusivamente datos del usuario activo.
 - Base confirmada: `13d1175`; no hubo conflictos ni cambios locales descartados.
 - El push posterior a esta actualización debe dejar `origin/main` alineado con el commit de documentación que registra esta integración. El despliegue queda sujeto a la regresión y confirmación de Vercel del integrador.
 
@@ -36,6 +37,7 @@ Responsable: Tech lead / integrador
 | Supervisora: validación aislada | `prompt`, `orchestrator` y `golden-evals`: 3 archivos, 33 tests correctos |
 | Supervisora: typecheck y lint | Correctos; lint conserva 3 warnings preexistentes |
 | Contratos conversacionales | `prompt`, contratos, `orchestrator` y `golden-evals`: 4 archivos, 59 tests correctos |
+| Diseño de activación | `day-view`, calendario, ideas y secuenciación: 4 archivos, 11 tests correctos; typecheck correcto |
 
 El E2E histórico espera el login legacy por código y aún no es compatible con el formulario Supabase. Además, `next dev` agotó el timeout de inicio en este filesystem lento. Al probar contra el build, el formulario Supabase se mostró correctamente. No se modificó producto ni se forzó la suite. La validación manual entregada por la rama congelada cubrió login, perfil, servicios, reanudación, cliente y workspace.
 
@@ -55,8 +57,8 @@ El fix `a1bf1da` fue desplegado y verificado en Vercel mediante
 `https://martu-os.vercel.app`, construido desde `6cb3bfe20df28a54971788130663a8407d97799b`.
 La producción responde HTTP 200 y presenta el acceso Supabase.
 
-Los cambios de briefs/PDF `06908b9`, de conversación `145b1f5` y los contratos
-de calidad `22fb93c` están integrados en `main`; la migración de briefs ya está
-aplicada en Supabase. La liberación de esta versión requiere confirmación del
-deployment de Vercel antes de declarar que producción dejó el deployment
-`dpl_6QDNgPTNfcn9Sb5BDT6HTokgtokg`.
+Los cambios de briefs/PDF `06908b9`, de conversación `145b1f5`, contratos
+`22fb93c` y activación visual `1e343b6` están integrados en `main`; la migración
+de briefs ya está aplicada en Supabase. La liberación de esta versión requiere
+confirmación del deployment de Vercel antes de declarar que producción dejó
+`dpl_9MmQbkTydBQ4pn6Ak1DDDhdrmF1o`.
