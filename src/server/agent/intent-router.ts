@@ -33,7 +33,14 @@ export function routeAgentTurn(request: AgentRequest, context: AgentContext, req
 
   // Writes and undo still require deterministic parsing, entity resolution and
   // policy gating. A model-produced plan can never activate a mutating tool.
-  if (legacy.allowedTools.length || legacy.operation === "undo" || legacy.requiresClarification) {
+  // A conservative legacy parser may see a relative date or an omitted object
+  // and ask about a write that Martu never requested. Once the semantic plan
+  // has established this is an answerable, read-only turn, it must be allowed
+  // to reach retrieval and composition before asking anything back.
+  const semanticReadOnly = !requestPlan.requiresClarification
+    && !requestPlan.sideEffectsExplicitlyRequested
+    && !mayRequestMutation(request.message);
+  if (legacy.allowedTools.length || legacy.operation === "undo" || (legacy.requiresClarification && !semanticReadOnly)) {
     return { ...legacy, requestPlan };
   }
   if (requestPlan.requiresClarification) {
@@ -440,6 +447,13 @@ function currentViewWithinConversationScope(
 
 function isDeicticReference(normalized: string): boolean {
   return /\b(?:esto|eso|aca|aqui|lo que (?:estoy|tengo) (?:viendo|abierto)|(?:esta|esa) (?:idea|tarea|pieza|nota|reunion)|(?:este|ese) (?:guion|contenido|compromiso|hilo|reel|video|hook)|pasalo|pasala|cambialo|cambiala|marcalo|marcala|completalo|completala)\b/.test(normalized);
+}
+
+/** Safety boundary, deliberately broader than any one product job. */
+function mayRequestMutation(message: string): boolean {
+  const normalized = normalizeSpanish(message);
+  return /\b(?:pasalo|pasala|cambialo|cambiala|moverlo|moverla|reprogramalo|reprogramala|completalo|completala|marcalo|marcala|deshacelo|deshacela|lo termine|la termine|termine(?:lo|la)?|anota|guarda|crea)\b/.test(normalized)
+    || /\bya esta\b(?!\s+abierto)/.test(normalized);
 }
 
 function hasExplicitTarget(normalized: string, clients: ClientRef[]): boolean {
