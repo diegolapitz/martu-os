@@ -203,7 +203,13 @@ export async function getDayData(
   const countRows = await dbQuery<Row>(
     `select
          count(*) filter (where status in ('pending','in_progress','blocked'))::text as open_count,
-         count(*) filter (where status in ('pending','in_progress','blocked') and due_at < now())::text as overdue_count
+         count(*) filter (where status in ('pending','in_progress','blocked') and due_at < now())::text as overdue_count,
+         (select count(*)::text from public.tasks all_tasks where all_tasks.user_id = $1) as task_count,
+         (select count(*)::text from public.ideas i join public.clients c on c.id = i.client_id where c.user_id = $1) as idea_count,
+         (select count(*)::text from public.scripts s join public.clients c on c.id = s.client_id where c.user_id = $1) as script_count,
+         (select count(*)::text from public.content_items ci join public.clients c on c.id = ci.client_id where c.user_id = $1) as content_count,
+         (select count(*)::text from public.calendar_events ce where ce.user_id = $1) as calendar_count,
+         (select count(*)::text from public.meetings m join public.clients c on c.id = m.client_id where c.user_id = $1) as meeting_count
        from public.tasks t where t.user_id = $1 and t.archived_at is null and
          (t.client_id is null or exists (select 1 from public.clients c where c.id = t.client_id and c.archived_at is null))`,
     [userId],
@@ -388,6 +394,17 @@ export async function getDayData(
       openTasks: number(countRows[0]?.open_count),
       overdueTasks: number(countRows[0]?.overdue_count),
       pendingNudges: number(pendingNudgeRows[0]?.count),
+    },
+    activation: {
+      empty:
+        clients.length > 0 &&
+        number(countRows[0]?.task_count) === 0 &&
+        number(countRows[0]?.idea_count) === 0 &&
+        number(countRows[0]?.script_count) === 0 &&
+        number(countRows[0]?.content_count) === 0 &&
+        number(countRows[0]?.calendar_count) === 0 &&
+        number(countRows[0]?.meeting_count) === 0,
+      firstClientSlug: clients[0]?.slug,
     },
   };
 }

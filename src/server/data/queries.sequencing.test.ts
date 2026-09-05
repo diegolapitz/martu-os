@@ -16,7 +16,16 @@ vi.mock("@/server/db", () => ({
     queryState.active -= 1;
 
     if (statement.includes("as open_count")) {
-      return [{ open_count: "0", overdue_count: "0" }];
+      return [{
+        open_count: "0",
+        overdue_count: "0",
+        task_count: "0",
+        idea_count: "0",
+        script_count: "0",
+        content_count: "0",
+        calendar_count: "0",
+        meeting_count: "0",
+      }];
     }
     if (statement.includes("from public.ai_nudges")) {
       return [{ count: "0" }];
@@ -61,6 +70,7 @@ describe("getDayData query scheduling", () => {
       overdueTasks: 0,
       pendingNudges: 0,
     });
+    expect(data.activation).toEqual({ empty: true, firstClientSlug: "qa" });
     expect(queryState.statements).toHaveLength(7);
     expect(queryState.statements.every((statement) => statement.startsWith("select"))).toBe(true);
     expect(queryState.maxActive).toBe(1);

@@ -323,7 +323,7 @@ function CalendarAgenda({ events, onEdit }: { events: CalendarEvent[]; onEdit: (
   );
 }
 
-export function CalendarV1() {
+export function CalendarV1({ openCreate = false }: { openCreate?: boolean }) {
   const [mode, setMode] = useState<CalendarViewMode>("month");
   const [cursor, setCursor] = useState(() => new Date());
   const [events, setEvents] = useState<CalendarEvent[]>([]);
@@ -332,7 +332,7 @@ export function CalendarV1() {
   const [clientSlug, setClientSlug] = useState("all");
   const [status, setStatus] = useState<CalendarStatusFilter>("all");
   const [filtersOpen, setFiltersOpen] = useState(true);
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(openCreate);
   const [draft, setDraft] = useState<EventDraft>(() => defaultDraft());
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -342,6 +342,13 @@ export function CalendarV1() {
   const visibleRange = useMemo(() => rangeFor(mode, cursor), [cursor, mode]);
   const rangeFrom = visibleRange.from.toISOString();
   const rangeTo = visibleRange.to.toISOString();
+
+  useEffect(() => {
+    if (!openCreate) return;
+    const url = new URL(window.location.href);
+    url.searchParams.delete("new");
+    window.history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
+  }, [openCreate]);
 
   useEffect(() => {
     const requestId = ++calendarRequestRef.current;

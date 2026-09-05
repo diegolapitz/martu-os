@@ -606,10 +606,12 @@ export function ClientWorkspace({
   data,
   requestedTab,
   requestedEntityId,
+  openCreate = false,
 }: {
   data: ClientWorkspaceData;
   requestedTab?: string;
   requestedEntityId?: string | null;
+  openCreate?: boolean;
 }) {
   const [noteOpen, setNoteOpen] = useState(false);
   const [clientOpen, setClientOpen] = useState(false);
@@ -674,6 +676,7 @@ export function ClientWorkspace({
           key={`ideas-${requestedEntityId || "first"}-${data.ideas.map((item) => item.updatedAt || item.createdAt).join("|")}`}
           data={{ ...data, client }}
           selectedEntityId={requestedEntityId}
+          openCreate={openCreate}
         />
       );
       break;
