@@ -15,6 +15,7 @@ Responsable: Tech lead / integrador
 - Supabase remoto: migración `202609040001_multi_user_auth.sql` aplicada y confirmada.
 - Supabase Auth: Site URL `https://martu-os.vercel.app`; redirects permitidos: `https://martu-os.vercel.app/auth/callback` y `http://localhost:3000/**`.
 - Vercel Production: configuradas `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` y `MARTU_ALLOW_LEGACY_AUTH=false`. No se registran secretos.
+- Producción verificada en `https://martu-os.vercel.app`: HTTP 200 servido por Vercel, formulario Supabase presente y formulario legacy ausente.
 
 ## Regresión de release
 
