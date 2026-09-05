@@ -54,6 +54,10 @@ export interface DayData {
   clientsNeedingAttention: AttentionClient[];
   stats: { openTasks: number; overdueTasks: number; pendingNudges: number };
   hasClients?: boolean;
+  activation?: {
+    empty: boolean;
+    firstClientSlug?: string;
+  };
 }
 
 export interface ClientSummary {

@@ -51,6 +51,10 @@ export type DayData = {
   clientsNeedingAttention: AttentionClient[];
   stats?: Record<string, number>;
   hasClients?: boolean;
+  activation?: {
+    empty: boolean;
+    firstClientSlug?: string;
+  };
 };
 
 export type ClientSummary = {

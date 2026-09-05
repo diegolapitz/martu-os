@@ -209,6 +209,16 @@ describe("IdeasWorkspace deep links", () => {
     }
   });
 
+  it("opens the existing idea dialog from the Mi día activation link", () => {
+    window.history.replaceState({}, "", "/clients/gavilan/ideas?new=1");
+
+    render(<IdeasWorkspace data={data} openCreate />);
+
+    expect(screen.getByRole("dialog", { name: "Capturá lo que apareció" })).toBeTruthy();
+    expect(window.location.pathname).toBe("/clients/gavilan/ideas");
+    expect(window.location.search).toBe("");
+  });
+
   it("keeps selection, duplicate, create and archive on the canonical object URL", async () => {
     const contexts: Array<Record<string, unknown>> = [];
     const receiveContext = (event: Event) => {

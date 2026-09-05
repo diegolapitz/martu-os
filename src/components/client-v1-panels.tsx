@@ -559,9 +559,11 @@ function ideaDraft(item?: ClientIdea): IdeaDraft {
 export function IdeasWorkspace({
   data,
   selectedEntityId,
+  openCreate = false,
 }: {
   data: ClientWorkspaceData;
   selectedEntityId?: string | null;
+  openCreate?: boolean;
 }) {
   const router = useRouter();
   const [items, setItems] = useState(data.ideas);
@@ -585,13 +587,21 @@ export function IdeasWorkspace({
   const [query, setQuery] = useState("");
   const deferred = useDeferredValue(query);
   const [filter, setFilter] = useState("Todas");
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(openCreate);
   const [newIdea, setNewIdea] = useState({ title: "", description: "" });
   const [busy, setBusy] = useState(false);
   const [feedback, setFeedback] = useState<{
     message: string;
     error?: boolean;
   } | null>(null);
+
+  useEffect(() => {
+    if (!openCreate) return;
+    const url = new URL(window.location.href);
+    url.searchParams.delete("new");
+    window.history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
+  }, [openCreate]);
+
   const dirty = JSON.stringify(draft) !== JSON.stringify(saved);
   const filtered = useMemo(
     () =>

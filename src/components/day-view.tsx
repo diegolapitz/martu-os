@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -9,8 +9,12 @@ import {
   Check,
   ChevronRight,
   Circle,
+  Clapperboard,
   Clock3,
+  FileText,
+  Lightbulb,
   Plus,
+  X,
 } from "lucide-react";
 import { ClientMark, SunMark } from "@/components/brand";
 import { announceFeedback, Feedback, SectionTitle } from "@/components/ui";
@@ -40,6 +44,9 @@ export function DayView({ data }: { data: DayData }) {
   const [feedback, setFeedback] = useState<string | null>(null);
   const [done, setDone] = useState<Set<string>>(() => new Set());
   const [updating, setUpdating] = useState<Set<string>>(() => new Set());
+  const [activationDismissed, setActivationDismissed] = useState(false);
+  const [activationCaptureOpen, setActivationCaptureOpen] = useState(false);
+  const activationInputRef = useRef<HTMLInputElement>(null);
   const priorities = data.priorities
     .filter((item) => item.id !== data.spotlight?.workId)
     .slice(0, 3);
@@ -62,6 +69,10 @@ export function DayView({ data }: { data: DayData }) {
   const todayCount = data.stats?.today
     ?? priorities.filter((item) => /hoy/i.test(item.dueLabel || "")).length;
 
+  useEffect(() => {
+    if (activationCaptureOpen) activationInputRef.current?.focus();
+  }, [activationCaptureOpen]);
+
   async function submitCapture(event: FormEvent) {
     event.preventDefault();
     const message = capture.trim();
@@ -82,6 +93,7 @@ export function DayView({ data }: { data: DayData }) {
       });
       if (!response.ok) throw new Error("No pude guardar eso todavía.");
       setCapture("");
+      setActivationDismissed(true);
       setFeedback("Anotado en Trabajo para hoy.");
       announceFeedback("Anotado en Trabajo para hoy.");
       window.setTimeout(() => router.refresh(), 450);
@@ -193,6 +205,97 @@ export function DayView({ data }: { data: DayData }) {
                 <Link className="button button--primary" href="/clients" prefetch={false}>Agregar mi primer cliente</Link>
                 <Link className="button button--secondary" href="/onboarding" prefetch={false}>Retomar la configuración</Link>
               </div>
+            </div>
+          </section>
+        </section>
+      </div>
+    );
+  }
+
+  if (data.activation?.empty && !activationDismissed) {
+    const ideaHref = data.activation.firstClientSlug
+      ? `/clients/${data.activation.firstClientSlug}/ideas?new=1`
+      : "/clients";
+    return (
+      <div className="day-layout day-layout--first-run">
+        <section className="day-main">
+          <header className="page-heading page-heading--day">
+            <div className="day-heading__copy">
+              <p>{formatDay(data.date)}</p>
+              <h1 data-testid="day-heading">{data.greeting}</h1>
+              <span>Este es el lugar donde Martu OS ordena lo que necesita tu atención.</span>
+            </div>
+          </header>
+
+          <section
+            className="first-run-empty first-run-empty--activation"
+            aria-labelledby="day-activation-title"
+            data-testid="day-activation"
+          >
+            <button
+              className="first-run-empty__dismiss"
+              type="button"
+              onClick={() => setActivationDismissed(true)}
+              aria-label="Cerrar bienvenida"
+            >
+              <X size={18} />
+            </button>
+            <span className="first-run-empty__number">01</span>
+            <div className="first-run-empty__content">
+              <p>Tu primer movimiento</p>
+              <h2 id="day-activation-title">Empezá por algo real.</h2>
+              <span>
+                Mi día reúne pendientes, fechas y próximos pasos para que sepas qué mover sin revisar todo.
+              </span>
+
+              <ol className="activation-flow" aria-label="Flujo de contenido conectado">
+                <li><Lightbulb size={16} /><span>Idea</span></li>
+                <li><FileText size={16} /><span>Guion</span></li>
+                <li><Clapperboard size={16} /><span>Contenido</span></li>
+              </ol>
+              <p className="activation-flow__note">No son listas separadas: una idea puede avanzar a guion y después convertirse en contenido.</p>
+
+              {activationCaptureOpen ? (
+                <form className="activation-capture" onSubmit={submitCapture}>
+                  <label htmlFor="activation-capture-input">¿Qué necesitás resolver?</label>
+                  <div>
+                    <input
+                      ref={activationInputRef}
+                      id="activation-capture-input"
+                      value={capture}
+                      onChange={(event) => setCapture(event.target.value)}
+                      placeholder="Ej: enviar propuesta a Gavilán"
+                    />
+                    <button
+                      className="button button--primary"
+                      type="submit"
+                      disabled={!capture.trim() || saving}
+                    >
+                      {saving ? "Guardando…" : "Crear pendiente"}
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <div className="first-run-empty__actions">
+                  <button
+                    className="button button--primary"
+                    type="button"
+                    onClick={() => setActivationCaptureOpen(true)}
+                  >
+                    <Plus size={17} />
+                    Crear primer pendiente
+                  </button>
+                  <Link className="button button--secondary" href={ideaHref} prefetch={false}>
+                    <Lightbulb size={16} />
+                    Capturar una idea
+                  </Link>
+                  <Link className="button button--secondary" href="/calendar?new=1" prefetch={false}>
+                    <CalendarDays size={16} />
+                    Agendar una fecha
+                  </Link>
+                </div>
+              )}
+              <Feedback message={feedback} />
             </div>
           </section>
         </section>

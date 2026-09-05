@@ -9,10 +9,13 @@ export const dynamic = "force-dynamic";
 
 export default async function ClientPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string; section?: string[] }>;
+  searchParams: Promise<{ new?: string }>;
 }) {
   const { slug, section } = await params;
+  const query = await searchParams;
   const requestedTab = section?.[0] || "resumen";
   const requestedEntityId = section?.[1] || null;
   let data: Awaited<ReturnType<typeof getClientWorkspace>>;
@@ -27,6 +30,7 @@ export default async function ClientPage({
       data={data as ClientWorkspaceData}
       requestedTab={requestedTab}
       requestedEntityId={requestedEntityId}
+      openCreate={query.new === "1"}
     />
   );
 }
