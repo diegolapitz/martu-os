@@ -74,4 +74,21 @@ describe("agent CURRENT_VIEW prompt", () => {
     expect(instructions).toMatch(/“esto”.*resolvé primero contra CURRENT_VIEW/i);
     expect(instructions).toMatch(/historial de conversación y la memoria explícita son fuentes distintas/i);
   });
+
+  it("keeps the editorial direction out of the visible response and blocks report language", () => {
+    const instructions = buildAgentInstructions(context, plan, {
+      conclusion: "Resolver la consulta de forma simple.",
+      depth: "short",
+      tone: "warm",
+      maxWords: 70,
+      structure: "paragraph",
+      evidence: ["Una tarea real"],
+      offerNextAction: true,
+    });
+
+    expect(instructions).toContain("Criterio editorial interno — no lo nombres ni lo expliques");
+    expect(instructions).toMatch(/no empieces con “Conclusión”, “Evidencia”, “Señales”, “Observaciones”, “Análisis”/);
+    expect(instructions).toContain("como máximo una pregunta de seguimiento");
+    expect(instructions).toContain("no hables de “evidencia insuficiente”");
+  });
 });
