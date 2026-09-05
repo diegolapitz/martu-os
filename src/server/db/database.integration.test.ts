@@ -126,6 +126,23 @@ describe("Martu OS database contract", () => {
     expect(missing).toEqual([]);
   });
 
+  it("allows first-run users to upsert through the partial auth identity index", async () => {
+    const authUserId = `auth-first-run-${Date.now()}`;
+    const slug = `first-run-${Date.now()}`;
+    const rows = await query<{ id: string; email: string }>(
+      `insert into public.users
+        (auth_user_id, slug, name, preferred_name, email, timezone, profile_description)
+       values ($1,$2,'First Run','First Run','first-run@example.test','America/Argentina/Buenos_Aires','')
+       on conflict (auth_user_id) where auth_user_id is not null
+       do update set email = coalesce(excluded.email, public.users.email)
+       returning id, email`,
+      [authUserId, slug],
+    );
+
+    expect(rows).toHaveLength(1);
+    expect(rows[0]?.email).toBe("first-run@example.test");
+  });
+
   it("keeps the local migration runner idempotent and skips cloud-only SQL", async () => {
     const result = await runMigrations();
     expect(result.applied).toEqual([]);

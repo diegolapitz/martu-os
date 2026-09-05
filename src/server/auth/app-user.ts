@@ -169,9 +169,10 @@ async function ensureAppUser(
   const slug = `${base}-${identity.id.replace(/-/gu, "").slice(0, 8)}`;
   const rows = await executor.query<UserRow>(
     `insert into public.users
-      (auth_user_id, slug, name, preferred_name, email, timezone, profile_description)
+     (auth_user_id, slug, name, preferred_name, email, timezone, profile_description)
      values ($1,$2,$3,$3,$4,'America/Argentina/Buenos_Aires','')
-     on conflict (auth_user_id) do update set email = coalesce(excluded.email, public.users.email)
+     on conflict (auth_user_id) where auth_user_id is not null
+     do update set email = coalesce(excluded.email, public.users.email)
      returning *`,
     [identity.id, slug, identity.name || "Freelancer", identity.email],
   );
